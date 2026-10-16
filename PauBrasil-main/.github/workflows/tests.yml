@@ -1,0 +1,98 @@
+name: Testes de Integridade e E2E
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: pau_brasil_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://user:password@localhost:5432/pau_brasil_test?schema=public"
+      NEXTAUTH_SECRET: "ci_secret_test_12345678"
+      NEXTAUTH_URL: "http://localhost:3000"
+      ALLOWED_EMAIL_DOMAIN: "grupopaubrasil.com.br"
+      NODE_ENV: "production" # Garante que cookies __Secure- sejam testados se necessário
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --include=dev
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Setup Database (Push & Seed)
+        run: |
+          npx prisma db push --accept-data-loss
+          npm run db:seed
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Server in Background
+        run: npm start &
+
+      - name: Wait for Server
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run Unit Tests
+        run: npm test
+
+      - name: Run Tests with Coverage
+        run: npm run test:coverage
+
+      - name: Run Integration & Security Tests
+        run: npm run test:integration
+
+      - name: Upload Coverage Report
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Run Playwright E2E Tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

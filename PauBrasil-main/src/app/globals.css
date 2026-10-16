@@ -1,0 +1,661 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 145 100% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 142 71% 36%;
+    --radius: 0.75rem;
+
+    --surface: 0 0% 100%;
+    --canvas: 220 14% 96%;
+    --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
+    --font-dm-sans: 'DM Sans', sans-serif;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 6%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 6%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 145 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 142 71% 45%;
+    --surface: 240 18% 7%;
+    --canvas: 240 22% 6%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Scroll nativo e contenção de overscroll em todos os containers roláveis */
+  .overflow-y-auto,
+  .overflow-y-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+    background-color: #0d0d14;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  :root:not(.dark) .app-shell {
+    background-color: hsl(var(--canvas));
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-plus-jakarta), 'Plus Jakarta Sans', sans-serif;
+    @apply font-semibold;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  .glass {
+    @apply backdrop-blur-md bg-white/80 border border-white/20;
+  }
+
+  .glass-dark {
+    @apply backdrop-blur-md bg-black/40 border border-white/10;
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, #00c951 0%, #007a30 100%);
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 25%,
+      rgba(255,255,255,0.4) 50%,
+      transparent 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+
+  /* Glow Effects */
+  .glow-emerald {
+    box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.3);
+  }
+  .glow-yellow {
+    box-shadow: 0 0 15px -3px rgba(234, 179, 8, 0.3);
+  }
+  .glow-red {
+    box-shadow: 0 0 15px -3px rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground; }
+
+/* Selects — dark mode */
+.dark select {
+  background-color: rgb(15 23 42);
+  color: rgb(226 232 240);
+  color-scheme: dark;
+}
+.dark select option {
+  background-color: rgb(15 23 42);
+  color: rgb(226 232 240);
+}
+.dark select option:checked,
+.dark select option:hover {
+  background-color: rgb(30 41 59);
+}
+
+/* ── Light mode: remapeia classes hardcoded — só dentro do app shell ────────── */
+/* Escopo .app-shell: público (landing, login, etc.) não é afetado */
+
+/* Backgrounds */
+:root:not(.dark) .app-shell .bg-\[#111118\]     { background-color: #ffffff; }
+:root:not(.dark) .app-shell .bg-\[#111118\]\/80 { background-color: rgba(255,255,255,.80); }
+:root:not(.dark) .app-shell .bg-\[#111118\]\/90 { background-color: rgba(255,255,255,.90); }
+:root:not(.dark) .app-shell .bg-\[#111118\]\/95 { background-color: rgba(255,255,255,.95); }
+:root:not(.dark) .app-shell .bg-\[#0d0d14\]     { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .bg-\[#0d0d14\]\/80 { background-color: rgba(241,245,249,.80); }
+:root:not(.dark) .app-shell .bg-\[#1a1a2e\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[#1a1a24\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[#1a1a28\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[#1c1c24\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[#1c1c24\]\/90 { background-color: rgba(248,250,252,.90); }
+:root:not(.dark) .app-shell .bg-\[#13131f\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[#0f0f17\]     { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .bg-\[#0a0a0f\]     { background-color: #f1f5f9; }
+
+/* Bordas */
+:root:not(.dark) .app-shell .border-white\/5  { border-color: #e2e8f0; }
+:root:not(.dark) .app-shell .border-white\/10 { border-color: #cbd5e1; }
+:root:not(.dark) .app-shell .border-white\/20 { border-color: #94a3b8; }
+:root:not(.dark) .app-shell .border-\[#111118\] { border-color: #e2e8f0; }
+:root:not(.dark) .app-shell .border-\[#09090b\] { border-color: #e2e8f0; }
+
+/* Texto dentro de surfaces escuros (mesmo elemento ou descendente) */
+:root:not(.dark) .app-shell .bg-\[#111118\].text-white,
+:root:not(.dark) .app-shell .bg-\[#111118\] .text-white  { color: #1e293b; }
+:root:not(.dark) .app-shell .bg-\[#0d0d14\].text-white,
+:root:not(.dark) .app-shell .bg-\[#0d0d14\] .text-white  { color: #1e293b; }
+:root:not(.dark) .app-shell .bg-\[#1a1a2e\].text-white,
+:root:not(.dark) .app-shell .bg-\[#1a1a2e\] .text-white  { color: #1e293b; }
+
+
+
+/* text-slate-* — melhor contraste no light */
+:root:not(.dark) .app-shell .text-slate-400 { color: #64748b; }
+:root:not(.dark) .app-shell .text-slate-500 { color: #475569; }
+:root:not(.dark) .app-shell .text-slate-600 { color: #334155; }
+
+/* ── Texto claro em fundo claro — o buraco que faltava ───────────────────── */
+/*
+  O app é escrito dark-first: a paleta de texto usa os tons -200/-300/-400,
+  pensados para fundo escuro. Só slate-400/500/600 estavam remapeados, e o
+  resto atravessava o light mode como estava — text-slate-300 é #cbd5e1, que
+  em página branca dá 1.4:1 e some (era o caso dos nomes de cargo na prévia
+  de importação), e text-emerald-400 dá 1.9:1.
+
+  Cada tom cai para o -600/-700 da mesma família: o significado da cor é
+  preservado (verde continua verde) e o contraste passa. Os fundos tingidos
+  que acompanham esses textos (bg-emerald-500/15 e afins) também clareiam no
+  light, então o par continua coerente.
+*/
+:root:not(.dark) .app-shell .text-slate-100 { color: #1e293b; }
+:root:not(.dark) .app-shell .text-slate-200 { color: #334155; }
+:root:not(.dark) .app-shell .text-slate-300 { color: #475569; }
+
+:root:not(.dark) .app-shell .text-brand-300,
+:root:not(.dark) .app-shell .text-brand-400    { color: #007a30; }
+:root:not(.dark) .app-shell .text-emerald-100,
+:root:not(.dark) .app-shell .text-emerald-300,
+:root:not(.dark) .app-shell .text-emerald-400  { color: #047857; }
+:root:not(.dark) .app-shell .text-green-400    { color: #15803d; }
+:root:not(.dark) .app-shell .text-teal-400     { color: #0f766e; }
+
+:root:not(.dark) .app-shell .text-red-200,
+:root:not(.dark) .app-shell .text-red-300,
+:root:not(.dark) .app-shell .text-red-400      { color: #b91c1c; }
+:root:not(.dark) .app-shell .text-rose-400     { color: #be123c; }
+:root:not(.dark) .app-shell .text-orange-400   { color: #c2410c; }
+
+:root:not(.dark) .app-shell .text-amber-300,
+:root:not(.dark) .app-shell .text-amber-400    { color: #b45309; }
+:root:not(.dark) .app-shell .text-yellow-200,
+:root:not(.dark) .app-shell .text-yellow-300,
+:root:not(.dark) .app-shell .text-yellow-400   { color: #a16207; }
+
+:root:not(.dark) .app-shell .text-blue-300,
+:root:not(.dark) .app-shell .text-blue-400     { color: #1d4ed8; }
+:root:not(.dark) .app-shell .text-sky-400      { color: #0369a1; }
+:root:not(.dark) .app-shell .text-cyan-400     { color: #0e7490; }
+:root:not(.dark) .app-shell .text-indigo-400   { color: #4338ca; }
+:root:not(.dark) .app-shell .text-violet-400   { color: #6d28d9; }
+:root:not(.dark) .app-shell .text-purple-300,
+:root:not(.dark) .app-shell .text-purple-400   { color: #7e22ce; }
+:root:not(.dark) .app-shell .text-pink-400     { color: #be185d; }
+:root:not(.dark) .app-shell .text-fuchsia-400  { color: #a21caf; }
+
+/*
+  Os poucos containers sólidos escuros que sobraram (dropdown do ranking, do
+  relatório do gestor e o modal de metas) clareiam junto, em vez de virarem
+  ilhas escuras com texto agora escuro dentro. Preservá-los como estavam
+  exigiria desfazer o remapeamento acima texto por texto.
+*/
+:root:not(.dark) .app-shell .bg-slate-900 { background-color: #ffffff; }
+:root:not(.dark) .app-shell .bg-slate-800 { background-color: #e2e8f0; }
+
+/* Hex dentro do app que ainda não tinha par no light (tela de ajuda). */
+:root:not(.dark) .app-shell .bg-\[#0c0c12\]\/80 { background-color: rgba(248,250,252,.80); }
+
+/* ── bg-white/X — quase invisíveis em fundo branco ─────────────────────── */
+:root:not(.dark) .app-shell .bg-white\/2  { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-white\/3  { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .bg-white\/5  { background-color: #e2e8f0; }
+:root:not(.dark) .app-shell .bg-white\/8  { background-color: #dde3ec; }
+:root:not(.dark) .app-shell .bg-white\/10 { background-color: #cbd5e1; }
+/* Degraus que estavam em uso sem par no light — sem isto ficam brancos. */
+:root:not(.dark) .app-shell .bg-white\/1  { background-color: #fbfcfd; }
+:root:not(.dark) .app-shell .bg-white\/4  { background-color: #edf1f6; }
+:root:not(.dark) .app-shell .bg-white\/6  { background-color: #dfe5ee; }
+:root:not(.dark) .app-shell .bg-white\/7  { background-color: #dde3ec; }
+:root:not(.dark) .app-shell .bg-white\/20 { background-color: #b6c2d2; }
+
+/* ── hover:bg-white/X — estados hover imperceptíveis ───────────────────── */
+:root:not(.dark) .app-shell .hover\:bg-white\/2:hover  { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .hover\:bg-white\/5:hover  { background-color: #e2e8f0; }
+:root:not(.dark) .app-shell .hover\:bg-white\/8:hover  { background-color: #dde3ec; }
+:root:not(.dark) .app-shell .hover\:bg-white\/10:hover { background-color: #cbd5e1; }
+:root:not(.dark) .app-shell .hover\:bg-white\/3:hover  { background-color: #e9eef4; }
+:root:not(.dark) .app-shell .hover\:bg-white\/4:hover  { background-color: #e5eaf1; }
+:root:not(.dark) .app-shell .hover\:bg-white\/6:hover  { background-color: #dde3ec; }
+:root:not(.dark) .app-shell .hover\:bg-white\/12:hover { background-color: #c2cddc; }
+:root:not(.dark) .app-shell .hover\:bg-white\/20:hover { background-color: #b6c2d2; }
+:root:not(.dark) .app-shell .hover\:bg-white\/40:hover { background-color: #94a3b8; }
+
+/* ── border-white/X adicionais ──────────────────────────────────────────── */
+:root:not(.dark) .app-shell .border-white\/2  { border-color: #f1f5f9; }
+:root:not(.dark) .app-shell .border-white\/4  { border-color: #e9eef4; }
+:root:not(.dark) .app-shell .border-white\/8  { border-color: #dde3ec; }
+:root:not(.dark) .app-shell .border-white\/3  { border-color: #eef2f7; }
+:root:not(.dark) .app-shell .border-white\/6  { border-color: #e5eaf1; }
+:root:not(.dark) .app-shell .border-white\/12 { border-color: #c2cddc; }
+:root:not(.dark) .app-shell .border-white\/15 { border-color: #b8c4d4; }
+:root:not(.dark) .app-shell .border-white\/25 { border-color: #a5b3c6; }
+:root:not(.dark) .app-shell .border-white\/30 { border-color: #8b9bb0; }
+
+/* ── divide-white/X — separadores invisíveis em light ──────────────────── */
+:root:not(.dark) .app-shell .divide-white\/4 > * + * { border-color: #e9eef4; }
+:root:not(.dark) .app-shell .divide-white\/5 > * + * { border-color: #e2e8f0; }
+:root:not(.dark) .app-shell .divide-white\/6 > * + * { border-color: #e5eaf1; }
+:root:not(.dark) .app-shell .divide-white\/8 > * + * { border-color: #dde3ec; }
+:root:not(.dark) .app-shell .divide-white\/10 > * + * { border-color: #cbd5e1; }
+
+/* ── text-white standalone — invisível em fundo branco ─────────────────── */
+:root:not(.dark) .app-shell .text-white { color: #1e293b; }
+/* ── Preserva branco sobre fundo realmente colorido ─────────────────────── */
+/*
+  Por que `~=` e nao `*=`.
+
+  A versao anterior usava [class*="bg-brand-"], que casa por SUBSTRING no
+  atributo inteiro. Isso fazia `hover:bg-brand-500/5` casar tambem — e como o
+  seletor e de descendente, todo `text-white` dentro daquele elemento virava
+  branco puro sobre um cartao claro. Era o caso da lista de candidatos, cujo
+  cartao e `bg-white/3 ... hover:bg-brand-500/5`: o nome sumia.
+  A varredura achou 137 elementos nessa situacao, em 55 arquivos.
+
+  `~=` casa TOKEN exato separado por espaco. Com ele:
+    bg-brand-500        -> casa   (fundo solido, texto branco e o certo)
+    hover:bg-brand-500  -> nao casa (o fundo base nao e colorido)
+    bg-brand-500/15     -> nao casa (fundo tingido, que no light e palido)
+
+  O ultimo caso tambem importa: havia 6 elementos com fundo tingido e
+  text-white (bg-red-500/5 nas telas de aprovacoes, por exemplo) que ficavam
+  brancos sobre rosa claro. Agora recebem texto escuro, como devem.
+
+  A lista e por token porque o seletor le o DOM, nao o codigo: cobre tambem as
+  classes montadas em tempo de execucao, como as faixas das trilhas do pipeline.
+*/
+:root:not(.dark) .app-shell .gradient-brand .text-white,
+:root:not(.dark) .app-shell .gradient-brand.text-white,
+:root:not(.dark) .app-shell [class~="bg-black"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-black"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-brand-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-red-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-red-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-orange-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-amber-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-yellow-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-lime-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-green-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-green-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-emerald-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-teal-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-cyan-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-sky-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-blue-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-indigo-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-violet-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-purple-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-fuchsia-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-pink-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-400"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-400"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-500"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-500"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-600"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-600"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-rose-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-slate-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-zinc-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-gray-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-neutral-950"].text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-700"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-700"].text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-800"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-800"].text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-900"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-900"].text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-950"] .text-white,
+:root:not(.dark) .app-shell [class~="bg-stone-950"].text-white { color: #ffffff; }
+
+
+/* ── Placeholders — visíveis mas suaves em light mode ──────────────────── */
+:root:not(.dark) .app-shell input::placeholder   { color: #94a3b8; }
+:root:not(.dark) .app-shell textarea::placeholder { color: #94a3b8; }
+
+/* ── Light mode: shadow system (elevação e hierarquia visual) ───────────── */
+
+/* Sidebar: sombra lateral sutil */
+:root:not(.dark) .app-shell aside {
+  box-shadow: 4px 0 12px -2px rgb(0 0 0 / 0.06);
+}
+
+/* Header: sombra inferior + borda visível */
+:root:not(.dark) .app-shell header {
+  box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.06);
+  border-bottom-color: #e2e8f0;
+}
+
+/* Cards rounded-2xl: elevação base */
+:root:not(.dark) .app-shell .rounded-2xl.bg-\[#111118\] {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+/* Cards rounded-xl: elevação menor (modais, dropdowns) */
+:root:not(.dark) .app-shell .rounded-xl.bg-\[#111118\] {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.06);
+}
+
+/* Hover em cards clicáveis: lift + shadow maior */
+:root:not(.dark) .app-shell .card-hover:hover {
+  box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.10), 0 2px 6px -2px rgb(0 0 0 / 0.06);
+  transform: translateY(-2px);
+}
+
+/* Dropdowns/modais flutuantes: shadow forte para separar do conteúdo */
+:root:not(.dark) .app-shell .shadow-2xl {
+  box-shadow: 0 20px 40px -8px rgb(0 0 0 / 0.15), 0 8px 16px -4px rgb(0 0 0 / 0.08);
+}

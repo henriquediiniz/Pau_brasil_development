@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# env files (never commit secrets)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# PWA generated files
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/fallback-*.js
+
+# TypeScript
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Claude local settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+.vercel
+
+# Projeto externo do RH — contem PII real e credenciais do Firebase.
+# NUNCA versionar (ver docs/plano-integracao-recrutamento.md §1.2).
+gestao de recrutamento/
+
+# Artefatos de teste e arquivos de rascunho
+test-results/
+playwright-report/
+scratch*.ts
+scratch*.js
+
+# PWA worker gerado a cada build (nome muda sempre)
+public/worker-*.js

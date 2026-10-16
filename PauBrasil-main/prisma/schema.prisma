@@ -1,0 +1,1398 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  GESTOR
+  RH_ADMIN
+  SYS_ADMIN
+}
+
+enum Nivel {
+  COLABORADOR
+  COORDENADOR
+  GERENTE
+  DIRETOR
+  PRESIDENTE
+  // legado — não usar em novos cadastros
+  SUPERVISOR
+  DIRETO
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum TaskStatus {
+  PENDING
+  BLOCKED // aguardando conclusão de tarefa anterior (encadeamento)
+  DONE
+  APPROVED
+  REJECTED
+}
+
+enum LedgerKind {
+  EARN
+  REDEEM
+  ADJUST
+  REVERSAL
+}
+
+enum LedgerStatus {
+  CONFIRMED
+  PENDING
+}
+
+enum OrderStatus {
+  REQUESTED
+  APPROVED
+  DELIVERED
+  CANCELED
+}
+
+enum LeaderVisitStatus {
+  valid
+  blocked_gps
+  blocked_face
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Empresa {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  slug      String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  operacoes          Operacao[]
+  usuarios           User[]
+  funcoes            Function[]
+  filiais            Filial[]
+  registrosPendentes PendingRegistration[]
+
+  // ── Gente: recrutamento e quadro ──
+  recVagas             RecVaga[]
+  recCargos            RecCargo[]
+  recCandidatos        RecCandidato[]
+  recCandidatosInterno RecCandidatoInterno[]
+  recSucessoes         RecSucessao[]
+  quadroColaboradores  QuadroColaborador[]
+  quadroDesligamentos  QuadroDesligamento[]
+  quadroPcd            QuadroPcd[]
+  quadroPcdMetas       QuadroPcdMeta[]
+  quadroAprendizes     QuadroAprendiz[]
+  quadroFrontlineCargos QuadroFrontlineCargo[]
+  quadroFrontlineMeses  QuadroFrontlineMes[]
+  quadroFrontlineTetos  QuadroFrontlineTeto[]
+
+  @@index([ativo])
+}
+
+/// Unidade física do grupo (cidade/filial) — fonte de verdade para a página de carreiras.
+/// Editável pelo RH Admin sem deploy de código.
+model Filial {
+  id        String  @id @default(cuid())
+  slug      String  @unique // "patos", "sousa", "guarabira"
+  label     String // "Patos", "Sousa", "Guarabira"
+  estado    String // "PB", "BA"
+  color     String // "#ff7d0d" — cor no card de carreiras
+  ativo     Boolean @default(true)
+  empresaId String?
+
+  empresa Empresa? @relation(fields: [empresaId], references: [id])
+  lideres User[]
+
+  @@index([ativo])
+  @@index([empresaId])
+}
+
+model Operacao {
+  id        String   @id @default(cuid())
+  nome      String
+  nomeAbrev String?
+  empresaId String
+  ativo     Boolean  @default(true)
+  ordem     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  // ── Gente: recrutamento e quadro ──
+  recVagas             RecVaga[]
+  recCandidatos        RecCandidato[]
+  recCandidatosInterno RecCandidatoInterno[]
+  recSucessoes         RecSucessao[]
+  quadroColaboradores  QuadroColaborador[]
+  quadroDesligamentos  QuadroDesligamento[]
+  quadroPcd            QuadroPcd[]
+  quadroPcdMetas       QuadroPcdMeta[]
+  quadroAprendizes     QuadroAprendiz[]
+  quadroFrontlineCargos QuadroFrontlineCargo[]
+  quadroFrontlineMeses  QuadroFrontlineMes[]
+
+  @@unique([nome, empresaId])
+  @@index([empresaId])
+  @@index([empresaId, ativo])
+}
+
+model User {
+  id                     String    @id @default(cuid())
+  name                   String
+  email                  String    @unique
+  passwordHash           String
+  role                   Role      @default(USER)
+  nivel                  Nivel     @default(COLABORADOR)
+  isUPBAdmin             Boolean   @default(false)
+  isEmpresaAdmin         Boolean   @default(false)
+  isItinerantLeader      Boolean   @default(false)
+  isVisitasAdmin         Boolean   @default(false)
+  leaderTitle            String?
+  faceReferenceUrl       String?
+  managedAreaIds         String[]  @default([])
+  functionId             String?
+  units                  String[]  @default([])
+  operationIds           String[]  @default([]) // fonte por ID; units fica como cache legado de nomes
+  company                String?
+  empresaId              String?
+  managerId              String?
+  photoUrl               String?
+  targetRewardId         String?
+  isActive               Boolean   @default(true)
+  mustChangePassword     Boolean   @default(false)
+  passwordResetTokenHash String?
+  passwordResetExpiresAt DateTime?
+  totpSecret             String?
+  totpEnabled            Boolean   @default(false)
+  // ── Carreiras públicas ──────────────────────────────────────────────────────
+  isLiderPublico         Boolean   @default(false) // aparece na página /carreiras
+  filialId               String? // filial principal do líder
+  trajetoria             Json? // CareerStep[] [{role,period}]
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  function                   Function?           @relation(fields: [functionId], references: [id])
+  empresa                    Empresa?            @relation(fields: [empresaId], references: [id])
+  filial                     Filial?             @relation(fields: [filialId], references: [id])
+  manager                    User?               @relation("ManagerSubordinates", fields: [managerId], references: [id])
+  subordinates               User[]              @relation("ManagerSubordinates")
+  taskInstances              TaskInstance[]
+  ledger                     PointsLedger[]
+  orders                     RedemptionOrder[]
+  targetReward               RewardProduct?      @relation("TargetReward", fields: [targetRewardId], references: [id])
+  feedEvents                 FeedEvent[]
+  approvals                  TaskInstance[]      @relation("Approver")
+  notifications              Notification[]
+  upbProgressos              UPBProgresso[]
+  upbCertificados            UPBCertificado[]
+  upbTentativas              UPBQuizTentativa[]
+  upbMatriculas              UPBMatricula[]
+  upbMatriculasAprov         UPBMatricula[]      @relation("MatriculaAprovador")
+  notasCandidatura           NotaCandidatura[]
+  leaderVisits               LeaderVisit[]
+  visitasObrigatorias        VisitaObrigatoria[] @relation("VisitasObrigatorias")
+  visitasObrigatoriasCreadas VisitaObrigatoria[] @relation("VisitasObrigatoriasCreadas")
+  pushSubscriptions          PushSubscription[]
+
+  // ── Gente: recrutamento e quadro ──
+  recVagasResponsavel   RecVaga[]             @relation("RecVagaResponsavel")
+  recVagasSolicitante   RecVaga[]             @relation("RecVagaSolicitante")
+  recVagasContratado    RecVaga[]             @relation("RecVagaContratado")
+  recEtapasAvaliadas    RecCandidatoEtapa[]   @relation("RecEtapaAvaliador")
+  recCandidatosInternos RecCandidatoInterno[] @relation("RecInternoUser")
+  recSucessoes          RecSucessao[]         @relation("RecSucessaoSucessor")
+  quadroColaborador     QuadroColaborador[]   @relation("QuadroColaboradorUser")
+  quadroDesligamentos   QuadroDesligamento[]  @relation("QuadroDesligamentoUser")
+  quadroPcd             QuadroPcd[]           @relation("QuadroPcdUser")
+  quadroAprendiz        QuadroAprendiz[]      @relation("QuadroAprendizUser")
+  quadroAprendizGeridos QuadroAprendiz[]      @relation("QuadroAprendizGestor")
+
+  @@index([functionId])
+  @@index([managerId])
+  @@index([empresaId])
+  @@index([isEmpresaAdmin])
+  @@index([isActive])
+}
+
+model LeaderVisit {
+  id            String            @id @default(cuid())
+  userId        String
+  operationSlug String
+  operationName String
+  checkedInAt   DateTime          @default(now())
+  photoUrl      String?
+  latitude      Float
+  longitude     Float
+  gpsValid      Boolean
+  faceValid     Boolean
+  status        LeaderVisitStatus
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([operationSlug])
+  @@index([checkedInAt])
+  @@index([userId, operationSlug, checkedInAt])
+}
+
+model Operation {
+  id           String @id @default(cuid())
+  slug         String @unique
+  name         String
+  latitude     Float
+  longitude    Float
+  radiusMeters Int    @default(200)
+}
+
+model VisitaObrigatoria {
+  id               String   @id @default(cuid())
+  userId           String
+  operationSlug    String
+  quantidadeMinima Int      @default(1)
+  ativo            Boolean  @default(true)
+  criadoPor        String
+  criadoEm         DateTime @default(now())
+  atualizadoEm     DateTime @updatedAt
+
+  user    User @relation("VisitasObrigatorias", fields: [userId], references: [id])
+  criador User @relation("VisitasObrigatoriasCreadas", fields: [criadoPor], references: [id])
+
+  @@unique([userId, operationSlug])
+  @@index([userId])
+  @@index([operationSlug])
+}
+
+model Function {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  empresaId   String? // null = global (SYS_ADMIN); preenchido = exclusivo da empresa
+  createdAt   DateTime @default(now())
+
+  empresa            Empresa?              @relation(fields: [empresaId], references: [id])
+  users              User[]
+  tasks              TaskDefinition[]
+  metas              MetaPontuacao[]
+  registrosPendentes PendingRegistration[]
+  recSucessoes       RecSucessao[]
+
+  @@index([empresaId])
+}
+
+model TaskDefinition {
+  id              String    @id @default(cuid())
+  functionId      String
+  title           String
+  description     String?
+  frequency       Frequency @default(DAILY)
+  daysOfWeek      Int[]
+  points          Int       @default(10)
+  requireEvidence Boolean   @default(false)
+  requireApproval Boolean   @default(false)
+  dailyLimit      Int       @default(1)
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  // Encadeamento: quando esta tarefa é concluída, desbloqueia nextTask
+  nextTaskDefinitionId String?
+  nextTaskDefinition   TaskDefinition?  @relation("TaskChain", fields: [nextTaskDefinitionId], references: [id])
+  prevTasks            TaskDefinition[] @relation("TaskChain")
+
+  function  Function       @relation(fields: [functionId], references: [id])
+  instances TaskInstance[]
+
+  @@index([functionId])
+  @@index([nextTaskDefinitionId])
+}
+
+model TaskInstance {
+  id               String     @id @default(cuid())
+  userId           String
+  taskDefinitionId String? // null for ad-hoc tasks
+  date             DateTime
+  status           TaskStatus @default(PENDING)
+  evidenceUrl      String?
+  note             String?
+  approvedBy       String?
+  approvedAt       DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  // Atividade avulsa — demanda verbal ou extra
+  isAdHoc         Boolean @default(false)
+  adHocTitle      String?
+  adHocDesc       String?
+  requestedPoints Int? // pontos sugeridos pelo colaborador
+  horario         String? // "HH:MM" — hora agendada (atividades agendadas)
+
+  // Encadeamento: qual instância desbloqueou esta (status BLOCKED → PENDING)
+  triggeredByInstanceId String?
+  triggeredByInstance   TaskInstance?  @relation("TaskTrigger", fields: [triggeredByInstanceId], references: [id])
+  triggeredInstances    TaskInstance[] @relation("TaskTrigger")
+
+  // Convites: se for cópia de convite de reunião
+  conviteDeId   String?
+  conviteDe     TaskInstance?  @relation("Convites", fields: [conviteDeId], references: [id])
+  convites      TaskInstance[] @relation("Convites")
+  conviteStatus String? // null | 'ACEITO' | 'RECUSADO'
+
+  user           User            @relation(fields: [userId], references: [id])
+  taskDefinition TaskDefinition? @relation(fields: [taskDefinitionId], references: [id])
+  approver       User?           @relation("Approver", fields: [approvedBy], references: [id])
+
+  @@unique([userId, taskDefinitionId, date])
+  @@index([userId, date])
+  @@index([userId, date, status])
+  @@index([userId, isAdHoc, date])
+  @@index([taskDefinitionId])
+  @@index([status])
+  @@index([isAdHoc])
+}
+
+model PointsLedger {
+  id        String       @id @default(cuid())
+  userId    String
+  kind      LedgerKind
+  status    LedgerStatus @default(CONFIRMED)
+  points    Int
+  refType   String?
+  refId     String?
+  note      String?
+  createdAt DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([refType, refId, kind])
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@index([userId, status])
+  @@index([userId, kind])
+}
+
+model RewardProduct {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  pointsCost  Int
+  stock       Int?
+  emoji       String?  @default("🎁")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders     RedemptionOrder[]
+  targetedBy User[]            @relation("TargetReward")
+}
+
+model RedemptionOrder {
+  id         String      @id @default(cuid())
+  userId     String
+  productId  String
+  pointsCost Int
+  status     OrderStatus @default(REQUESTED)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user    User          @relation(fields: [userId], references: [id])
+  product RewardProduct @relation(fields: [productId], references: [id])
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([status])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actorName  String
+  action     String
+  targetType String
+  targetId   String?
+  meta       Json?
+  ip         String?
+  userAgent  String?
+  requestId  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@index([action, createdAt])
+  @@index([targetType, createdAt])
+}
+
+model PendingRegistration {
+  id             String             @id @default(cuid())
+  name           String
+  email          String
+  passwordHash   String
+  empresaId      String
+  functionId     String?
+  note           String?
+  status         RegistrationStatus @default(PENDING)
+  rejectedReason String?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  function Function? @relation(fields: [functionId], references: [id])
+
+  @@index([empresaId])
+  @@index([status])
+  @@index([email])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@index([userId, read, createdAt])
+}
+
+// ─── Gamificação & ROI (Visão Executiva) ──────────────────────────────────────
+
+model GlobalGoal {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  targetValue  Decimal   @db.Decimal(15, 2)
+  currentValue Decimal   @default(0) @db.Decimal(15, 2)
+  deadline     DateTime?
+  rewardPoints Int
+  units        String[]  @default([]) // operações envolvidas (vazio = toda empresa)
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([active])
+}
+
+model FeedEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String // LEVEL_UP, NEW_TARGET, GOAL_REACHED, etc.
+  message   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@index([type])
+  @@index([userId])
+}
+
+// ─── UPB — Universidade Pau Brasil ───────────────────────────────────────────
+
+enum UPBMatriculaStatus {
+  PENDENTE
+  APROVADO
+  NEGADO
+}
+
+model UPBTemporada {
+  id                  String   @id @default(cuid())
+  titulo              String
+  descricao           String?
+  capa                String?
+  ordem               Int      @default(0)
+  ativo               Boolean  @default(true)
+  restricaoAcesso     Boolean  @default(false) // exige matrícula aprovada
+  pontosNoCertificado Int      @default(0) // pontos creditados ao concluir/passar na prova
+  empresas            String[] @default([]) // vazio = todas as empresas
+  unidades            String[] @default([]) // vazio = todas as operações
+  funcoesComAcesso    String[] @default([]) // IDs de funções com acesso automático (sem matrícula)
+  preRequisitos       String[] @default([]) // IDs de UPBTemporada que devem ter certificado válido antes de liberar
+  validadeDias        Int? // null = certificado permanente; número = dias até expirar (ex: NR-11 = 365)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  episodios    UPBEpisodio[]
+  certificados UPBCertificado[]
+  questoes     UPBQuestao[]
+  tentativas   UPBQuizTentativa[]
+  matriculas   UPBMatricula[]
+  obrigatorios UPBObrigatorio[]
+}
+
+// Treinamento obrigatório com prazo — vincula uma temporada a empresas/unidades + deadline
+model UPBObrigatorio {
+  id          String   @id @default(cuid())
+  temporadaId String
+  empresas    String[] @default([]) // vazio = todas as empresas da temporada
+  unidades    String[] @default([]) // vazio = todas as unidades
+  funcoes     String[] @default([]) // IDs de Function; vazio = todas as funções da empresa
+  prazo       DateTime
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  temporada UPBTemporada @relation(fields: [temporadaId], references: [id])
+
+  @@index([temporadaId])
+}
+
+// Questão de múltipla escolha da prova final
+model UPBQuestao {
+  id          String   @id @default(cuid())
+  temporadaId String
+  enunciado   String
+  ordem       Int      @default(0)
+  versao      Int      @default(1) // incrementado a cada edição do enunciado; preserva integridade dos logs históricos
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  temporada UPBTemporada         @relation(fields: [temporadaId], references: [id])
+  opcoes    UPBQuestaoOpcao[]
+  respostas UPBRespostaUsuario[]
+
+  @@index([temporadaId])
+}
+
+model UPBQuestaoOpcao {
+  id        String  @id @default(cuid())
+  questaoId String
+  texto     String
+  correta   Boolean @default(false)
+  ordem     Int     @default(0)
+
+  questao UPBQuestao @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+
+  @@index([questaoId])
+}
+
+// Registro de tentativas da prova
+model UPBQuizTentativa {
+  id          String   @id @default(cuid())
+  userId      String
+  temporadaId String
+  acertos     Int
+  total       Int
+  aprovado    Boolean
+  createdAt   DateTime @default(now())
+
+  user      User                 @relation(fields: [userId], references: [id])
+  temporada UPBTemporada         @relation(fields: [temporadaId], references: [id])
+  respostas UPBRespostaUsuario[]
+
+  @@index([userId, temporadaId])
+}
+
+// Resposta individual por questão — base da Matriz de Complexidade Pedagógica
+model UPBRespostaUsuario {
+  id               String   @id @default(cuid())
+  tentativaId      String
+  questaoId        String
+  questaoVersao    Int // snapshot da versão da questão no momento da resposta
+  opcaoEscolhidaId String
+  correta          Boolean
+  createdAt        DateTime @default(now())
+
+  tentativa UPBQuizTentativa @relation(fields: [tentativaId], references: [id], onDelete: Cascade)
+  questao   UPBQuestao       @relation(fields: [questaoId], references: [id])
+
+  @@index([tentativaId])
+  @@index([questaoId, questaoVersao]) // consultas analíticas: "erros por questão na versão atual"
+}
+
+// Matrícula / controle de acesso por curso
+model UPBMatricula {
+  id          String             @id @default(cuid())
+  userId      String
+  temporadaId String
+  status      UPBMatriculaStatus @default(PENDENTE)
+  aprovadoPor String?
+  nota        String? // observação do admin
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  user      User         @relation(fields: [userId], references: [id])
+  temporada UPBTemporada @relation(fields: [temporadaId], references: [id])
+  aprovador User?        @relation("MatriculaAprovador", fields: [aprovadoPor], references: [id])
+
+  @@unique([userId, temporadaId])
+  @@index([temporadaId])
+  @@index([status])
+}
+
+model UPBEpisodio {
+  id          String   @id @default(cuid())
+  titulo      String
+  descricao   String?
+  videoUrl    String
+  duracaoMin  Int      @default(0)
+  temporadaId String
+  ordem       Int      @default(0)
+  publicado   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  temporada  UPBTemporada   @relation(fields: [temporadaId], references: [id])
+  progressos UPBProgresso[]
+
+  @@index([temporadaId])
+}
+
+model UPBProgresso {
+  id          String    @id @default(cuid())
+  userId      String
+  episodioId  String
+  concluidoEm DateTime?
+  createdAt   DateTime  @default(now())
+
+  user     User        @relation(fields: [userId], references: [id])
+  episodio UPBEpisodio @relation(fields: [episodioId], references: [id])
+
+  @@unique([userId, episodioId])
+  @@index([userId])
+  @@index([episodioId])
+}
+
+model UPBCertificado {
+  id          String    @id @default(cuid())
+  userId      String
+  temporadaId String
+  emitidoEm   DateTime  @default(now())
+  validoAte   DateTime? // null = permanente; preenchido quando UPBTemporada.validadeDias != null
+  createdAt   DateTime  @default(now())
+
+  user      User         @relation(fields: [userId], references: [id])
+  temporada UPBTemporada @relation(fields: [temporadaId], references: [id])
+
+  @@unique([userId, temporadaId])
+  @@index([userId])
+  @@index([temporadaId])
+  @@index([validoAte]) // varredura eficiente para expirados
+}
+
+// ─── Metas de Pontuação ───────────────────────────────────────────────────────
+
+model MetaPontuacao {
+  id          String   @id @default(cuid())
+  titulo      String
+  meta        Int // pontos-alvo
+  periodo     String // 'mensal' | 'trimestral'
+  mes         Int? // 1-12 (quando mensal)
+  trimestre   Int? // 1-4 (quando trimestral)
+  ano         Int
+  funcaoId    String? // null = todas as funções (matching de usuário)
+  units       String[] @default([]) // operações (vazio = todas)
+  funcoesMeta String[] @default([]) // funções cujos pontos contam (vazio = todas)
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  funcao Function? @relation(fields: [funcaoId], references: [id])
+
+  @@index([ano, periodo])
+  @@index([funcaoId])
+}
+
+// ─── Banco de Talentos ────────────────────────────────────────────────────────
+
+enum EtapaCandidatura {
+  RECEBIDO
+  TRIAGEM
+  ENTREVISTA
+  APROVADO
+  REJEITADO
+  ARQUIVADO
+}
+
+enum TipoNotaCandidatura {
+  NOTA
+  MUDANCA_ETAPA
+  SISTEMA
+}
+
+model Candidatura {
+  id                 String            @id @default(cuid())
+  nome               String
+  email              String
+  telefone           String?
+  cidade             String
+  estado             String
+  empresa            String            @default("Pau Brasil Bebidas")
+  gruposInteresse    String[]
+  cargosInteresse    String[]
+  cvUrl              String?
+  cvPublicId         String?
+  cvOriginalFilename String?
+  cvMimeType         String?
+  cvSizeBytes        Int?
+  cvHash             String?
+  mensagem           String?           @db.Text
+  /// Perfil de triagem (ver `src/lib/carreiras-perfil.ts`). Texto validado
+  /// contra listas no codigo, nao enum: a lista pode crescer sem migration.
+  /// Anulaveis: candidaturas antigas e CVs importados pelo RH nao tem.
+  genero             String?
+  /// Data pura. A idade e calculada na hora — gravada, erraria no aniversario.
+  dataNascimento     DateTime?         @db.Date
+  escolaridade       String?
+  etapa              EtapaCandidatura  @default(RECEBIDO)
+  consentimentoLgpd  Boolean
+  notas              NotaCandidatura[]
+  /// Ponte com o processo seletivo do módulo Gente.
+  recCandidato       RecCandidato?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([etapa])
+  @@index([createdAt])
+  @@index([email])
+}
+
+model NotaCandidatura {
+  id            String              @id @default(cuid())
+  candidaturaId String
+  autorId       String
+  texto         String              @db.Text
+  tipo          TipoNotaCandidatura @default(NOTA)
+  etapaAnterior EtapaCandidatura?
+  etapaNova     EtapaCandidatura?
+  createdAt     DateTime            @default(now())
+
+  candidatura Candidatura @relation(fields: [candidaturaId], references: [id], onDelete: Cascade)
+  autor       User        @relation(fields: [autorId], references: [id])
+
+  @@index([candidaturaId])
+}
+
+// ─── Sistema ──────────────────────────────────────────────────────────────────
+
+model SystemConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model BackupJob {
+  id          String    @id @default(cuid())
+  type        String // 'EXPORT' | 'IMPORT'
+  status      String    @default("PENDING") // 'PENDING' | 'RUNNING' | 'DONE' | 'FAILED'
+  trigger     String // 'manual' | 'cron'
+  triggeredBy String?
+  blobUrl     String?
+  blobKey     String?
+  sizeBytes   BigInt?
+  rowCounts   Json?
+  errorMsg    String?
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+
+  @@index([type, status])
+  @@index([startedAt])
+}
+
+// ─── Gente: Recrutamento e Quadro ─────────────────────────────────────────────
+// Domínio extraído do app externo do RH (ver docs/plano-integracao-recrutamento.md).
+// O escopo multi-unidade sai do nome da chave no cliente e passa a ser `operacaoId`,
+// filtrado no servidor em toda query via helpers de `auth-helpers.ts`.
+
+enum SetorOperacional {
+  DPO
+  SPO
+}
+
+enum RecVagaStatus {
+  ABERTA
+  FECHADA
+  CANCELADA
+}
+
+/// Derivado por `src/lib/gente/vaga-sla.ts`. Só é persistido quando o RH força
+/// o valor manualmente (campo `statusFechamentoManual`).
+enum RecStatusFechamento {
+  ABERTA_NO_PRAZO
+  ABERTA_VENCIDA
+  FECHADA_NO_PRAZO
+  FECHADA_FORA_PRAZO
+}
+
+enum RecResultadoEtapa {
+  OK
+  NAO
+  NA
+}
+
+enum RecSituacaoCandidato {
+  EM_STAND_BY
+  EM_ANDAMENTO
+  CONTRATADO
+  INDISPONIVEL
+  NAO_CONTRATADO
+}
+
+enum RecOrigemCurriculo {
+  PORTAL_CARREIRAS
+  APLICATIVO
+  WHATSAPP
+  EMAIL
+  INDICACAO
+  OUTRO
+}
+
+enum RecSituacaoInterno {
+  AGUARDANDO
+  PROMOVIDO
+  NAO_ATENDE
+  DESLIGADO
+  OUTRA
+}
+
+enum QuadroAprendizSituacao {
+  VIGENTE
+  ENCERRADO
+  DESLIGADO
+}
+
+/// Requisição e controle de vagas. `diasEmAberto` e `statusFechamento` NÃO são
+/// colunas: são derivados em `src/lib/gente/vaga-sla.ts` a cada leitura.
+model RecVaga {
+  id           String  @id @default(cuid())
+  empresaId    String
+  operacaoId   String?
+  /// Nome da unidade como veio da planilha, quando não houve match com Operacao.
+  unidadeTexto String?
+
+  departamento    SetorOperacional?
+  cargo           String
+  cargoId         String?
+  area            String?
+  salario         Decimal?          @db.Decimal(12, 2)
+  localTrabalho   String?
+  horario         String?
+  quantidadeVagas Int               @default(1)
+
+  informacoesComplementares String? @db.Text
+  requisitosMinimos         String? @db.Text
+  formacao                  String?
+  motivoSolicitacao         String?
+  codigo                    String?
+  frontline                 String?
+
+  colaboradorAnterior   String?
+  colaboradorAnteriorId String?
+  dataDesligamento      DateTime?
+
+  dataAbertura           DateTime
+  dataPrevistaFechamento DateTime?
+  dataContratacao        DateTime?
+  /// Encerramento sem contratação (vaga cancelada). Congela o contador de dias.
+  encerradaEm            DateTime?
+
+  responsavelVaga String?
+  responsavelId   String?
+  solicitanteVaga String?
+  solicitanteId   String?
+  nomeContratado  String?
+  contratadoId    String?
+
+  status                 RecVagaStatus        @default(ABERTA)
+  /// Override manual do RH. Quando preenchido, vence o cálculo automático.
+  statusFechamentoManual RecStatusFechamento?
+  andamentoProcesso      String?              @db.Text
+
+  /// Lote da importacao que criou esta vaga.
+  ///
+  /// Existe para o RH desfazer uma importacao errada sem caçar linha por
+  /// linha: apaga exatamente o que entrou naquele arquivo, e nao toca no
+  /// que foi cadastrado a mao nem em importacoes anteriores.
+  /// Nulo nas vagas criadas pela tela.
+  importacaoId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa     Empresa        @relation(fields: [empresaId], references: [id])
+  operacao    Operacao?      @relation(fields: [operacaoId], references: [id])
+  cargoRef    RecCargo?      @relation(fields: [cargoId], references: [id])
+  responsavel User?          @relation("RecVagaResponsavel", fields: [responsavelId], references: [id])
+  solicitante User?          @relation("RecVagaSolicitante", fields: [solicitanteId], references: [id])
+  contratado  User?          @relation("RecVagaContratado", fields: [contratadoId], references: [id])
+  candidatos  RecCandidato[]
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([status])
+  @@index([dataAbertura])
+  @@index([empresaId, status])
+  @@index([operacaoId, status])
+  @@index([importacaoId])
+}
+
+/// Descritivo de cargo padrão. Fonte de comparação do Verificador de Aderência.
+model RecCargo {
+  id        String @id @default(cuid())
+  empresaId String
+
+  cargo    String
+  area     String
+  tipoVaga String?
+
+  descricaoAtividades   String? @db.Text
+  competenciasSugeridas String? @db.Text
+  experienciaSugerida   String? @db.Text
+  formacao              String?
+  statusCurso           String?
+  /// Curso exigido, quando o cargo pede um específico. `formacao` é o nível
+  /// (Ensino Superior) e `statusCurso` é a situação (Formado / Cursando);
+  /// este é qual curso — "técnico em Segurança do Trabalho", por exemplo.
+  curso                 String? @db.Text
+  exigencias            String? @db.Text
+  observacoes           String? @db.Text
+  etapasProcesso        String? @db.Text
+  testes                String? @db.Text
+  /// Exige que o candidato resida dentro do raio definido para a operação.
+  precisaAderenciaRaio  Boolean @default(false)
+
+  /// Cargo de frontline: a linha de frente da operacao, onde a vaga aberta
+  /// pesa no indice de comprometimento de QLP. E marcado no descritivo, e
+  /// nao por vaga, porque a natureza e do cargo — "Ajudante de Armazem" e
+  /// frontline sempre, nao so nesta requisicao.
+  frontline             Boolean @default(false)
+
+  // ── Publicacao na pagina de carreiras ──────────────────────────────────────
+  /// Aparece na lista publica de cargos.
+  ///
+  /// Nasceu `false`, para cargo em estudo nao vazar por descuido. O PO inverteu
+  /// em 2026-09-23: descritivo escrito e para ser visto, e esconder por padrao
+  /// fazia o RH escrever 57 e publicar 2. Agora o padrao e aparecer, e quem
+  /// nao deve aparecer o RH tira.
+  publicarNoSite Boolean  @default(true)
+  /// Slug do grupo em `src/lib/carreiras-areas.ts` (armazem, vendas, rh...).
+  /// A arquitetura publica e curada e nao acompanha a area interna: o site
+  /// agrupa por "Vendas & Marketing", o RH classifica como "Vendas".
+  grupoPublico   String?
+  /// Turnos oferecidos. Vazio = cargo sem variacao de turno. Um descritivo
+  /// serve os dois turnos; a lista publica e que se desdobra em duas opcoes.
+  turnos         String[] @default([])
+
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa Empresa   @relation(fields: [empresaId], references: [id])
+  vagas   RecVaga[]
+
+  @@unique([empresaId, cargo, area])
+  @@index([empresaId, ativo])
+}
+
+/// Candidato dentro do processo seletivo (o "stand-by" do app do RH).
+/// `candidaturaId` é a ponte com o funil inbound do Banco de Talentos.
+model RecCandidato {
+  id            String  @id @default(cuid())
+  empresaId     String
+  operacaoId    String?
+  candidaturaId String? @unique
+  vagaId        String?
+
+  nome     String
+  cargo    String?
+  telefone String?
+  email    String?
+
+  mesProcesso String?
+  setor       SetorOperacional?
+
+  escolaridade String?
+  habilidades  String? @db.Text
+  residencia   String?
+  observacao   String? @db.Text
+
+  origemCurriculo RecOrigemCurriculo @default(OUTRO)
+  quemIndicou     String?
+
+  cvUrl              String?
+  cvPublicId         String?
+  cvOriginalFilename String?
+  cvMimeType         String?
+  cvSizeBytes        Int?
+  cvHash             String?
+
+  situacao          RecSituacaoCandidato  @default(EM_STAND_BY)
+  situacaoFinal     RecSituacaoCandidato?
+  dataSituacaoFinal DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa     Empresa             @relation(fields: [empresaId], references: [id])
+  operacao    Operacao?           @relation(fields: [operacaoId], references: [id])
+  candidatura Candidatura?        @relation(fields: [candidaturaId], references: [id])
+  vaga        RecVaga?            @relation(fields: [vagaId], references: [id])
+  etapas      RecCandidatoEtapa[]
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([situacao])
+  @@index([vagaId])
+  @@index([empresaId, situacao])
+}
+
+/// Etapas do processo por candidato. Tabela em vez de colunas fixas para que
+/// incluir uma etapa nova não exija migration.
+model RecCandidatoEtapa {
+  id          String @id @default(cuid())
+  candidatoId String
+  /// Identificador estável da etapa: entrevista_gg, aprovacao_gestor,
+  /// teste_pratico, teste_direcao, direcao_teorico, …
+  chave       String
+  ordem       Int    @default(0)
+
+  resultado   RecResultadoEtapa @default(NA)
+  observacao  String?           @db.Text
+  avaliadoPor String?
+  avaliadoEm  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  candidato RecCandidato @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
+  avaliador User?        @relation("RecEtapaAvaliador", fields: [avaliadoPor], references: [id])
+
+  @@unique([candidatoId, chave])
+  @@index([candidatoId])
+}
+
+/// Recrutamento interno / movimentação de colaborador do grupo.
+model RecCandidatoInterno {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+  userId     String?
+
+  nome             String
+  cargoAtual       String?
+  setorAtual       String?
+  tempoFuncao      String?
+  cargoPretendido  String?
+  avaliacaoCiclo   String?
+  possuiRequisitos Boolean  @default(false)
+  matrizOuFilial   String?
+  observacoes      String?  @db.Text
+  /// Cargos que a pessoa tem perfil para assumir no futuro.
+  futurosCargos    String[] @default([])
+
+  situacao RecSituacaoInterno @default(AGUARDANDO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+  user     User?     @relation("RecInternoUser", fields: [userId], references: [id])
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([situacao])
+  @@index([userId])
+}
+
+/// Pipeline de sucessão: quem está sendo preparado para qual cargo.
+model RecSucessao {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+
+  cargoSucessao     String
+  areaCargoSucessao String?
+  functionId        String?
+
+  nomeSucessor       String
+  sucessorId         String?
+  cargoAtualSucessor String?
+
+  prontoAgora Boolean @default(false)
+  pronto1Ano  Boolean @default(false)
+  pronto2Anos Boolean @default(false)
+
+  habilidadeTecnica        String? @db.Text
+  habilidadeComportamental String? @db.Text
+  planoDesenvolvimento     String? @db.Text
+
+  inicioMapeamento  DateTime?
+  houveMovimentacao Boolean?
+  observacao        String?   @db.Text
+  mesAno            String?
+  cicloGente        String?
+  ativo             Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+  sucessor User?     @relation("RecSucessaoSucessor", fields: [sucessorId], references: [id])
+  funcao   Function? @relation(fields: [functionId], references: [id])
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([ativo])
+  @@index([sucessorId])
+}
+
+/// QLP — quadro de lotação de pessoal.
+model QuadroColaborador {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+  userId     String?
+
+  nome  String
+  cargo String?
+  area  String?
+  ativo Boolean @default(true)
+
+  /// Matricula do colaborador na folha.
+  ///
+  /// E o unico identificador estavel que a planilha do RH tem: nome muda
+  /// (casamento, grafia) e homonimo existe. Quando vem preenchida, e ela que
+  /// diz se duas linhas sao a mesma pessoa.
+  matricula    String?
+  /// CPF, so digitos. Dado pessoal: nao sai em listagem para quem nao tem
+  /// permissao de dado sensivel, e a leitura e auditada.
+  cpf          String?
+  dataAdmissao DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+  user     User?     @relation("QuadroColaboradorUser", fields: [userId], references: [id])
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([userId])
+  @@index([empresaId, matricula])
+  @@index([empresaId, ativo])
+}
+
+model QuadroDesligamento {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+  userId     String?
+
+  nome             String
+  cargo            String?
+  area             String?
+  setor            SetorOperacional?
+  dataDesligamento DateTime
+  motivo           String?           @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+  user     User?     @relation("QuadroDesligamentoUser", fields: [userId], references: [id])
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([dataDesligamento])
+  @@index([userId])
+}
+
+/// Colaborador PCD. O laudo é dado sensível (art. 11 LGPD): fica em blob
+/// privado e o acesso passa por `canViewDadoSensivel` + `audit()`.
+model QuadroPcd {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+  userId     String?
+
+  nome        String
+  admissao    DateTime?
+  funcao      String?
+  tipo        String?
+  deficiencia String?
+  sexo        String?
+  cor         String?
+
+  laudoBlobKey          String?
+  laudoOriginalFilename String?
+  laudoMimeType         String?
+  laudoSizeBytes        Int?
+
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+  user     User?     @relation("QuadroPcdUser", fields: [userId], references: [id])
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([empresaId, ativo])
+}
+
+/// Meta x real de contratação PCD por mês.
+model QuadroPcdMeta {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+
+  ano  Int
+  mes  Int
+  meta Int @default(0)
+  real Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+
+  @@unique([empresaId, operacaoId, ano, mes])
+  @@index([empresaId, ano])
+}
+
+/// Cargo do acompanhamento Frontline: uma linha do cruzamento QLP x vagas abertas.
+///
+/// Existe separado de `RecCargo` (o descritivo) e de `QuadroColaborador` (o
+/// efetivo, uma linha por pessoa) porque responde outra pergunta: quantas
+/// posicoes daquele cargo a unidade DEVE ter (meta) e quantas TEM (real).
+/// O indice de comprometimento sai dai: vagas abertas / QLP meta.
+model QuadroFrontlineCargo {
+  id         String @id @default(cuid())
+  empresaId  String
+  operacaoId String
+
+  cargo        String
+  atividade    String?
+  departamento SetorOperacional
+
+  qlpMeta Int @default(0)
+  qlpReal Int @default(0)
+
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa  @relation(fields: [empresaId], references: [id])
+  operacao Operacao @relation(fields: [operacaoId], references: [id])
+
+  @@unique([operacaoId, departamento, cargo])
+  @@index([empresaId, ativo])
+  @@index([operacaoId])
+}
+
+/// Percentual de vagas em aberto consolidado em um mes, por segmento.
+/// Alimenta o YTD; e digitado pelo RH, nao calculado — e o numero que eles
+/// fecham com a Ambev, que nem sempre bate com a foto do sistema no dia.
+model QuadroFrontlineMes {
+  id           String           @id @default(cuid())
+  empresaId    String
+  operacaoId   String
+  departamento SetorOperacional
+
+  ano        Int
+  mes        Int
+  percentual Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa  @relation(fields: [empresaId], references: [id])
+  operacao Operacao @relation(fields: [operacaoId], references: [id])
+
+  @@unique([operacaoId, departamento, ano, mes])
+  @@index([empresaId, ano])
+}
+
+/// Teto de comprometimento aceito, em %. A Ambev usa 3,00, mas fica editavel
+/// pelo RH por ano — meta corporativa muda, e chumbar no codigo obrigaria
+/// deploy para acompanhar.
+model QuadroFrontlineTeto {
+  id        String @id @default(cuid())
+  empresaId String
+  ano       Int
+
+  percentual Float @default(3)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  @@unique([empresaId, ano])
+}
+
+model QuadroAprendiz {
+  id         String  @id @default(cuid())
+  empresaId  String
+  operacaoId String?
+  userId     String?
+
+  nome            String
+  admissao        DateTime?
+  funcao          String?
+  centroCusto     String?
+  departamento    String?
+  setor           SetorOperacional?
+  sexo            String?
+  dataNascimento  DateTime?
+  gestorNome      String?
+  gestorId        String?
+  fundacao        String?
+  horario         String?
+  inicioContrato  DateTime?
+  terminoContrato DateTime?
+
+  situacao QuadroAprendizSituacao @default(VIGENTE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  operacao Operacao? @relation(fields: [operacaoId], references: [id])
+  user     User?     @relation("QuadroAprendizUser", fields: [userId], references: [id])
+  gestor   User?     @relation("QuadroAprendizGestor", fields: [gestorId], references: [id])
+
+  @@index([empresaId])
+  @@index([operacaoId])
+  @@index([situacao])
+  @@index([terminoContrato])
+}

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guia — Visitas de Líderes · Pau Brasil Portal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d14;
+      --surface:   #13131f;
+      --border:    rgba(255,255,255,0.08);
+      --brand:     #7c3aed;
+      --brand-lt:  #a78bfa;
+      --emerald:   #10b981;
+      --orange:    #f59e0b;
+      --red:       #ef4444;
+      --text:      #f1f5f9;
+      --muted:     #94a3b8;
+      --subtle:    #475569;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .wrapper { max-width: 860px; margin: 0 auto; padding: 48px 24px 96px; }
+
+    /* ── Header ── */
+    .hero {
+      text-align: center;
+      padding: 56px 24px 48px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 56px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(124,58,237,.15); border: 1px solid rgba(124,58,237,.3);
+      color: var(--brand-lt); font-size: 12px; font-weight: 600; letter-spacing: .06em;
+      padding: 5px 14px; border-radius: 999px; margin-bottom: 20px; text-transform: uppercase;
+    }
+    .hero h1 { font-size: clamp(26px, 5vw, 42px); font-weight: 800; margin-bottom: 12px; }
+    .hero h1 span { background: linear-gradient(135deg, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 16px; max-width: 520px; margin: 0 auto; }
+
+    /* ── Section labels ── */
+    .section-label {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--subtle); margin-bottom: 20px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Step blocks ── */
+    .steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+
+    .step {
+      display: grid; grid-template-columns: 52px 1fr; gap: 0;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      overflow: hidden; transition: border-color .2s;
+    }
+    .step:hover { border-color: rgba(124,58,237,.4); }
+
+    .step-num {
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 22px;
+      font-size: 13px; font-weight: 800; color: var(--brand-lt);
+      background: rgba(124,58,237,.06);
+      border-right: 1px solid var(--border);
+    }
+
+    .step-body { padding: 20px 24px; }
+
+    .step-title {
+      font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .step-title .tag {
+      font-size: 10px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px;
+      border-radius: 6px; text-transform: uppercase;
+    }
+    .tag-once  { background: rgba(16,185,129,.12); color: #34d399; border: 1px solid rgba(16,185,129,.25); }
+    .tag-recur { background: rgba(124,58,237,.12); color: var(--brand-lt); border: 1px solid rgba(124,58,237,.25); }
+    .tag-admin { background: rgba(245,158,11,.12); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+
+    .step-desc { color: var(--muted); font-size: 14px; }
+
+    /* ── Code / path ── */
+    code {
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+      font-size: 12px; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 6px;
+      padding: 2px 7px; color: var(--brand-lt);
+    }
+    .cmd {
+      display: block; margin-top: 10px;
+      background: #0a0a12; border: 1px solid rgba(255,255,255,.07);
+      border-radius: 12px; padding: 12px 16px;
+      font-family: 'SF Mono', monospace; font-size: 13px; color: #86efac;
+      overflow-x: auto;
+    }
+
+    /* ── Cards em grade ── */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 48px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px; transition: border-color .2s;
+    }
+    .card:hover { border-color: rgba(255,255,255,.15); }
+
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 14px;
+    }
+    .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .card p  { font-size: 13px; color: var(--muted); }
+
+    /* ── Status badges ── */
+    .status-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 48px; }
+    .status-item {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 18px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green  { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
+    .dot-orange { background: var(--orange);  box-shadow: 0 0 8px var(--orange); }
+    .dot-red    { background: var(--red);     box-shadow: 0 0 8px var(--red); }
+
+    .status-label { font-size: 13px; font-weight: 600; min-width: 130px; }
+    .status-desc  { font-size: 13px; color: var(--muted); }
+
+    /* ── Filiais table ── */
+    .table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden; margin-bottom: 48px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--subtle); padding: 12px 18px; }
+    td { padding: 12px 18px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,.04); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(255,255,255,.02); }
+    td code { font-size: 12px; }
+
+    /* ── Tips ── */
+    .tips { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+    .tip {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 18px;
+    }
+    .tip-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .tip-text { font-size: 13px; color: var(--muted); }
+    .tip-text strong { color: var(--text); }
+
+    /* ── Flow diagram ── */
+    .flow {
+      display: flex; align-items: center; gap: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 20px;
+      margin-bottom: 48px; overflow-x: auto;
+    }
+    .flow-step {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      min-width: 110px; text-align: center; flex-shrink: 0;
+    }
+    .flow-circle {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; border: 2px solid;
+    }
+    .flow-circle.gps    { background: rgba(124,58,237,.15); border-color: rgba(124,58,237,.4); }
+    .flow-circle.face   { background: rgba(14,165,233,.15);  border-color: rgba(14,165,233,.4); }
+    .flow-circle.ok     { background: rgba(16,185,129,.15);  border-color: rgba(16,185,129,.4); }
+    .flow-circle.block  { background: rgba(239,68,68,.15);   border-color: rgba(239,68,68,.4); }
+    .flow-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .flow-arrow { font-size: 20px; color: var(--subtle); margin: 0 4px; flex-shrink: 0; padding-bottom: 20px; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border);
+      text-align: center; color: var(--subtle); font-size: 13px;
+    }
+    .footer strong { color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .step { grid-template-columns: 40px 1fr; }
+      .flow-step { min-width: 80px; }
+      .flow-circle { width: 42px; height: 42px; font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">📍 Módulo de Visitas</div>
+    <h1>Visitas de <span>Líderes Itinerantes</span></h1>
+    <p>Check-in com GPS + reconhecimento facial nas filiais do Grupo Pau Brasil.</p>
+  </div>
+
+  <div class="wrapper">
+
+    <!-- ── QUEM FAZ O QUÊ ── -->
+    <div class="section-label">Visão geral</div>
+    <div class="grid-2" style="margin-bottom: 48px;">
+      <div class="card">
+        <div class="card-icon" style="background: rgba(245,158,11,.1);">🛡️</div>
+        <h3>Sys Admin</h3>
+        <p>Ativa o acesso de líder itinerante para cada colaborador. Feito na tela de Usuários do Admin.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(124,58,237,.1);">👤</div>
+        <h3>Líder Itinerante</h3>
+        <p>Configura sua foto de referência uma única vez e faz check-in sempre que visita uma filial.</p>
+      </div>
+    </div>
+
+    <!-- ── SETUP (UMA VEZ) ── -->
+    <div class="section-label">Setup inicial — feito uma única vez</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">
+            Popular as filiais no banco
+            <span class="tag tag-once">Uma vez</span>
+          </div>
+          <div class="step-desc">
+            Execute este comando no terminal do servidor para cadastrar as 8 filiais (Patos, Sousa, Itaporanga, Sumé, Guarabira, Brumado, Barra da Estiva, Caculé):
+            <span class="cmd">npx ts-node prisma/seed-operations.ts</span>
+            Depois disto, nunca mais precisa rodar. As filiais ficam permanentemente no banco.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">
+            Ativar o líder itinerante no colaborador
+            <span class="tag tag-admin">Admin</span>
+          </div>
+          <div class="step-desc">
+            Acesse <code>/admin/usuarios</code>, encontre o colaborador e clique em <strong>Editar (lápis)</strong>. Na seção <em>Módulos especiais</em>, ative <strong>Líder Itinerante</strong>. Um campo aparece para preencher o cargo (ex: CFO, Diretora de Gente). Salve. O colaborador verá o menu <em>Visitas</em> no próximo login.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">
+            Configurar foto de referência
+            <span class="tag tag-once">Uma vez por líder</span>
+          </div>
+          <div class="step-desc">
+            O próprio líder acessa <code>/app/visitas/configurar-face</code> pelo portal.
+            <br /><br />
+            <strong>Passo a passo:</strong><br />
+            1. Clicar em <strong>Abrir câmera</strong> (modelos de IA carregam em ~5s)<br />
+            2. Posicionar o rosto centralizado, em ambiente bem iluminado<br />
+            3. A captura é <strong>automática</strong> quando o rosto é detectado<br />
+            4. A foto é salva e vinculada ao perfil — pode refazer quantas vezes quiser
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── FLUXO DO CHECK-IN ── -->
+    <div class="section-label">Fluxo do check-in</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-circle gps">📍</div>
+        <div class="flow-label">GPS verifica<br />localização</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle face">📷</div>
+        <div class="flow-label">Câmera reconhece<br />o rosto</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle ok">✅</div>
+        <div class="flow-label">Visita registrada<br />com sucesso</div>
+      </div>
+      <div class="flow-arrow" style="color: #ef4444;">↗</div>
+      <div class="flow-step">
+        <div class="flow-circle block">🚫</div>
+        <div class="flow-label">Bloqueado:<br />GPS ou face</div>
+      </div>
+    </div>
+
+    <!-- ── FAZENDO O CHECK-IN ── -->
+    <div class="section-label">Fazer check-in — uso diário do líder</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">
+            Acessar a página de check-in
+            <span class="tag tag-recur">Cada visita</span>
+          </div>
+          <div class="step-desc">
+            No menu lateral do portal, clique em <strong>Visitas → Check-in</strong>. Isso abre o check-in para a filial de Patos. Para outras filiais, acesse diretamente pela URL:
+            <span class="cmd">/app/visitas/checkin/sousa</span>
+            (veja a tabela de filiais abaixo para os slugs corretos)
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Fase 1 — Validação de GPS</div>
+          <div class="step-desc">
+            O navegador pede permissão de localização — <strong>aceite</strong>. O sistema verifica se você está dentro do raio de <strong>200 metros</strong> da filial.<br /><br />
+            ✅ Dentro do raio → avança para a câmera<br />
+            🟠 Fora do raio → tela laranja mostra a distância exata em metros
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Fase 2 — Reconhecimento facial</div>
+          <div class="step-desc">
+            A câmera frontal abre automaticamente. Olhe diretamente para a lente, de frente e em ambiente iluminado. O check-in é <strong>feito automaticamente</strong> quando o rosto corresponde à foto de referência cadastrada.<br /><br />
+            Não é preciso apertar nenhum botão — basta olhar para a câmera.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Fase 3 — Confirmação</div>
+          <div class="step-desc">
+            Tela verde com ✅ <strong>Check-in realizado!</strong> — a visita foi registrada. Você pode ver o histórico completo em <code>/app/visitas/lider/[seu-id]</code> ou clicando em <strong>Ver histórico</strong>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── STATUS POSSÍVEIS ── -->
+    <div class="section-label">Status de cada visita</div>
+    <div class="status-row">
+      <div class="status-item">
+        <div class="dot dot-green"></div>
+        <div class="status-label" style="color: #34d399;">Válida</div>
+        <div class="status-desc">GPS e reconhecimento facial aprovados. Visita registrada com sucesso.</div>
+      </div>
+      <div class="status-item">
+        <div class="dot dot-orange"></div>
+        <div class="status-label" style="color: #fcd34d;">GPS inválido</div>
+        <div class="status-desc">O líder estava fora do raio de 200m da filial. A tentativa é registrada mas não conta como visita.</div>
+      </div>
+      <div class="status-item">
+        <div class="dot dot-red"></div>
+        <div class="status-label" style="color: #fca5a5;">Face inválida</div>
+        <div class="status-desc">GPS ok, mas o rosto não foi reconhecido. Pode ser iluminação ruim ou foto de referência desatualizada.</div>
+      </div>
+    </div>
+
+    <!-- ── FILIAIS ── -->
+    <div class="section-label">Filiais cadastradas</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Filial</th>
+            <th>Slug (URL)</th>
+            <th>Estado</th>
+            <th>Raio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Patos</td><td><code>patos</code></td><td>Paraíba</td><td>200m</td></tr>
+          <tr><td>Sousa</td><td><code>sousa</code></td><td>Paraíba</td><td>200m</td></tr>
+          <tr><td>Itaporanga</td><td><code>itaporanga</code></td><td>Paraíba</td><td>200m</td></tr>
+          <tr><td>Sumé</td><td><code>sume</code></td><td>Paraíba</td><td>200m</td></tr>
+          <tr><td>Guarabira</td><td><code>guarabira</code></td><td>Paraíba</td><td>200m</td></tr>
+          <tr><td>Brumado</td><td><code>brumado</code></td><td>Bahia</td><td>200m</td></tr>
+          <tr><td>Barra da Estiva</td><td><code>barra-da-estiva</code></td><td>Bahia</td><td>200m</td></tr>
+          <tr><td>Caculé</td><td><code>cacule</code></td><td>Bahia</td><td>200m</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── DASHBOARD ADMIN ── -->
+    <div class="section-label">Dashboard administrativo</div>
+    <div class="steps" style="margin-bottom: 48px;">
+      <div class="step">
+        <div class="step-num">🔍</div>
+        <div class="step-body">
+          <div class="step-title">
+            Acessar o dashboard
+            <span class="tag tag-admin">Somente Sys Admin</span>
+          </div>
+          <div class="step-desc">
+            Acesse <code>/app/visitas/dashboard</code> ou pelo menu <strong>Visitas → Dashboard Visitas</strong>.<br /><br />
+            Você pode filtrar por:
+            <ul style="margin-top: 8px; padding-left: 20px; color: #94a3b8; font-size: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <li><strong style="color: #f1f5f9;">Líder</strong> — ver visitas de um líder específico</li>
+              <li><strong style="color: #f1f5f9;">Filial</strong> — ver todas as visitas a uma unidade</li>
+              <li><strong style="color: #f1f5f9;">Mês</strong> — filtrar por período</li>
+              <li><strong style="color: #f1f5f9;">Status</strong> — válidas, GPS inválido ou face inválida</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DICAS ── -->
+    <div class="section-label">Dicas e resolução de problemas</div>
+    <div class="tips">
+      <div class="tip">
+        <div class="tip-icon">💡</div>
+        <div class="tip-text">
+          <strong>Iluminação ruim:</strong> O reconhecimento facial precisa de boa iluminação. Se a detecção falhar, peça ao líder para ir a um ambiente mais claro antes de tentar novamente.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🔄</div>
+        <div class="tip-text">
+          <strong>Foto de referência desatualizada:</strong> Se o líder mudou muito de aparência (barba, óculos, cabelo), acesse <code>/app/visitas/configurar-face</code> e refaça a foto de referência clicando em <strong>Refazer foto</strong>.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📡</div>
+        <div class="tip-text">
+          <strong>GPS impreciso em prédios:</strong> O raio de 200m já leva isso em conta. Se o líder estiver claramente dentro da filial mas o GPS não validar, o raio pode ser ajustado por filial via Prisma Studio no campo <code>radiusMeters</code>.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🔐</div>
+        <div class="tip-text">
+          <strong>Usuário não vê o menu Visitas:</strong> O Sys Admin precisa ativar <strong>Líder Itinerante</strong> no cadastro do usuário. Após salvar, o colaborador precisa fazer logout e login novamente para o token atualizar.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📱</div>
+        <div class="tip-text">
+          <strong>Melhor experiência:</strong> Use o celular, não o desktop. Câmera frontal + GPS são mais precisos no dispositivo móvel.
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <strong>Grupo Pau Brasil</strong> · Portal Interno · Módulo Visitas de Líderes<br />
+      <span style="font-size: 12px; margin-top: 4px; display: block;">Gerado em abril de 2026</span>
+    </div>
+
+  </div>
+</body>
+</html>

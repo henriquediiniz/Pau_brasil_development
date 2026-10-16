@@ -1,0 +1,11 @@
+-- Descritivo de cargo passa a nascer publicado.
+--
+-- A coluna nasceu com DEFAULT false, para cargo em estudo nao vazar por
+-- descuido. Na pratica o efeito foi outro: o RH escreveu 57 descritivos e
+-- publicou 2, porque publicar era um passo extra que ninguem lembrava.
+--
+-- Decisao do PO em 2026-09-23: o padrao passa a ser aparecer, e quem nao deve
+-- aparecer o RH tira. Esta migration muda apenas o DEFAULT — as linhas
+-- existentes nao sao tocadas aqui, porque ligar 50 cargos de uma vez e decisao
+-- de conteudo, nao de schema.
+ALTER TABLE "RecCargo" ALTER COLUMN "publicarNoSite" SET DEFAULT true;
