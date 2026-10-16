@@ -7,15 +7,17 @@ import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   CheckSquare, Trophy, Star, Target,
-  User, LayoutDashboard, Users, Settings, LogOut, ShoppingBag, Package,
+  User, LayoutDashboard, Users, Settings, LogOut,
   ChevronLeft, ChevronRight, Menu, Bell, X, Key, ClipboardList,
   GraduationCap, BarChart3, ShieldCheck, LayoutDashboard as DashboardIcon,
   Coins, Search, Home, Building2, Briefcase, MapPin, HardDrive, Camera, HelpCircle,
-  UsersRound,
+  UsersRound, ArrowLeft, type LucideIcon,
 } from 'lucide-react'
 import { CommandMenu } from '@/components/ui/command-menu'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { PublicBackground } from '@/app/_components/PublicBackground'
+import * as Dialog from '@radix-ui/react-dialog'
+import { portalFont } from '@/lib/portal-font'
+import '@/app/portal-brand.css'
 import { toast } from '@/components/ui/toaster'
 import Image from 'next/image'
 import {
@@ -31,7 +33,7 @@ import {
 interface NavItem {
   href: string
   label: string
-  icon: any
+  icon: LucideIcon
   badge?: number
   children?: NavItem[]
 }
@@ -55,12 +57,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const searchTriggerRef = useRef<HTMLButtonElement>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [notifLoading, setNotifLoading] = useState(false)
+  const [notifError, setNotifError] = useState(false)
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null)
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['/app/pontos']))
   const notifRef = useRef<HTMLDivElement>(null)
@@ -75,8 +81,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isUPBAdmin = user ? isUpbAdmin(user) : false
   const isRhAdminUser = user ? hasRhAdminAccess(user) : false
   const isEmpresaAdmin = user?.isEmpresaAdmin === true
-  const isItinerantLeader = (user as any)?.isItinerantLeader === true
-  const isVisitasAdmin    = (user as any)?.isVisitasAdmin === true
+  const isItinerantLeader = user?.isItinerantLeader === true
+  const isVisitasAdmin    = user?.isVisitasAdmin === true
 
   // Empresa com acesso à gamificação completa; demais vão apenas à Universidade
   const hasGamification = user ? hasGamificationAccess(user) : false
@@ -91,15 +97,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return
-    if ((user as any).mustChangePassword && pathname !== '/app/alterar-senha') {
+    if (user.mustChangePassword && pathname !== '/app/alterar-senha') {
       router.replace('/app/alterar-senha')
     }
   }, [user, pathname, router])
 
   useEffect(() => {
-    if (!user) return
+    if (!user || user.mustChangePassword) return
     if (hasGamification) return
-    const allowedPaths = ['/universidade', '/app/perfil', '/app/visitas']
+    const allowedPaths = ['/universidade', '/app/perfil', '/app/visitas', '/app/alterar-senha']
     const onAllowed = allowedPaths.some(p => pathname.startsWith(p))
     const onEmpresa = pathname.startsWith('/empresa')
     const onUPBAdmin = pathname.startsWith('/admin/upb') && isUPBAdmin
@@ -146,15 +152,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     // ── Zona: Recompensas ─────────────────────────────────────────────────
     _sections.push({
-      label: 'Recompensas',
+      label: 'Meu desenvolvimento',
       items: [
         {
           href: '/app/pontos',
           label: 'Carteira',
           icon: Coins,
           children: [
-            { href: '/app/loja',        label: 'Loja',          icon: ShoppingBag },
-            { href: '/app/resgates',    label: 'Meus Resgates', icon: Package },
             { href: '/app/conquistas',  label: 'Conquistas',    icon: Star },
           ],
         },
@@ -260,7 +264,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       isUPBAdmin, isRhAdminUser, isEmpresaAdmin, isItinerantLeader, isVisitasAdmin])
 
   // Flat list for mobile bottom nav
-  const allNavItems = useMemo(() => sections.flatMap(s => s.items), [sections])
+  const commandSections = useMemo(() => sections.map(section => ({
+    label: section.label,
+    items: section.items.flatMap(item => [item, ...(item.children ?? [])]),
+  })), [sections])
 
   // ── Fetch notifications from DB ───────────────────────────────────────────
   const fetchNotifications = useCallback(async (silent = false) => {
@@ -268,8 +275,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (!silent) setNotifLoading(true)
     try {
       const res = await fetch('/api/notifications')
-      if (!res.ok) return
+      if (!res.ok) throw new Error('Falha ao carregar notificações')
       const data = await res.json()
+      setNotifError(false)
       setNotifications(data.notifications ?? [])
       setUnreadCount(data.unreadCount ?? 0)
 
@@ -281,7 +289,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {
-      // silent fail
+      setNotifError(true)
     } finally {
       if (!silent) setNotifLoading(false)
     }
@@ -304,7 +312,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
     if (document.visibilityState === 'visible') return // skip when tab is focused
     try {
-      new Notification(title, { body, icon: '/icon-192.png', badge: '/icon-192.png' })
+      new Notification(title, { body, icon: '/brand/icone.png', badge: '/brand/icone.png' })
     } catch {}
   }
 
@@ -376,11 +384,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   async function markAllRead() {
     if (unreadCount === 0) return
-    setUnreadCount(0)
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     try {
-      await fetch('/api/notifications', { method: 'PATCH' })
-    } catch {}
+      const response = await fetch('/api/notifications', { method: 'PATCH' })
+      if (!response.ok) throw new Error()
+      setUnreadCount(0)
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+    } catch {
+      toast({ title: 'Não foi possível marcar as notificações como lidas.', variant: 'destructive' })
+    }
   }
 
   function handleBellClick() {
@@ -411,19 +422,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
     <div className="flex flex-col h-full">
-      <div className={`flex items-center gap-3 px-4 py-5 border-b border-border/30 ${collapsed && !mobile ? 'justify-center' : ''}`}>
-        <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center shrink-0 shadow-md shadow-brand-500/30">
-          <span className="text-white font-bold text-sm font-display">P</span>
+      <div className={`flex flex-col gap-3 px-4 py-5 border-b border-border/30 ${collapsed && !mobile ? 'items-center' : ''}`}>
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/" aria-label="Voltar ao hub do Grupo Pau Brasil" className={`portal-logo ${collapsed && !mobile ? 'is-collapsed' : ''}`}>
+            <Image src={collapsed && !mobile ? '/brand/icone.png' : '/brand/logo-compacta.png'} alt="Pau Brasil" width={136} height={64} priority />
+          </Link>
+          {mobile && <Dialog.Close className="portal-mobile-close" aria-label="Fechar menu"><X size={18} /></Dialog.Close>}
         </div>
-        {(!collapsed || mobile) && (
-          <div className="overflow-hidden">
-            <div className="text-foreground font-display font-bold text-sm leading-none whitespace-nowrap">Grupo Pau Brasil</div>
-            <div className="text-brand-400 text-xs">Portal</div>
-          </div>
-        )}
+        {(!collapsed || mobile) && <span className="portal-caption">Portal do colaborador</span>}
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4 px-2">
+      <nav aria-label={mobile ? "Menu móvel do portal" : "Menu do portal"} className="flex-1 overflow-y-auto py-4 px-2">
         {collapsed && !mobile ? (
           // Collapsed: icon-only; children hidden, parent icon shown
           <div className="space-y-0.5">
@@ -456,10 +465,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div key={si} className={si > 0 ? 'mt-3' : ''}>
                   <div className="flex items-center gap-2 px-3 mb-1">
                     <span className={`text-[10px] font-medium uppercase tracking-widest
-                      ${isAdminZone ? 'text-amber-500/60' : 'text-muted-foreground/60'}`}>
+                      portal-section-label`}>
                       {section.label}
                     </span>
-                    <div className={`flex-1 h-px ${isAdminZone ? 'bg-amber-500/10' : 'bg-border/30'}`} />
+                    <div className={`flex-1 h-px bg-border/30`} />
                   </div>
 
                   {section.items.map((item) => {
@@ -483,7 +492,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <button onClick={() => toggleGroup(item.href)}
                               className={`px-2.5 py-2.5 rounded-xl transition-colors
                                 ${parentHighlight ? 'text-brand-400' : 'text-muted-foreground hover:text-foreground'}`}
-                              aria-label={isExpanded ? 'Recolher' : 'Expandir'}>
+                              aria-expanded={isExpanded} aria-label={`${isExpanded ? 'Recolher' : 'Expandir'} ${item.label}`}>
                               <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
                             </button>
                           </div>
@@ -523,7 +532,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 active:scale-95
                           ${active
                             ? 'bg-brand-500/15 text-brand-400 shadow-sm'
-                            : `text-muted-foreground hover:text-foreground ${isAdminZone ? 'hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-200' : 'hover:bg-accent'}`
+                            : `text-muted-foreground hover:text-foreground hover:bg-accent`
                           }`}>
                         <Icon style={{ width: 18, height: 18 }} className={`shrink-0 ${active ? 'text-brand-400' : ''}`} />
                         <span>{item.label}</span>
@@ -569,65 +578,73 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </div>
   )
 
-  // Mobile bottom nav items: Hoje, Ranking, Universidade, Perfil + one contextual
-  const mobileBottomItems: NavItem[] = [
+  const mobileBottomItems: NavItem[] = hasGamification ? [
+    { href: '/app/inicio', label: 'Início', icon: Home },
     { href: '/app/hoje', label: 'Hoje', icon: CheckSquare },
-    { href: '/app/ranking', label: 'Ranking', icon: Trophy },
+    { href: '/app/pontos', label: 'Carteira', icon: Coins },
+    { href: '/universidade', label: 'Universidade', icon: GraduationCap },
+    { href: '/app/perfil', label: 'Perfil', icon: User },
+  ] : [
+    ...(isEmpresaAdmin ? [{ href: '/empresa', label: 'Empresa', icon: Building2 }] : []),
     { href: '/universidade', label: 'Universidade', icon: GraduationCap },
     { href: '/app/perfil', label: 'Perfil', icon: User },
   ]
+
   // Add a 5th contextual item
-  if (isCoord && !isAdmin) {
-    mobileBottomItems.push({ href: '/coord/aprovacoes', label: 'Aprovações', icon: ShieldCheck })
-  } else if (isGestor && !isAdmin) {
-    mobileBottomItems.push({ href: '/gestor/aprovacoes', label: 'Aprovações', icon: ShieldCheck })
+  if (hasGamification && isCoord && !isAdmin) {
+    mobileBottomItems[2] = { href: '/coord/aprovacoes', label: 'Aprovações', icon: ShieldCheck }
+  } else if (hasGamification && isGestor && !isAdmin) {
+    mobileBottomItems[2] = { href: '/gestor/aprovacoes', label: 'Aprovações', icon: ShieldCheck }
   }
 
+  if (status !== 'authenticated') return (
+    <div className={`portal-brand ${portalFont.variable} min-h-screen grid place-items-center`} role="status">
+      Carregando seu portal…
+    </div>
+  )
+
   return (
-    <div className="app-shell min-h-screen flex">
-      <PublicBackground />
+    <div className={`app-shell portal-brand ${portalFont.variable} min-h-screen flex`}>
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-30 bg-surface border-r border-border/30 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}>
+      <aside className={`portal-sidebar hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-30 bg-surface border-r border-border/30 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}>
         <SidebarContent />
-        <button onClick={() => setCollapsed(!collapsed)}
+        <button aria-label={collapsed ? "Expandir barra lateral" : "Recolher barra lateral"} aria-expanded={!collapsed} onClick={() => setCollapsed(!collapsed)}
           className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-lg">
           <ChevronLeft className={`w-3 h-3 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
         </button>
       </aside>
 
-      {/* Mobile sidebar overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-            <motion.aside initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 w-64 z-50 bg-surface border-r border-border/30">
-              <SidebarContent mobile />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
+        <Dialog.Overlay className="lg:hidden fixed inset-0 z-40 bg-black/60" />
+        <Dialog.Content onCloseAutoFocus={event => { event.preventDefault(); mobileTriggerRef.current?.focus() }} className="portal-sidebar lg:hidden fixed left-0 top-0 bottom-0 w-[min(19rem,90vw)] z-50 bg-surface border-r border-border">
+          <Dialog.Title className="sr-only">Menu do portal</Dialog.Title>
+          <Dialog.Description className="sr-only">Navegue pelas funções disponíveis para seu perfil.</Dialog.Description>
+          <SidebarContent mobile />
+        </Dialog.Content>
+      </Dialog.Root>
 
       <div className={`flex-1 min-w-0 flex flex-col min-h-screen transition-all duration-300 ${collapsed ? 'lg:ml-16' : 'lg:ml-56'}`}>
         {/* Top bar */}
-        <header className="sticky top-0 z-20 flex items-center gap-4 px-4 lg:px-6 h-14 bg-canvas/80 backdrop-blur-md border-b border-border/30">
-          <button onClick={() => setMobileOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
+        <header className="portal-topbar sticky top-0 z-20 flex items-center gap-4 px-4 lg:px-6 h-14 bg-canvas/80 backdrop-blur-md border-b border-border/30">
+          <button ref={mobileTriggerRef} aria-label="Abrir menu do portal" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
             <Menu className="w-5 h-5" />
           </button>
-          <div className="flex-1 lg:hidden">
-            <div className="text-foreground font-display font-semibold text-sm">Grupo Pau Brasil</div>
+          <div className="flex-1 min-w-0 lg:hidden">
+            <div className="text-foreground font-display font-semibold text-sm leading-tight">Grupo Pau Brasil</div>
           </div>
 
+          <Link href="/" className="portal-hub-link hidden lg:flex"><ArrowLeft size={15} /> Hub do grupo</Link>
           <div className="ml-auto flex items-center gap-2">
             {/* Command Menu Button */}
             <button
-              onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-              className="hidden md:flex items-center gap-2 px-3 h-8 rounded-lg bg-accent hover:bg-accent/80 border border-border text-muted-foreground hover:text-foreground transition-colors text-xs mr-2"
+              ref={searchTriggerRef}
+              aria-label="Buscar no portal"
+              aria-expanded={searchOpen}
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 px-3 h-8 rounded-lg bg-accent hover:bg-accent/80 border border-border text-muted-foreground hover:text-foreground transition-colors text-xs mr-2"
             >
               <Search className="w-3.5 h-3.5" />
-              <span className="font-medium">Buscar...</span>
+              <span className="hidden md:inline font-medium">Buscar...</span>
               <kbd className="hidden lg:inline-flex items-center gap-1 ml-4 px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono text-muted-foreground">
                 <span className="text-xs">⌘</span> K
               </kbd>
@@ -637,7 +654,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             {/* Notification bell */}
             <div className="relative" ref={notifRef}>
-              <button onClick={handleBellClick}
+              <button aria-label="Notificações" aria-expanded={showNotif} onClick={handleBellClick}
                 className="relative w-8 h-8 rounded-lg bg-accent hover:bg-accent/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
@@ -660,12 +677,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             Ativar alertas
                           </button>
                         )}
-                        <button onClick={() => setShowNotif(false)} className="text-muted-foreground hover:text-foreground">
+                        <button aria-label="Fechar notificações" onClick={() => setShowNotif(false)} className="text-muted-foreground hover:text-foreground">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
                     <div className="max-h-80 overflow-y-auto divide-y divide-border/30">
+                      {notifError && <div role="alert" className="p-4 text-sm text-muted-foreground">Não foi possível carregar as notificações. <button className="text-brand-400 underline" onClick={() => fetchNotifications()}>Tentar novamente</button></div>}
                       {notifLoading ? (
                         <div className="py-8 flex items-center justify-center">
                           <div className="w-5 h-5 border-2 border-brand-400/30 border-t-brand-400 rounded-full animate-spin" />
@@ -689,7 +707,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             {/* Profile dropdown */}
             <div className="relative" ref={profileRef}>
-              <button onClick={() => { setShowProfile(!showProfile); setShowNotif(false) }}
+              <button aria-label="Menu da conta" aria-expanded={showProfile} onClick={() => { setShowProfile(!showProfile); setShowNotif(false) }}
                 className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-brand-400/50 transition-[box-shadow] cursor-pointer">
                 {user?.photoUrl ? (
                   <Image src={user.photoUrl} alt={user.name ?? ''} width={32} height={32} className="w-full h-full object-cover" />
@@ -737,7 +755,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
 
         {/* Bottom nav - mobile */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-surface/95 backdrop-blur-md border-t border-border/30 flex">
+        <nav aria-label="Atalhos do portal" className="portal-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-surface/95 backdrop-blur-md border-t border-border/30 flex">
           {mobileBottomItems.map((item) => {
             const Icon = item.icon
             const active = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -751,7 +769,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
       </div>
-      <CommandMenu />
+      <CommandMenu sections={commandSections} open={searchOpen} onOpenChange={setSearchOpen} triggerRef={searchTriggerRef} />
     </div>
   )
 }

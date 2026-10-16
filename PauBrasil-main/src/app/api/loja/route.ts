@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { REWARDS_STORE_ENABLED } from '@/lib/portal-features'
 import { StoreService } from '@/services/StoreService'
 
 export const dynamic = 'force-dynamic'
@@ -9,6 +10,7 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!REWARDS_STORE_ENABLED) return NextResponse.json({ error: 'A loja está indisponível nesta versão do portal.' }, { status: 403 })
 
   const products = await prisma.rewardProduct.findMany({
     where: { active: true },
@@ -23,6 +25,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!REWARDS_STORE_ENABLED) return NextResponse.json({ error: 'A loja está indisponível nesta versão do portal.' }, { status: 403 })
 
   const userId = session.user.id
   const userName = session.user.name ?? 'Colaborador'

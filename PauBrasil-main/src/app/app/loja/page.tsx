@@ -1,9 +1,12 @@
 export const dynamic = 'force-dynamic'
 
+import { redirect } from 'next/navigation'
+import { REWARDS_STORE_ENABLED } from '@/lib/portal-features'
 import { headers } from 'next/headers'
 import LojaClient from './LojaClient'
 
 export default async function LojaPage() {
+  if (!REWARDS_STORE_ENABLED) redirect('/app/pontos')
   // Hydration com Server Component
   let fallbackData = null
   try {

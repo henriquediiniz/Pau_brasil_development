@@ -44,7 +44,7 @@ export function TaskCard({
     ? 'bg-indigo-500/[0.03] border-indigo-500/20'
     : task.status === 'REJECTED'
     ? 'bg-red-500/[0.03] border-red-500/20'
-    : 'bg-white/[0.02] border-white/10 hover:border-brand-500/40 hover:bg-brand-500/[0.05] hover:shadow-[0_0_30px_rgba(34,197,94,0.1)] group relative overflow-hidden'
+    : 'bg-white/[0.02] border-white/10 hover:border-brand-500/40 hover:bg-brand-500/[0.05] hover:shadow-sm group relative overflow-hidden'
 
   const title = isConvite
     ? (task.conviteDe?.adHocTitle ?? task.adHocTitle ?? 'Reunião')
@@ -70,6 +70,7 @@ export function TaskCard({
     >
       <div className="flex items-start gap-4">
         <button
+          aria-label={`Concluir ${title}`}
           onClick={() => isPending && !completing && !isConvite && onComplete(task)}
           disabled={!isPending || !!completing || isBlocked || isConvite}
           className={`mt-1 shrink-0 transition-[color,transform] duration-300

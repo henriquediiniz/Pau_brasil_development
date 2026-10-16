@@ -19,6 +19,10 @@ export function resolveMiddlewareRedirect(
     return '/login?error=SessionRevoked'
   }
 
+  if (user?.mustChangePassword && path !== '/app/alterar-senha') {
+    return '/app/alterar-senha'
+  }
+
   const hasGamification = user ? hasGamificationAccess(user) : false
 
   if (!hasGamification && (path === '/app/inicio' || path === '/app/hoje')) {

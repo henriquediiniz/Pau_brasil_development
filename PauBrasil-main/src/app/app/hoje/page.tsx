@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import useSWR, { useSWRConfig } from 'swr'
 import { motion } from 'framer-motion'
 import { 
-  CheckCircle2, Flame, AlertCircle, Plus, CalendarClock, ChevronRight
+  CheckCircle2, Flame, AlertCircle, Plus, ChevronRight
 } from 'lucide-react'
 import Link from 'next/link'
 import confetti from 'canvas-confetti'
@@ -23,7 +23,11 @@ import { DashboardSkeleton } from '@/components/hoje/DashboardSkeleton'
 import { UserService } from '@/services/UserService'
 import { useFloatingPoints, FloatingPointsDisplay } from '@/components/ui/FloatingPoints'
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = async (url: string) => {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error('Não foi possível carregar as atividades.')
+  return response.json()
+}
 
 function isRolledOver(task: TaskInstance): boolean {
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -37,11 +41,9 @@ export default function HojePage() {
   const user = session?.user
 
   // SWR Hooks
-  const { data: tasks = [], mutate: mutateTasks, isLoading: loadingTasks } = useSWR<TaskInstance[]>('/api/checklist', fetcher)
-  const { data: pointsData, mutate: mutatePoints, isLoading: loadingPoints } = useSWR('/api/pontos', fetcher)
-  const { data: agendaData } = useSWR('/api/agenda', fetcher)
+  const { data: tasks = [], mutate: mutateTasks, isLoading: loadingTasks, error: tasksError } = useSWR<TaskInstance[]>('/api/checklist', fetcher)
+  const { data: pointsData, isLoading: loadingPoints, error: pointsError } = useSWR('/api/pontos', fetcher)
   const { data: metaData } = useSWR('/api/metas/minha', fetcher)
-  const { data: targetData } = useSWR('/api/me/target', fetcher)
 
   // Estados Locais para UI e Ações
   const [completing, setCompleting]       = useState<string | null>(null)
@@ -59,11 +61,13 @@ export default function HojePage() {
     mutate('/api/checklist')
     mutate('/api/pontos')
     mutate('/api/metas/minha')
-    mutate('/api/me/target')
   }
+
+  const completingRef = useRef(false)
 
   // Handlers de Ações
   async function completeTask(taskToComplete: TaskInstance) {
+    if (completingRef.current) return
     if (!taskToComplete.isAdHoc && taskToComplete.taskDefinition?.requireEvidence && !evidenceModal) {
       setEvidenceModal(taskToComplete)
       setEvidenceImage(null)
@@ -79,45 +83,39 @@ export default function HojePage() {
       t.id === id ? { ...t, status: 'DONE' as const } : t
     )
 
+    completingRef.current = true
     navigator.vibrate?.(30)
     setCompleting(id)
-
-    // Dispara a mutação otimista
-    void mutateTasks(
-      fetch(`/api/tasks/${id}/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ evidenceUrl: evidenceImage ?? undefined, note: evidenceNote || undefined }),
-      }).then(async res => {
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error)
-        
-        toast({ 
-          title: data.isAdHoc ? '✅ Atividade concluída!' : (data.isLate ? '✅ Pendência concluída (0 pts)' : (data.requiresApproval ? '⏳ Enviado para aprovação!' : '✅ Tarefa concluída!')),
-          description: data.isAdHoc ? 'Seu gestor irá atribuir a pontuação.' : (data.isLate ? 'Atividades do dia anterior não pontuam.' : (data.requiresApproval ? 'Aguardando aprovação do gestor.' : 'Pontos adicionados ao seu saldo.'))
-        })
-        
-        // Revalida pontos após sucesso
-        mutatePoints()
-        if (!data.isAdHoc && !data.isLate && !data.requiresApproval) {
-          firePoints(task.taskDefinition?.points ?? 0)
-        }
-        return optimisticTasks // O SWR cuida da revalidação final com o dado real
-      }),
-      {
-        optimisticData: optimisticTasks,
-        rollbackOnError: true,
-        revalidate: true,
-      }
-    )
-
-    setEvidenceModal(null)
-    setEvidenceImage(null)
-    setCompleting(null)
+    try {
+      await mutateTasks(
+        fetch(`/api/tasks/${id}/complete`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ evidenceUrl: evidenceImage ?? undefined, note: evidenceNote || undefined }),
+        }).then(async response => {
+          const result = await response.json()
+          if (!response.ok) throw new Error(typeof result.error === 'string' ? result.error : 'Não foi possível concluir a atividade.')
+          toast({
+            title: result.isAdHoc ? 'Atividade concluída!' : result.requiresApproval ? 'Enviado para aprovação!' : 'Tarefa concluída!',
+            description: result.isAdHoc ? 'Seu gestor irá atribuir a pontuação.' : result.isLate ? 'Atividades do dia anterior não pontuam.' : result.requiresApproval ? 'Aguardando aprovação do gestor.' : 'Pontos adicionados ao seu saldo.',
+          })
+          if (!result.isAdHoc && !result.isLate && !result.requiresApproval) firePoints(task.taskDefinition?.points ?? 0)
+          return optimisticTasks
+        }),
+        { optimisticData: optimisticTasks, rollbackOnError: true, revalidate: true },
+      )
+      setEvidenceModal(null)
+      setEvidenceImage(null)
+      refreshAll()
+    } catch (error) {
+      toast({ title: error instanceof Error ? error.message : 'Falha de conexão. Tente novamente.', variant: 'destructive' })
+    } finally {
+      completingRef.current = false
+      setCompleting(null)
+    }
   }
 
   async function submitAdhoc() {
-    if (!adhocForm.title.trim()) { toast({ title: 'Informe o título da atividade', variant: 'destructive' }); return }
+    if (adhocForm.title.trim().length < 3) { toast({ title: 'Informe um título com ao menos 3 caracteres', variant: 'destructive' }); return }
     setAdhocSaving(true)
     try {
       const res = await fetch('/api/tasks/adhoc', {
@@ -131,7 +129,7 @@ export default function HojePage() {
       })
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || 'Erro ao registrar')
+        throw new Error(typeof data.error === 'string' ? data.error : 'Confira os dados da atividade. A pontuação deve estar entre 0 e 10.000.')
       }
       toast({ title: '✅ Atividade adicionada!', description: 'Aparece no seu checklist de hoje.' })
       setAdhocModal(false)
@@ -161,26 +159,26 @@ export default function HojePage() {
   // Celebração de Meta Atingida (Confetes)
   const [hasCelebrated, setHasCelebrated] = useState(false)
   useEffect(() => {
-    if (dailyProgress === 100 && totalCount > 0 && !hasCelebrated) {
+    if (!completing && dailyProgress === 100 && totalCount > 0 && !hasCelebrated) {
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#22c55e', '#ff7d0d', '#eab308'], // Brand colors: Emerald, Laranja, Yellow
+        colors: ['#7a1520', '#dcc8b1', '#bb8c08'],
         zIndex: 9999
       })
       setHasCelebrated(true)
     } else if (dailyProgress < 100) {
       setHasCelebrated(false)
     }
-  }, [dailyProgress, totalCount, hasCelebrated])
+  }, [completing, dailyProgress, totalCount, hasCelebrated])
 
   const userLevel = UserService.getLevelByPoints(confirmedPoints)
   const levelProgress = UserService.calculateLevelProgress(confirmedPoints)
 
   const todayLabel = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-  const todayStr = new Date().toISOString().slice(0, 10)
-  const upcoming = (agendaData?.minhas ?? []).filter((a: any) => a.date.slice(0, 10) > todayStr).slice(0, 5)
+
+  if (tasksError || pointsError) return <div className="portal-error max-w-3xl mx-auto" role="alert"><h1>Não foi possível carregar suas atividades.</h1><p>Tente novamente para consultar o checklist e os pontos.</p><button onClick={refreshAll}>Tentar novamente</button></div>
 
   if (loadingTasks || loadingPoints) return <DashboardSkeleton />
 
@@ -201,12 +199,11 @@ export default function HojePage() {
       <ProgressSection 
         levelProgress={levelProgress}
         userPoints={balance?.confirmed || 0}
-        targetReward={targetData?.targetReward ? { title: targetData.targetReward.title, requiredPoints: targetData.targetReward.pointsCost } : null}
-        activeGoals={metaData ? [{
-          title: metaData.titulo,
+        activeGoals={metaData?.meta ? [{
+          title: metaData.meta.titulo,
           progress: metaData.pontos,
-          target: metaData.meta,
-          type: metaData.periodo
+          target: metaData.meta.meta,
+          type: metaData.meta.periodo
         }] : []}
       />
 
@@ -299,39 +296,6 @@ export default function HojePage() {
           </div>
         )}
       </div>
-
-      {/* Próximas Atividades */}
-      {upcoming.length > 0 && (
-        <div className="space-y-2 pt-4">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <CalendarClock className="w-4 h-4 text-brand-400" />
-              <h2 className="text-sm font-medium text-slate-400 uppercase tracking-wider">Em breve</h2>
-            </div>
-            <Link href="/app/agenda" className="flex items-center gap-1 text-xs text-brand-400 hover:text-brand-300 transition-colors">
-              Ver agenda <ChevronRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="rounded-2xl bg-white/3 border border-white/8 divide-y divide-white/5 overflow-hidden">
-            {upcoming.map((item: any) => {
-              const d = new Date(item.date)
-              const dayLabel = d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })
-              return (
-                <div key={item.id} className="flex items-center gap-3 px-4 py-3">
-                  <span className="text-xs font-mono font-medium text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2 py-0.5 rounded-lg shrink-0">
-                    {item.horario || '--:--'}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white font-medium truncate">{item.adHocTitle ?? 'Atividade agendada'}</p>
-                    {item.adHocDesc && <p className="text-xs text-slate-500 truncate">{item.adHocDesc}</p>}
-                  </div>
-                  <span className="text-xs text-slate-500 shrink-0 capitalize">{dayLabel}</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Modais */}
       <EvidenceModal 

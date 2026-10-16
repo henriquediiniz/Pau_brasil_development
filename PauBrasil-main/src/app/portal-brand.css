@@ -1,0 +1,311 @@
+/* Marca 2026 apenas no portal. Cores de sucesso, erro e níveis mantêm seu significado. */
+.portal-brand {
+  --brand-50: 253 246 245;
+  --brand-100: 246 227 224;
+  --brand-200: 235 198 196;
+  --brand-300: 168 61 74;
+  --brand-400: 122 21 32;
+  --brand-500: 122 21 32;
+  --brand-600: 101 17 27;
+  --brand-700: 86 18 27;
+  --brand-800: 66 16 24;
+  --brand-900: 47 14 20;
+  --brand-950: 30 9 13;
+  --background: 45 29% 97%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --surface: 0 0% 100%;
+  --canvas: 37 28% 94%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 353 71% 28%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 33 22% 90%;
+  --secondary-foreground: 0 0% 10%;
+  --muted: 34 23% 91%;
+  --muted-foreground: 27 10% 38%;
+  --accent: 33 22% 92%;
+  --accent-foreground: 0 0% 10%;
+  --border: 31 19% 80%;
+  --input: 31 19% 80%;
+  --ring: 353 71% 28%;
+  --portal-muted: #72675e;
+  --portal-strong: #353535;
+  --portal-gold: #9a740a;
+  font-family: var(--font-portal), Arial, sans-serif;
+  background: hsl(var(--canvas));
+  color: hsl(var(--foreground));
+  color-scheme: light;
+}
+.dark .portal-brand:not(.portal-login) {
+  --brand-200: 235 198 196;
+  --brand-300: 228 172 178;
+  --brand-400: 223 143 152;
+  --background: 0 0% 10%;
+  --foreground: 40 29% 96%;
+  --card: 0 0% 13%;
+  --card-foreground: 40 29% 96%;
+  --surface: 0 0% 13%;
+  --canvas: 0 0% 10%;
+  --popover: 0 0% 13%;
+  --popover-foreground: 40 29% 96%;
+  --secondary: 20 7% 19%;
+  --secondary-foreground: 40 29% 96%;
+  --muted: 20 7% 19%;
+  --muted-foreground: 30 16% 70%;
+  --accent: 20 7% 20%;
+  --accent-foreground: 40 29% 96%;
+  --border: 25 10% 31%;
+  --input: 25 10% 31%;
+  --ring: 353 55% 71%;
+  --portal-muted: #b9ada0;
+  --portal-strong: #eee6dc;
+  --portal-gold: #dcc8b1;
+  color-scheme: dark;
+}
+.portal-brand :is(h1, h2, h3, h4, h5, h6, .font-display, .font-sans) {
+  font-family: var(--font-portal), Arial, sans-serif;
+}
+.portal-brand :is(button, input, select, textarea) {
+  font-family: inherit;
+}
+.portal-brand :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--portal-gold);
+  outline-offset: 4px;
+}
+.portal-brand select {
+  background: hsl(var(--surface));
+  color: hsl(var(--foreground));
+  color-scheme: inherit;
+}
+.app-shell.portal-brand {
+  background: hsl(var(--canvas)) !important;
+}
+.portal-brand .portal-sidebar {
+  background: hsl(var(--surface));
+  border-color: hsl(var(--border));
+}
+.portal-brand .portal-topbar {
+  background: hsl(var(--canvas) / 0.96);
+}
+.portal-brand .portal-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #faf9f6;
+  padding: 12px;
+  border-radius: 6px;
+}
+.portal-brand .portal-logo img {
+  display: block;
+  width: 136px;
+  height: auto;
+}
+.portal-brand .portal-logo.is-collapsed {
+  padding: 6px;
+}
+.portal-brand .portal-logo.is-collapsed img {
+  width: 32px;
+  height: 38px;
+  object-fit: contain;
+}
+.portal-brand .portal-section-label {
+  color: var(--portal-muted);
+}
+.portal-brand .portal-caption {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--portal-muted);
+}
+.portal-brand .portal-welcome {
+  border: 1px solid hsl(var(--border));
+  background: linear-gradient(
+    120deg,
+    rgb(var(--brand-500) / 0.12),
+    hsl(var(--surface))
+  );
+}
+.portal-brand .portal-feature {
+  background: hsl(var(--surface));
+  border-color: hsl(var(--border));
+  height: 100%;
+}
+.portal-brand .portal-feature:hover {
+  border-color: rgb(var(--brand-400));
+}
+.portal-brand .portal-stat {
+  background: hsl(var(--surface));
+  border-color: hsl(var(--border));
+}
+.portal-brand .portal-wallet {
+  background: linear-gradient(
+    135deg,
+    rgb(var(--brand-500) / 0.12),
+    hsl(var(--surface))
+  );
+  border: 1px solid hsl(var(--border));
+}
+.portal-brand .portal-menu-overlay {
+  background: rgb(0 0 0 / 0.55);
+}
+.portal-brand .portal-mobile-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid hsl(var(--border));
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  color: hsl(var(--foreground));
+}
+.portal-brand .portal-bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.portal-brand .portal-hub-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--portal-muted);
+}
+.portal-brand .portal-hub-link:hover {
+  color: rgb(var(--brand-400));
+}
+.portal-brand .portal-error {
+  padding: 24px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  background: hsl(var(--surface));
+  color: hsl(var(--foreground));
+}
+.portal-brand .portal-error p {
+  font-size: 13px;
+  margin: 8px 0 16px;
+  color: var(--portal-muted);
+}
+.portal-brand .portal-error button {
+  background: #7a1520;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+/* Compatibilidade com as telas existentes escritas com superfícies e textos dark-first. */
+.app-shell.portal-brand :is(.text-slate-400, .text-slate-500, .text-slate-600),
+:root:not(.dark)
+  .app-shell.portal-brand
+  :is(.text-slate-400, .text-slate-500, .text-slate-600) {
+  color: var(--portal-muted);
+}
+.app-shell.portal-brand :is(.text-slate-100, .text-slate-200, .text-slate-300),
+:root:not(.dark)
+  .app-shell.portal-brand
+  :is(.text-slate-100, .text-slate-200, .text-slate-300) {
+  color: var(--portal-strong);
+}
+:root:not(.dark) .app-shell.portal-brand :is(.text-brand-300, .text-brand-400) {
+  color: rgb(var(--brand-400));
+}
+@media (prefers-reduced-motion: reduce) {
+  .portal-brand *,
+  .portal-brand *::before,
+  .portal-brand *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.app-shell.portal-brand [class~='bg-[#111118]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#111118]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#111118]/95'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#111118]/95'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#0d0d14]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#0d0d14]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#0d0d14]/80'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#0d0d14]/80'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#1a1a2e]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#1a1a2e]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#1a1a24]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#1a1a24]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#1a1a28]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#1a1a28]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#1c1c24]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#1c1c24]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#13131f]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#13131f]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#0f0f17]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#0f0f17]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#0a0a0f]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#0a0a0f]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#09090b]'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#09090b]'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-[#0c0c12]/80'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-[#0c0c12]/80'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='bg-slate-900'],
+:root:not(.dark) .app-shell.portal-brand [class~='bg-slate-900'] {
+  background-color: hsl(var(--surface));
+}
+:root:not(.dark) .app-shell.portal-brand [class~='bg-white/2'] {
+  background-color: hsl(var(--surface));
+}
+:root:not(.dark) .app-shell.portal-brand [class~='bg-white/3'] {
+  background-color: hsl(var(--surface));
+}
+:root:not(.dark) .app-shell.portal-brand [class~='bg-white/5'] {
+  background-color: hsl(var(--surface));
+}
+:root:not(.dark) .app-shell.portal-brand [class~='bg-white/8'] {
+  background-color: hsl(var(--surface));
+}
+:root:not(.dark) .app-shell.portal-brand [class~='bg-white/10'] {
+  background-color: hsl(var(--surface));
+}
+.app-shell.portal-brand [class~='border-white/5'],
+:root:not(.dark) .app-shell.portal-brand [class~='border-white/5'] {
+  border-color: hsl(var(--border) / 0.65);
+}
+.app-shell.portal-brand [class~='border-white/8'],
+:root:not(.dark) .app-shell.portal-brand [class~='border-white/8'] {
+  border-color: hsl(var(--border) / 0.65);
+}
+.app-shell.portal-brand [class~='border-white/10'],
+:root:not(.dark) .app-shell.portal-brand [class~='border-white/10'] {
+  border-color: hsl(var(--border) / 0.65);
+}
+.app-shell.portal-brand [class~='border-white/20'],
+:root:not(.dark) .app-shell.portal-brand [class~='border-white/20'] {
+  border-color: hsl(var(--border) / 0.65);
+}
+
+@media (max-width: 1023px) {
+  .portal-brand .portal-hub-link {
+    display: none;
+  }
+}

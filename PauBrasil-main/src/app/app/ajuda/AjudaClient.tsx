@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HelpCircle, Search, CheckSquare, Coins, GraduationCap, DollarSign,
-  MapPin, ShoppingBag, ChevronDown, BookOpen, Shield, Clock,
+  MapPin, ChevronDown, BookOpen, Shield, Clock,
   AlertCircle, X, ArrowRight, Lightbulb, FileText,
 } from 'lucide-react'
 
@@ -43,7 +43,7 @@ const MODULOS: Modulo[] = [
     guias: [
       { titulo: 'Ver suas tarefas do dia', descricao: 'Acesse "Hoje" na sidebar para ver todas as tarefas pendentes do dia. As tarefas são organizadas por categoria e exibem o prazo e os pontos disponíveis.' },
       { titulo: 'Completar uma tarefa', descricao: 'Clique em uma tarefa para abrir os detalhes. Selecione "Concluir" e, se necessário, anexe uma foto ou texto como evidência. Após o envio, a tarefa entra em fila de aprovação.' },
-      { titulo: 'Acompanhar aprovações', descricao: 'No menu "Histórico", você vê o status de cada tarefa: Pendente, Aprovada ou Reprovada. Tarefas reprovadas mostram o motivo do gestor.' },
+      { titulo: 'Acompanhar aprovações', descricao: 'Na tela "Hoje", você vê o status das atividades: Pendente, Aprovada ou Reprovada. Tarefas reprovadas mostram o motivo do gestor.' },
       { titulo: 'Tarefas avulsas', descricao: 'Gestores podem criar tarefas avulsas fora do ciclo normal. Você receberá uma notificação quando uma tarefa avulsa for atribuída a você.' },
     ],
     faq: [
@@ -59,8 +59,8 @@ const MODULOS: Modulo[] = [
   },
   {
     id: 'pontos',
-    titulo: 'Pontos & Recompensas',
-    descricao: 'Entenda como acumular pontos, subir no ranking e trocar pontos na loja.',
+    titulo: 'Pontos & Evolução',
+    descricao: 'Entenda como acumular pontos, acompanhar sua evolução e consultar o ranking.',
     icon: Coins,
     color: 'amber',
     borderColor: 'border-amber-500/30',
@@ -69,19 +69,16 @@ const MODULOS: Modulo[] = [
     guias: [
       { titulo: 'Como ganhar pontos', descricao: 'Pontos são concedidos automaticamente ao ter uma tarefa aprovada pelo gestor. O valor varia conforme a tarefa. Certificados da UPB também concedem pontos.' },
       { titulo: 'Ver seu saldo', descricao: 'Acesse "Carteira" na sidebar ou o card de pontos no Dashboard de Início. O saldo é atualizado em tempo real conforme aprovações ocorrem.' },
-      { titulo: 'Resgatar na loja', descricao: 'Vá em Carteira → Loja. Escolha um produto, clique em "Resgatar" e confirme. O pedido entra em fila de entrega — você acompanha em "Meus Resgates".' },
       { titulo: 'Ver o Ranking', descricao: 'O Ranking mostra os colaboradores com mais pontos no período. É atualizado diariamente. Filtre por empresa ou unidade para comparar com sua equipe.' },
     ],
     faq: [
       { pergunta: 'Os pontos expiram?', resposta: 'Atualmente os pontos não têm data de expiração. Porém, a empresa pode estabelecer ciclos de reset — verifique com seu gestor.' },
       { pergunta: 'Posso transferir pontos para outro colaborador?', resposta: 'Não. Os pontos são pessoais e intransferíveis.' },
-      { pergunta: 'Quanto tempo leva para receber um resgate?', resposta: 'O prazo varia conforme o produto. Acompanhe o status em "Meus Resgates" — o administrador atualiza conforme a entrega avança.' },
       { pergunta: 'O ranking considera todos os períodos?', resposta: 'O ranking padrão exibe o mês atual. Existe um ranking geral (acumulado) disponível na tela de Ranking.' },
     ],
     politicas: [
       { titulo: 'Pontos por tarefa', detalhe: 'Cada tarefa define seu valor em pontos. O valor é visível antes de você completar a tarefa.', icone: 'shield' },
       { titulo: 'Estorno de pontos', detalhe: 'Se uma tarefa aprovada for revisada e reprovada posteriormente, os pontos são estornados automaticamente do saldo.', icone: 'alert' },
-      { titulo: 'Limite de resgate mensal', detalhe: 'Cada produto pode ter limite de unidades por colaborador por mês — verifique na ficha do produto na Loja.', icone: 'clock' },
     ],
   },
   {
@@ -167,33 +164,7 @@ const MODULOS: Modulo[] = [
       { titulo: 'Foto obrigatória', detalhe: 'Toda visita exige foto validada. Check-ins sem validação facial são marcados como inválidos no relatório.', icone: 'alert' },
     ],
   },
-  {
-    id: 'loja',
-    titulo: 'Loja & Resgates',
-    descricao: 'Como navegar na loja, resgatar produtos e acompanhar o status dos seus pedidos.',
-    icon: ShoppingBag,
-    color: 'teal',
-    borderColor: 'border-teal-500/30',
-    bgColor: 'bg-teal-500/10',
-    textColor: 'text-teal-400',
-    guias: [
-      { titulo: 'Navegar na loja', descricao: 'Acesse Carteira → Loja. Os produtos disponíveis aparecem com nome, foto, valor em pontos e estoque disponível. Produtos esgotados ficam desabilitados.' },
-      { titulo: 'Resgatar um produto', descricao: 'Clique em "Resgatar" no produto desejado. Confirme o resgate na janela de confirmação. Os pontos são debitados imediatamente do seu saldo.' },
-      { titulo: 'Acompanhar pedidos', descricao: 'Vá em Carteira → Meus Resgates. Cada pedido mostra o produto, data do resgate, pontos gastos e o status atual (Pendente, Aprovado, Entregue, Cancelado).' },
-      { titulo: 'Produto meta', descricao: 'Você pode definir um produto como sua meta em "Meu Perfil". O card de pontos no Dashboard mostrará o progresso até o produto escolhido.' },
-    ],
-    faq: [
-      { pergunta: 'Posso cancelar um resgate?', resposta: 'Não é possível cancelar diretamente. Entre em contato com o administrador ou gestor para solicitar o cancelamento antes da entrega.' },
-      { pergunta: 'Os pontos são devolvidos se o produto acabar?', resposta: 'Se um produto esgotar após o seu resgate, o admin pode cancelar e estornar os pontos. Você receberá notificação.' },
-      { pergunta: 'Há limite de resgates por mês?', resposta: 'Cada produto pode ter um limite configurado pelo admin. O limite é exibido na ficha do produto antes do resgate.' },
-      { pergunta: 'Como saber quando meu pedido será entregue?', resposta: 'O prazo de entrega varia por produto. Acompanhe o status em "Meus Resgates" — o admin atualiza conforme o andamento.' },
-    ],
-    politicas: [
-      { titulo: 'Saldo mínimo', detalhe: 'Não é possível resgatar um produto se o seu saldo for inferior ao valor necessário — mesmo que parcialmente.', icone: 'shield' },
-      { titulo: 'Estoque em tempo real', detalhe: 'O estoque exibido é em tempo real. Dois colaboradores não podem resgatar o último item simultaneamente — o sistema bloqueia o segundo.', icone: 'alert' },
-      { titulo: 'Intransferibilidade', detalhe: 'Resgates são pessoais. Não é possível resgatar em nome de outro colaborador ou transferir um pedido.', icone: 'shield' },
-    ],
-  },
+
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

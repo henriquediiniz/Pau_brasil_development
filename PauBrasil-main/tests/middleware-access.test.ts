@@ -127,3 +127,17 @@ test('sessao revogada nao entra no Gente mesmo sendo RH', () => {
     '/login?error=SessionRevoked'
   )
 })
+
+test('troca obrigatoria de senha precede o destino por perfil sem criar loop', () => {
+  for (const user of [
+    buildSessionUser({ mustChangePassword: true }),
+    buildSessionUser({ mustChangePassword: true, isEmpresaAdmin: true }),
+    buildSessionUser({ mustChangePassword: true, role: 'SYS_ADMIN' }),
+  ]) {
+    for (const path of ['/app/inicio', '/universidade', '/empresa', '/admin']) {
+      assert.equal(resolveMiddlewareRedirect(path, user, true), '/app/alterar-senha')
+    }
+    assert.equal(resolveMiddlewareRedirect('/app/alterar-senha', user, true), null)
+    assert.equal(resolveMiddlewareRedirect('/app/inicio', user, false), '/login?error=SessionRevoked')
+  }
+})

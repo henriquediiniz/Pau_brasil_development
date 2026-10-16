@@ -74,6 +74,9 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Portal do colaborador e identidade 2026 | Codex | concluido | 2026-10-16: paleta, login/navegacao/atividades corrigidos, loja suspensa; 6 E2E + 42 testes aprovados | Aguardar requisitos dos supervisores |
+| Hub institucional e marca 2026 | Codex | concluido | 2026-10-16: home e 8 empresas, marca nova, filtros e orientacao editorial; tsc e 3 E2E aprovados | Receber acervo e cadastro oficial; definir encaminhamento real entre empresas |
+| PostgreSQL e admin local | Codex | concluido | 2026-10-16: PostgreSQL local, conta SYS_ADMIN e login HTTP validados | Reiniciar banco com `bash .local-dev/postgres.sh start` quando necessario |
 | `docs/ai-handoff.md` | Codex | concluido | Estrutura de handoff, posse e revisao cruzada criada | Parecer do Claude registrado |
 | `src/app/app/inicio/page.tsx` | Gemini | concluido | Refatorado para usar SWR e cache (2026-04-13) | Expandir SWR |
 | `src/app/universidade/certificados/page.tsx` | Gemini | concluido | Skeleton Screen Premium adicionado (2026-04-13) | — |
@@ -243,6 +246,21 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
+- Codex — portal do colaborador (2026-10-16)
+  - objetivo concluido: identidade do hub no portal, correcoes de login/atividades/navegacao e retirada temporaria da loja conforme pedido
+  - arquivos em posse: nenhum
+  - preservadas as alteracoes anteriores do hub, README e ambiente local; nenhuma migracao destrutiva
+
+- Codex — hub institucional (2026-10-16)
+  - objetivo concluido: primeira versao local do hub, marca 2026, empresas/unidades, capitulos editoriais e acessos aos modulos existentes
+  - arquivos em posse: nenhum
+  - preservar alteracoes anteriores em `.gitignore` e neste handoff; nenhum conflito com posse ativa identificado
+
+- Codex
+  - data: 2026-10-16
+  - objetivo concluido: PostgreSQL local e conta SYS_ADMIN de desenvolvimento; autenticacao e pagina administrativa verificadas
+  - arquivos em posse: nenhum
+
 - Claude
   - data: 2026-10-07
   - objetivo: lote de 7 pedidos do PO (2026-10-07) — CONCLUIDO
@@ -380,6 +398,42 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-16 - Codex - Portal do colaborador e retirada da loja
+
+- Pedido: continuar o portal na mesma paleta do hub; remover a loja por enquanto e aguardar analise de requisitos dos supervisores para outras remocoes. README permanece somente com `npm ci` e `npm run dev`.
+- Marca: tema isolado em `src/app/portal-brand.css`, Montserrat, logos originais, login responsivo; vinho/areia/grafite nos temas claro/escuro. Tailwind conserva fallback da marca anterior nas outras areas.
+- Navegacao: busca compartilhada com as permissoes da sidebar; foco e Escape nos dialogs; atalhos mobile por perfil; links de agenda inexistente retirados; retorno ao hub. Login aguarda inicializacao da sessao/hidratacao; destino por perfil e troca obrigatoria de senha no servidor. Middleware usa o login da marca.
+- Loja: links e orientacoes retirados do portal, busca, ajuda e atalhos admin; flag central `REWARDS_STORE_ENABLED=false`; paginas antigas redirecionam para pontos no middleware e nos wrappers; API de novos resgates e definicao de meta de recompensa bloqueadas. Produtos/pedidos/saldos preservados, inclusive APIs e paginas administrativas legadas para historico.
+- Atividades: conclusao aguarda API, bloqueia envio simultaneo, captura falha e permite tentar novamente com rollback; confetes apenas apos conclusao; atividades avulsas aparecem sem funcao cadastrada; formulario rotulado e validado; contagem inicial consistente; metas usam o formato real da API; evolucao usa os limites reais de nivel.
+- Arquivos complementares: `src/lib/checklist.ts`, `src/lib/middleware-access.ts`, `src/middleware.ts`, SSR de Inicio, componentes Hoje, loja/resgates, APIs loja/target e atalhos admin; sobreposicoes historicas revisadas sem diffs ativos de outros agentes. Implementacao detalhada em `docs/portal-colaborador.md`.
+- Validacao: `npx tsc --noEmit` e lint dos arquivos principais aprovados; 42 testes de auth/helpers/middleware/tasks/store/notifications aprovados; `PORTAL_E2E_DB=1 npx playwright test tests/e2e/portal-colaborador.spec.ts tests/e2e/hub.spec.ts`: **6/6 aprovados**. Fluxos reais com contas locais temporarias: login, rotas protegidas, busca, temas, redirecionamentos, bloqueio API sem debito, principais telas, menu mobile, perfil Universidade, senha obrigatoria, criacao/conclusao de tarefa e falha simulada com rollback. Screenshots de login, desktop claro/escuro e celular revisadas.
+- Ambiente: PostgreSQL local e dev server em localhost:3000; credenciais nao versionadas. Testes opt-in restritos ao banco local e com limpeza dos registros proprios. Sem build de producao, deploy ou commit nesta rodada.
+- Pendencias: requisitos dos supervisores; validacao de cursos/avaliacoes com conteudo cadastrado (nesta rodada Universidade validada quanto a acesso/navegacao). Dados oficiais de historia/filiais permanecem pendentes conforme combinado.
+- Parecer do outro agente: pendente; nenhuma delegacao nesta rodada.
+
+### 2026-10-16 - Codex - Hub institucional e nova identidade
+
+- Pedido: primeira versao do hub central do grupo com historia, empresas/filiais, universidade e talentos.
+- Implementacao: home institucional responsiva; logos originais em `public/brand`; paleta e Montserrat conforme manual; paginas `/empresas/[slug]` para 8 empresas; filtro por segmento; busca de unidades sem acento e filtro por estado; menu mobile; orientacao de empresas por interesse profissional.
+- Integracoes: links para universidade, candidatura, carreiras, contato e portal existentes. Nenhuma alteracao em schema, upload de CV, candidaturas ou permissoes. Encaminhamento automatico entre empresas NAO implementado; a orientacao editorial nao envia dados nem decide elegibilidade.
+- Conteudo: 8 unidades de Bebidas dos seeds do projeto, com Barra identificada como Barra da Estiva pelo seed de operacoes. Demais filiais pendentes. Historia em capitulos sem datas ficticias; fachada do manual explicitamente ilustrativa.
+- Validacao: `npx tsc --noEmit` aprovado; `npx playwright test tests/e2e/hub.spec.ts`: 3/3 aprovados, incluindo 320/390/768/1280 px, filtro de empresas/unidades, estado vazio, 404, menu e orientacao; screenshots desktop/mobile revisadas; `/`, `/carreiras`, `/universidade-pb` responderam 200. Build de producao nao executada; testes nao enviaram curriculos nem validaram automacao de RH.
+- Ambiente: Chromium headless instalado para Playwright; banco local iniciado com script existente. Nenhum deploy, commit ou mudanca de producao.
+- Pendencias de conteudo e proxima etapa em `docs/hub-institucional.md`.
+- Alteracoes anteriores em `.gitignore` e neste handoff preservadas.
+- Parecer do outro agente: pendente.
+
+### 2026-10-16 - Codex - PostgreSQL e administrador de desenvolvimento
+
+- Usuario autorizou configurar PostgreSQL nesta maquina e criar uma conta administrativa exclusivamente local.
+- PostgreSQL 16 extraido dos pacotes da distribuicao em `.local-dev/postgres/runtime`, dados em `.local-dev/postgres/data`, escutando somente em `127.0.0.1:55432`; banco `paub_portal_dev` novo, schema aplicado com Prisma `db push`.
+- `.env.development.local` com conexao local e secret aleatorio; `.local-dev/` adicionado ao `.gitignore`. Nenhuma credencial ou dado do banco foi versionado.
+- Conta `admin@grupopaubrasil.com.br` criada como `SYS_ADMIN`, ativa, senha com bcrypt. Autenticacao existente preservada, sem bypass.
+- Scripts locais de iniciar/parar/status e instrucoes em `.local-dev/README.md`. Next.js reiniciado para carregar o ambiente.
+- Validacao: hash bcrypt, login HTTP, sessao `SYS_ADMIN`, API `/api/admin/usuarios` e pagina `/admin` com HTTP 200. Avisos preexistentes de Sentry, Tailwind e download de fontes durante a compilacao nao impediram a pagina.
+- Arquivos versionados alterados: `.gitignore`, `docs/ai-handoff.md` (registro aditivo apos conferir diff limpo; posse historica de abril).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-08 - Claude - `Painel Gente sem a linha Origem`
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { REWARDS_STORE_ENABLED } from '@/lib/portal-features'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -10,6 +11,8 @@ export async function POST(req: NextRequest) {
     if (!token?.sub) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    if (!REWARDS_STORE_ENABLED) return NextResponse.json({ error: 'Metas de recompensa estão indisponíveis.' }, { status: 403 })
 
     const body = await req.json()
     const { rewardId } = body // Can be null to unpin
@@ -37,6 +40,8 @@ export async function GET(req: NextRequest) {
     if (!token?.sub) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    if (!REWARDS_STORE_ENABLED) return NextResponse.json({ targetReward: null })
 
     const user = await prisma.user.findUnique({
       where: { id: token.sub },

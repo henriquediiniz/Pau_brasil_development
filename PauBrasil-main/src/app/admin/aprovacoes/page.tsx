@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { REWARDS_STORE_ENABLED } from '@/lib/portal-features'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -73,7 +74,7 @@ export default function AdminAprovacoesPage() {
   }, [orderStatusFilter])
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
-  useEffect(() => { fetchOrders() }, [fetchOrders])
+  useEffect(() => { if (REWARDS_STORE_ENABLED) fetchOrders() }, [fetchOrders])
 
   // ── Task actions ─────────────────────────────────────────────────────────────
   async function reviewTask(id: string, action: 'approve' | 'reject', task?: PendingTask) {
@@ -190,7 +191,7 @@ export default function AdminAprovacoesPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-2xl bg-white/5 w-fit">
-        {(['tarefas', 'resgates'] as const).map(t => (
+        {(REWARDS_STORE_ENABLED ? ['tarefas', 'resgates'] as const : ['tarefas'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-5 py-2 rounded-xl text-sm font-medium transition-all
               ${tab === t ? 'bg-brand-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}>

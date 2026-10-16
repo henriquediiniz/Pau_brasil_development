@@ -121,8 +121,7 @@ export default function PontosPage() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-3xl overflow-hidden p-6"
-        style={{ background: 'linear-gradient(135deg, #00c95115 0%, #007a3010 100%)', border: '1px solid rgba(0,201,81,0.2)' }}
+        className="portal-wallet relative rounded-3xl overflow-hidden p-6"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full -translate-y-8 translate-x-8 blur-2xl" />
         <div className="relative">

@@ -3,8 +3,8 @@
 import useSWR, { preload } from 'swr'
 import { motion } from 'framer-motion'
 import {
-  CheckSquare, CalendarClock, Trophy, GraduationCap, User, Star,
-  Flame, ArrowRight, Target, Loader2, ShoppingBag, Clock, TrendingUp,
+  CheckSquare, Trophy, GraduationCap, User, Star,
+  Flame, ArrowRight, Target, Loader2, Clock, TrendingUp,
   Shield, Users, BarChart2, Settings, ChevronRight, Building2,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -13,7 +13,11 @@ import { getLevel, LEVEL_COLORS, LEVEL_BG } from '@/types'
 import type { Badge } from '@/lib/badges'
 import { isCoordLevel } from '@/lib/auth-helpers'
 
-const fetcher = (url: string) => fetch(url).then(r => r.json())
+const fetcher = async (url: string) => {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error('Não foi possível carregar os dados do portal.')
+  return response.json()
+}
 
 const PREFETCH_MAP: Record<string, string> = {
   '/app/hoje': '/api/checklist',
@@ -41,26 +45,23 @@ interface GlobalGoal {
 
 const COLAB_FEATURES = [
   { href: '/app/hoje', icon: CheckSquare, color: 'text-brand-400', bg: 'bg-brand-400/10 border-brand-400/20', title: 'Minhas tarefas', desc: 'Veja e conclua as atividades do dia para acumular pontos.' },
-  { href: '/app/agenda', icon: CalendarClock, color: 'text-indigo-400', bg: 'bg-indigo-400/10 border-indigo-400/20', title: 'Agenda', desc: 'Reuniões e atividades agendadas. Aceite convites e confirme presença.' },
   { href: '/app/ranking', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/20', title: 'Ranking', desc: 'Compare seu desempenho com o time. Veja quem lidera hoje, na semana e no mês.' },
-  { href: '/universidade', icon: GraduationCap, color: 'text-purple-400', bg: 'bg-purple-400/10 border-purple-400/20', title: 'Universidade PB', desc: 'Assista episódios, faça provas e ganhe certificados que valem pontos extras.' },
-  { href: '/app/perfil', icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/20', title: 'Minha evolução', desc: 'Acompanhe seu histórico semanal de pontos, streak e conquistas desbloqueadas.' },
+  { href: '/universidade', icon: GraduationCap, color: 'text-brand-400', bg: 'bg-brand-400/10 border-brand-400/20', title: 'Universidade PB', desc: 'Assista episódios, faça provas e ganhe certificados que valem pontos extras.' },
+  { href: '/app/perfil?tab=evolucao', icon: TrendingUp, color: 'text-brand-400', bg: 'bg-brand-400/10 border-brand-400/20', title: 'Minha evolução', desc: 'Acompanhe seu histórico semanal de pontos, streak e conquistas desbloqueadas.' },
   { href: '/app/conquistas', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/20', title: 'Conquistas', desc: 'Seus badges e certificações desbloqueados. Veja o que ainda falta conquistar.' },
-  { href: '/app/loja', icon: ShoppingBag, color: 'text-orange-400', bg: 'bg-orange-400/10 border-orange-400/20', title: 'Loja de recompensas', desc: 'Troque seus pontos por produtos e benefícios exclusivos.' },
 ]
 
 const COORD_FEATURES = [
   { href: '/gestor/dashboard', icon: BarChart2, color: 'text-brand-400', bg: 'bg-brand-400/10 border-brand-400/20', title: 'Dashboard da equipe', desc: 'Veja em tempo real quem concluiu as tarefas e quem precisa de apoio.' },
   { href: '/coord/aprovacoes', icon: Shield, color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/20', title: 'Aprovações', desc: 'Revise e aprove tarefas submetidas pela sua equipe.' },
   { href: '/coord/atividades', icon: Settings, color: 'text-slate-400', bg: 'bg-slate-400/10 border-slate-400/20', title: 'Atividades da equipe', desc: 'Configure e gerencie as atividades avulsas do seu time.' },
-  { href: '/app/agenda', icon: CalendarClock, color: 'text-purple-400', bg: 'bg-purple-400/10 border-purple-400/20', title: 'Agenda', desc: 'Reuniões, convites e atividades agendadas para a equipe.' },
   { href: '/app/ranking', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/20', title: 'Ranking', desc: 'Posição da equipe no ranking de pontos.' },
-  { href: '/app/hoje', icon: CheckSquare, color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/20', title: 'Minhas tarefas', desc: 'Suas próprias atividades do dia.' },
+  { href: '/app/hoje', icon: CheckSquare, color: 'text-brand-400', bg: 'bg-brand-400/10 border-brand-400/20', title: 'Minhas tarefas', desc: 'Suas próprias atividades do dia.' },
 ]
 
 function StatCard({ icon: Icon, value, label, color, bg }: { icon: any; value: string | number; label: string; color: string; bg: string }) {
   return (
-    <div className={`relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg backdrop-blur-md ${bg}`}>
+    <div className={`portal-stat relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg backdrop-blur-md ${bg}`}>
       <Icon className={`w-4 h-4 ${color} mb-2`} />
       <div className={`text-2xl font-display font-bold ${color}`}>{value}</div>
       <div className="text-xs text-slate-500 mt-0.5">{label}</div>
@@ -77,7 +78,7 @@ function FeatureCard({ item, i }: { item: typeof COLAB_FEATURES[0]; i: number })
           const apiUrl = PREFETCH_MAP[item.href]
           if (apiUrl) preload(apiUrl, fetcher)
         }}
-        className={`group flex flex-col gap-3 rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] backdrop-blur-md ${item.bg}`}>
+        className={`portal-feature group flex flex-col gap-3 rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] backdrop-blur-md ${item.bg}`}>
         <div className="flex items-start justify-between">
           <Icon className={`w-6 h-6 ${item.color}`} />
           <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
@@ -95,25 +96,25 @@ export default function InicioClient({ session, fallbackData }: { session: any; 
   const user = session?.user
   const isCoord = user ? isCoordLevel(user) : false
 
-  const { data, isLoading } = useSWR(
+  const { data, isLoading, error, mutate } = useSWR(
     'dashboard_inicio_data',
     async () => {
       const [pts, tasks, ev, meta, gg, bdgs] = await Promise.all([
-        fetch('/api/pontos').then(r => r.json()),
-        fetch('/api/checklist').then(r => r.json()),
-        fetch('/api/pontos/evolucao').then(r => r.json()),
-        fetch('/api/metas/minha').then(r => r.json()),
-        fetch('/api/global-goal').then(r => r.json()),
-        fetch('/api/conquistas').then(r => r.json()),
+        fetcher('/api/pontos'),
+        fetcher('/api/checklist'),
+        fetcher('/api/pontos/evolucao'),
+        fetcher('/api/metas/minha'),
+        fetcher('/api/global-goal'),
+        fetcher('/api/conquistas'),
       ])
       const feitas = Array.isArray(tasks) ? tasks.filter((t: any) => ['DONE', 'APPROVED'].includes(t.status) && !t.rolledOver).length : 0
-      const total  = Array.isArray(tasks) ? tasks.filter((t: any) => !t.rolledOver && !t.isAdHoc).length : 0
+      const total  = Array.isArray(tasks) ? tasks.filter((t: any) => !t.rolledOver).length : 0
       return {
         stats: {
           pontos: pts?.balance?.confirmed ?? 0,
           streak: ev?.streak ?? 0,
           tarefasHoje: { total, feitas },
-          meta: meta ? { titulo: meta.meta.titulo, meta: meta.meta.meta, pontos: meta.pontos, pct: meta.pct, periodo: meta.meta.periodo } : null,
+          meta: meta?.meta ? { titulo: meta.meta.titulo, meta: meta.meta.meta, pontos: meta.pontos, pct: meta.pct, periodo: meta.meta.periodo } : null,
         },
         globalGoal: gg?.goal ?? null,
         badges: Array.isArray(bdgs) ? bdgs : []
@@ -125,6 +126,8 @@ export default function InicioClient({ session, fallbackData }: { session: any; 
   const stats: Stats | null = data?.stats ?? null
   const globalGoal: GlobalGoal | null = data?.globalGoal ?? null
   const badges: Badge[] = data?.badges ?? []
+
+  if (error) return <div className="portal-error max-w-3xl mx-auto" role="alert"><h1>Não foi possível carregar seu início.</h1><p>Seus dados continuam salvos. Tente carregar novamente.</p><button onClick={() => mutate()}>Tentar novamente</button></div>
 
   if (isLoading && !data) {
     return (
@@ -150,9 +153,9 @@ export default function InicioClient({ session, fallbackData }: { session: any; 
     <div className="max-w-3xl mx-auto space-y-8">
       {/* Hero: saudação */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-3xl overflow-hidden border border-white/8 bg-gradient-to-br from-brand-500/15 via-white/2 to-indigo-500/10 p-7">
+        className="portal-welcome relative rounded-2xl overflow-hidden p-7">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative flex items-center gap-5">
           <div className="w-16 h-16 rounded-2xl overflow-hidden gradient-brand flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/30">
             {user?.photoUrl
@@ -222,7 +225,7 @@ export default function InicioClient({ session, fallbackData }: { session: any; 
             </div>
             {globalGoal.description && <p className="text-xs text-slate-500 mb-3 leading-relaxed">{globalGoal.description}</p>}
             <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-2">
-              <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.9, ease: 'easeOut' }} className={`h-full rounded-full ${concluida ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : 'gradient-brand shadow-[0_0_10px_rgba(0,201,81,0.3)]'}`} />
+              <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.9, ease: 'easeOut' }} className={`h-full rounded-full ${concluida ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : 'gradient-brand shadow-sm'}`} />
             </div>
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <p className="text-xs text-slate-500">
@@ -274,7 +277,7 @@ export default function InicioClient({ session, fallbackData }: { session: any; 
             {[
               { step: '1', title: 'Complete tarefas', desc: 'Acesse "Minhas tarefas" todos os dias e marque as atividades da sua função como concluídas.' },
               { step: '2', title: 'Acumule pontos', desc: 'Cada tarefa concluída e aprovada adiciona pontos à sua conta. Certificados UPB valem pontos extras.' },
-              { step: '3', title: 'Troque por recompensas', desc: 'Com pontos suficientes, visite a Loja e resgate produtos, vouchers e benefícios exclusivos.' },
+              { step: '3', title: 'Acompanhe sua evolução', desc: 'Consulte seus pontos, suas conquistas e os conteúdos da Universidade Pau Brasil.' },
             ].map(s => (
               <div key={s.step} className="flex gap-3">
                 <div className="w-6 h-6 rounded-full gradient-brand flex items-center justify-center text-xs font-bold text-white shrink-0 mt-0.5">{s.step}</div>

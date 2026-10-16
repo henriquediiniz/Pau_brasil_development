@@ -13,13 +13,13 @@ export async function generateDailyChecklist(userId: string, date: Date) {
     select: { functionId: true, isActive: true },
   })
 
-  if (!user?.functionId || !user.isActive) return []
+  if (!user?.isActive) return []
 
   const dayOfWeek = date.getDay()
 
   // ── 2) Busca definições de tarefas + instâncias existentes hoje em paralelo
   const [taskDefs, existingToday] = await Promise.all([
-    prisma.taskDefinition.findMany({
+    user.functionId ? prisma.taskDefinition.findMany({
       where: {
         functionId: user.functionId,
         active: true,
@@ -30,7 +30,7 @@ export async function generateDailyChecklist(userId: string, date: Date) {
         ],
       },
       include: { prevTasks: { select: { id: true } } },
-    }),
+    }) : Promise.resolve([]),
     prisma.taskInstance.findMany({
       where: { userId, isAdHoc: false, date: { gte: dayStart, lte: dayEnd } },
       select: { taskDefinitionId: true },

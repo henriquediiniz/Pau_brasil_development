@@ -43,7 +43,7 @@ export function ChecklistHeader({
           className="flex-1"
         >
           <h1 className="text-4xl md:text-5xl font-display font-black text-white tracking-tighter leading-tight">
-            Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-300">{userName.split(' ')[0]}</span>! 👋
+            Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-[#dcc8b1]">{userName.split(' ')[0]}</span>! 👋
           </h1>
           <p className="text-slate-500 text-sm md:text-base mt-2 font-medium">
             Seu roteiro de sucesso para hoje está pronto.

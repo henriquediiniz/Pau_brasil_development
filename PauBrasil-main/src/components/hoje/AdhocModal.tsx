@@ -54,11 +54,12 @@ export function AdhocModal({
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <MessageSquarePlus className="w-5 h-5 text-indigo-400" />
+                <MessageSquarePlus className="w-5 h-5 text-brand-400" />
                 <h3 className="text-white font-display font-bold text-lg">Nova Atividade</h3>
               </div>
               <button
                 onClick={onClose}
+                aria-label="Fechar nova atividade"
                 className="text-slate-500 hover:text-white"
               >
                 <X className="w-5 h-5" />
@@ -66,47 +67,54 @@ export function AdhocModal({
             </div>
 
             <div className="space-y-4">
-              <p className="text-xs text-indigo-400/80 bg-indigo-500/5 p-3 rounded-xl border border-indigo-500/10 mb-2">
+              <p className="text-xs text-brand-400/80 bg-brand-500/5 p-3 rounded-xl border border-brand-500/10 mb-2">
                 Use para registrar demandas que surgiram no dia e não estavam no checklist. O gestor validará a pontuação.
               </p>
 
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1.5">O que você fez? *</label>
+                <label htmlFor="adhoc-title" className="text-xs text-slate-400 font-medium block mb-1.5">O que você fez? *</label>
                 <input
+                  id="adhoc-title"
+                  maxLength={200}
                   type="text"
                   value={formData.title}
                   onChange={e => onFormChange('title', e.target.value)}
                   placeholder="Ex: Reunião extra com fornecedor"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1.5">Detalhes (opcional)</label>
+                <label htmlFor="adhoc-desc" className="text-xs text-slate-400 font-medium block mb-1.5">Detalhes (opcional)</label>
                 <textarea
+                  id="adhoc-desc"
+                  maxLength={1000}
                   value={formData.desc}
                   onChange={e => onFormChange('desc', e.target.value)}
                   placeholder="Descreva brevemente o resultado..."
                   rows={2}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50 resize-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1.5 flex items-center justify-between">
+                <label htmlFor="adhoc-points" className="text-xs text-slate-400 font-medium block mb-1.5 flex items-center justify-between">
                   Sugestão de Pontos
                   <span className="text-[10px] text-slate-500 font-normal italic">sujeito a revisão</span>
                 </label>
                 <div className="relative group">
                   <input
+                    id="adhoc-points"
+                    min={0}
+                    max={10000}
                     type="number"
                     value={formData.points || ''}
                     onChange={e => onFormChange('points', parseInt(e.target.value) || 0)}
                     placeholder="0"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50"
                   />
-                  <Star className="absolute left-3.5 top-3 w-4 h-4 text-indigo-500/60 group-focus-within:text-indigo-400 transition-colors" />
+                  <Star className="absolute left-3.5 top-3 w-4 h-4 text-brand-500/60 group-focus-within:text-brand-400 transition-colors" />
                 </div>
               </div>
 
@@ -119,10 +127,10 @@ export function AdhocModal({
                 </button>
                 <button
                   onClick={onSubmit}
-                  disabled={!formData.title || isSubmitting}
-                  className="flex-2 py-3 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-lg shadow-indigo-500/20"
+                  disabled={formData.title.trim().length < 3 || isSubmitting}
+                  className="flex-2 py-3 px-6 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-lg shadow-brand-500/20"
                 >
-                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Criar e Finalizar
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Adicionar atividade
                 </button>
               </div>
             </div>

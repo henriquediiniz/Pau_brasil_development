@@ -13,6 +13,7 @@ export default async function InicioPage() {
   }
 
   const user = session.user
+  if (user.mustChangePassword) redirect('/app/alterar-senha')
   const isAdmin = isSysAdmin(user)
   const isEmpresaAdmin = user.isEmpresaAdmin === true
   const isGestor = isGestorLevel(user)
@@ -47,14 +48,14 @@ export default async function InicioPage() {
     ])
 
     const feitas = Array.isArray(tasks) ? tasks.filter((t: any) => ['DONE', 'APPROVED'].includes(t.status) && !t.rolledOver).length : 0
-    const total  = Array.isArray(tasks) ? tasks.filter((t: any) => !t.rolledOver && !t.isAdHoc).length : 0
+    const total  = Array.isArray(tasks) ? tasks.filter((t: any) => !t.rolledOver).length : 0
     
     fallbackData = {
       stats: {
         pontos: pts?.balance?.confirmed ?? 0,
         streak: ev?.streak ?? 0,
         tarefasHoje: { total, feitas },
-        meta: meta ? { titulo: meta?.meta?.titulo, meta: meta?.meta?.meta, pontos: meta?.pontos, pct: meta?.pct, periodo: meta?.meta?.periodo } : null,
+        meta: meta?.meta ? { titulo: meta.meta.titulo, meta: meta.meta.meta, pontos: meta.pontos, pct: meta.pct, periodo: meta.meta.periodo } : null,
       },
       globalGoal: gg?.goal ?? null,
       badges: Array.isArray(bdgs) ? bdgs : []
