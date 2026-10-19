@@ -103,7 +103,6 @@ Definidas em `vercel.json`, em UTC:
 
 | Rota | Cron | Fortaleza (UTC−3) |
 | --- | --- | --- |
-| `/api/cron/daily-reminder` | `0 11 * * *` | 08:00 |
 | `/api/cron/backup` | `0 3 * * *` | 00:00 |
 | `/api/cron/limpar-cvs` | `0 6 * * *` | 03:00 |
 

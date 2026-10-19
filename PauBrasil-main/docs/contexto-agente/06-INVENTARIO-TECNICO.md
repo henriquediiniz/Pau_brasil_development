@@ -167,7 +167,6 @@ Métodos extraídos estaticamente; exports indiretos podem exigir leitura do arq
 | `/api/carreiras/upload-cv` | POST |
 | `/api/contato` | POST |
 | `/api/cron/backup` | GET, POST |
-| `/api/cron/daily-reminder` | GET, POST |
 | `/api/cron/limpar-cvs` | GET |
 | `/api/empresa/operacoes` | GET |
 | `/api/empresa/registros-pendentes/[id]/aprovar` | POST |
@@ -1032,7 +1031,7 @@ Somente nomes e locais de referência. Não são valores nem uma lista de obriga
 | `CLOUDINARY_CLOUD_NAME` | `src/app/api/admin/rh/candidaturas/[id]/cv-url/route.ts`, `src/app/api/admin/rh/importar-cv/route.ts`, `src/app/api/carreiras/upload-cv/route.ts` (e outras referências) |
 | `CLOUDINARY_CV_PRESET` | `src/app/api/admin/rh/importar-cv/route.ts`, `src/app/api/carreiras/upload-cv/route.ts` |
 | `CLOUDINARY_UPLOAD_PRESET` | `src/app/api/upload/route.ts`, `src/app/api/visitas/cadastrar-face/route.ts`, `src/app/api/visitas/checkin/route.ts` |
-| `CRON_SECRET` | `src/app/api/cron/backup/route.ts`, `src/app/api/cron/daily-reminder/route.ts`, `src/app/api/cron/limpar-cvs/route.ts` |
+| `CRON_SECRET` | `src/app/api/cron/backup/route.ts`, `src/app/api/cron/limpar-cvs/route.ts` |
 | `EMAIL_ADMIN` | `scripts/test-email.ts`, `src/app/api/contato/route.ts` |
 | `EMAIL_FROM` | `scripts/test-email.ts`, `src/lib/email.ts` |
 | `LOG_LEVEL` | `src/lib/logger.ts` |
