@@ -4,7 +4,7 @@ import { Users, Settings, BarChart3, ArrowRight, ClipboardList, BarChart2, Build
 const SECTIONS = [
   { href: '/admin/usuarios',              icon: Users,          label: 'Usuários',              desc: 'Gerenciar colaboradores e papéis' },
   { href: '/admin/empresas',              icon: Building2,      label: 'Empresas & Operações',  desc: 'Cadastrar empresas e unidades' },
-  { href: '/admin/funcoes',               icon: Settings,       label: 'Funções & Atividades',  desc: 'Configurar funções e tarefas' },
+  { href: '/admin/funcoes',               icon: Settings,       label: 'Funções',               desc: 'Gerenciar funções dos colaboradores' },
   { href: '/admin/auditoria',             icon: ClipboardList,  label: 'Auditoria',             desc: 'Histórico de ações no sistema' },
   { href: '/admin/obz',                   icon: BarChart2,      label: 'Estrutura OBZ',         desc: 'Estados, operações, áreas e pacotes' },
   { href: '/admin/visitas/obrigatorias',  icon: MapPin,         label: 'Visitas Obrigatórias',  desc: 'Defina obrigações mensais de visita por líder' },

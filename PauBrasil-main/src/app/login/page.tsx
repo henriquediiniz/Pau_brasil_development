@@ -12,7 +12,7 @@ import {
   ArrowLeft,
   ArrowRight,
   BookOpen,
-  CheckSquare,
+  User,
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -157,7 +157,7 @@ function LoginContent() {
           </p>
           <div className={styles.features}>
             <span>
-              <CheckSquare size={19} /> Atividades e acompanhamento
+              <User size={19} /> Perfil e serviços do colaborador
             </span>
             <span>
               <BookOpen size={19} /> Universidade Pau Brasil

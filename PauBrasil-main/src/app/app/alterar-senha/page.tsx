@@ -43,7 +43,7 @@ export default function AlterarSenhaPage() {
       }
       setDone(true)
       await update({ mustChangePassword: false })
-      setTimeout(() => router.replace('/app/hoje'), 1200)
+      setTimeout(() => router.replace('/app/inicio'), 1200)
     } catch {
       setError('Erro de conexão. Tente novamente.')
     } finally {

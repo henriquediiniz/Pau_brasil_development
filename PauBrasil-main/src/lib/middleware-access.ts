@@ -1,7 +1,7 @@
+import { isRetiredPortalPath } from '@/lib/portal-features'
 import {
   canAccessGente,
   canManageEmpresa,
-  hasGamificationAccess,
   isCoordLevel,
   isGestorLevel,
   isRhAdmin,
@@ -23,11 +23,7 @@ export function resolveMiddlewareRedirect(
     return '/app/alterar-senha'
   }
 
-  const hasGamification = user ? hasGamificationAccess(user) : false
-
-  if (!hasGamification && (path === '/app/inicio' || path === '/app/hoje')) {
-    return user?.isEmpresaAdmin ? '/empresa' : '/universidade'
-  }
+  if (isRetiredPortalPath(path)) return '/app/inicio'
 
   // Redireciona a rota legada /admin/rh para a URL limpa /talentos
   if (path.startsWith('/admin/rh')) {
@@ -42,36 +38,36 @@ export function resolveMiddlewareRedirect(
       : !!user && isSysAdmin(user)
 
     if (!allowed) {
-      return '/app/hoje'
+      return '/app/inicio'
     }
   }
 
   if (path.startsWith('/talentos')) {
-    if (!user || !isRhAdmin(user)) return '/app/hoje'
+    if (!user || !isRhAdmin(user)) return '/app/inicio'
   }
 
   if (path.startsWith('/gente')) {
-    if (!user || !canAccessGente(user)) return '/app/hoje'
+    if (!user || !canAccessGente(user)) return '/app/inicio'
   }
 
   if (path.startsWith('/gestor')) {
     const allowed = !!user && isGestorLevel(user)
     if (!allowed) {
-      return '/app/hoje'
+      return '/app/inicio'
     }
   }
 
   if (path.startsWith('/coord')) {
     const allowed = !!user && (isCoordLevel(user) || isSysAdmin(user))
     if (!allowed) {
-      return '/app/hoje'
+      return '/app/inicio'
     }
   }
 
   if (path.startsWith('/empresa')) {
     const allowed = !!user && canManageEmpresa(user)
     if (!allowed) {
-      return '/app/hoje'
+      return '/app/inicio'
     }
   }
 

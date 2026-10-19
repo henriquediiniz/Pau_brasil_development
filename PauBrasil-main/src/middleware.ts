@@ -2,7 +2,6 @@ import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 import type { SessionUser } from '@/lib/auth-helpers'
 import { resolveMiddlewareRedirect } from '@/lib/middleware-access'
-import { REWARDS_STORE_ENABLED } from '@/lib/portal-features'
 
 export default withAuth(
   function middleware(req) {
@@ -13,10 +12,6 @@ export default withAuth(
 
     if (redirectPath) {
       return NextResponse.redirect(new URL(redirectPath, req.url))
-    }
-
-    if (!REWARDS_STORE_ENABLED && ['/app/loja', '/app/resgates'].includes(path)) {
-      return NextResponse.redirect(new URL('/app/pontos', req.url))
     }
 
     return NextResponse.next()

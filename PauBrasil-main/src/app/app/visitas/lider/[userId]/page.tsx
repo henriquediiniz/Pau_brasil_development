@@ -70,7 +70,7 @@ export default function LiderHistoricoPage() {
 
   useEffect(() => {
     if (status === 'loading') return
-    if (status === 'unauthenticated' || (session && !canView)) router.replace('/app/hoje')
+    if (status === 'unauthenticated' || (session && !canView)) router.replace('/app/inicio')
   }, [status, session, canView, router])
 
   useEffect(() => {

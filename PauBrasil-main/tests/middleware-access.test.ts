@@ -11,21 +11,27 @@ test('redireciona sessoes revogadas para o login', () => {
   )
 })
 
-test('desvia usuarios sem gamificacao para o shell correto', () => {
-  assert.equal(
-    resolveMiddlewareRedirect('/app/hoje', buildSessionUser({ isEmpresaAdmin: true }), true),
-    '/empresa'
-  )
-  assert.equal(
-    resolveMiddlewareRedirect('/app/inicio', buildSessionUser(), true),
-    '/universidade'
-  )
+test('inicio fica acessivel a todos os perfis', () => {
+  for (const user of [buildSessionUser(), buildSessionUser({ isEmpresaAdmin: true }), buildSessionUser({ role: 'SYS_ADMIN' })]) {
+    assert.equal(resolveMiddlewareRedirect('/app/inicio', user, true), null)
+  }
+})
+
+test('links de gamificacao antigos voltam ao inicio para todos os perfis', () => {
+  for (const user of [buildSessionUser(), buildSessionUser({ nivel: 'GERENTE' }), buildSessionUser({ role: 'SYS_ADMIN' })]) {
+    for (const path of ['/app/hoje', '/app/pontos', '/app/pontos/extrato', '/app/conquistas', '/app/ranking', '/app/loja', '/app/resgates', '/app/cockpit', '/coord/atividades', '/coord/aprovacoes', '/gestor/dashboard', '/gestor/metas', '/admin/aprovacoes', '/admin/metas']) {
+      assert.equal(resolveMiddlewareRedirect(path, user, true), '/app/inicio', path)
+    }
+    for (const path of ['/app/perfil', '/app/ajuda', '/universidade']) {
+      assert.equal(resolveMiddlewareRedirect(path, user, true), null, path)
+    }
+  }
 })
 
 test('protege rotas administrativas e coord/gestao com os mesmos helpers do middleware', () => {
   assert.equal(
     resolveMiddlewareRedirect('/admin/usuarios', buildSessionUser(), true),
-    '/app/hoje'
+    '/app/inicio'
   )
   assert.equal(
     resolveMiddlewareRedirect('/admin/usuarios', buildSessionUser({ role: 'RH_ADMIN' }), true),
@@ -33,7 +39,7 @@ test('protege rotas administrativas e coord/gestao com os mesmos helpers do midd
   )
   assert.equal(
     resolveMiddlewareRedirect('/admin/empresas', buildSessionUser({ role: 'RH_ADMIN' }), true),
-    '/app/hoje'
+    '/app/inicio'
   )
   assert.equal(
     resolveMiddlewareRedirect('/admin/upb', buildSessionUser({ isUPBAdmin: true }), true),
@@ -41,11 +47,11 @@ test('protege rotas administrativas e coord/gestao com os mesmos helpers do midd
   )
   assert.equal(
     resolveMiddlewareRedirect('/coord/aprovacoes', buildSessionUser({ nivel: 'SUPERVISOR' }), true),
-    null
+    '/app/inicio'
   )
   assert.equal(
     resolveMiddlewareRedirect('/gestor/dashboard', buildSessionUser({ nivel: 'GERENTE' }), true),
-    null
+    '/app/inicio'
   )
 })
 
@@ -71,7 +77,7 @@ test('protege /talentos — so RH_ADMIN e SYS_ADMIN passam', () => {
   // Usuário comum é redirecionado
   assert.equal(
     resolveMiddlewareRedirect('/talentos', buildSessionUser(), true),
-    '/app/hoje'
+    '/app/inicio'
   )
   // RH_ADMIN passa
   assert.equal(
@@ -86,7 +92,7 @@ test('protege /talentos — so RH_ADMIN e SYS_ADMIN passam', () => {
   // GESTOR não passa (não é RH_ADMIN nem SYS_ADMIN)
   assert.equal(
     resolveMiddlewareRedirect('/talentos', buildSessionUser({ nivel: 'GERENTE' }), true),
-    '/app/hoje'
+    '/app/inicio'
   )
 })
 
@@ -97,7 +103,7 @@ test('mantem o redirect especifico de empresa', () => {
   )
   assert.equal(
     resolveMiddlewareRedirect('/empresa', buildSessionUser(), true),
-    '/app/hoje'
+    '/app/inicio'
   )
 })
 
@@ -112,13 +118,13 @@ test('protege o modulo Gente com a mesma fronteira do helper', () => {
   )
   assert.equal(
     resolveMiddlewareRedirect('/gente/pcd', buildSessionUser({ nivel: 'GERENTE' }), true),
-    '/app/hoje'
+    '/app/inicio'
   )
   assert.equal(
     resolveMiddlewareRedirect('/gente', buildSessionUser(), true),
-    '/app/hoje'
+    '/app/inicio'
   )
-  assert.equal(resolveMiddlewareRedirect('/gente', null, true), '/app/hoje')
+  assert.equal(resolveMiddlewareRedirect('/gente', null, true), '/app/inicio')
 })
 
 test('sessao revogada nao entra no Gente mesmo sendo RH', () => {

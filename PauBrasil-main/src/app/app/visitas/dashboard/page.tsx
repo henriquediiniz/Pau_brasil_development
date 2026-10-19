@@ -72,7 +72,7 @@ export default function VisitasDashboardPage() {
 
   useEffect(() => {
     if (status === 'loading') return
-    if (status === 'unauthenticated' || (session && !isAdmin)) router.replace('/app/hoje')
+    if (status === 'unauthenticated' || (session && !isAdmin)) router.replace('/app/inicio')
   }, [status, session, isAdmin, router])
 
   const fetcher = (url: string) => fetch(url).then(r => r.json())

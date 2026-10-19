@@ -6,11 +6,10 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  CheckSquare, Trophy, Star, Target,
   User, LayoutDashboard, Users, Settings, LogOut,
   ChevronLeft, ChevronRight, Menu, Bell, X, Key, ClipboardList,
-  GraduationCap, BarChart3, ShieldCheck, LayoutDashboard as DashboardIcon,
-  Coins, Search, Home, Building2, Briefcase, MapPin, HardDrive, Camera, HelpCircle,
+  GraduationCap, LayoutDashboard as DashboardIcon,
+  Search, Home, Building2, Briefcase, MapPin, HardDrive, Camera, HelpCircle,
   UsersRound, ArrowLeft, type LucideIcon,
 } from 'lucide-react'
 import { CommandMenu } from '@/components/ui/command-menu'
@@ -21,12 +20,9 @@ import '@/app/portal-brand.css'
 import { toast } from '@/components/ui/toaster'
 import Image from 'next/image'
 import {
-  hasGamificationAccess,
-  isCoordLevel,
-  isDiretoriaLevel,
-  isGestorLevel,
   isRhAdmin as hasRhAdminAccess,
   isSysAdmin,
+  isDiretoriaLevel,
   isUpbAdmin,
 } from '@/lib/auth-helpers'
 
@@ -68,15 +64,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [notifError, setNotifError] = useState(false)
   const mobileTriggerRef = useRef<HTMLButtonElement>(null)
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null)
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['/app/pontos']))
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const notifRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const pollingRef = useRef<NodeJS.Timeout | null>(null)
 
   const user = session?.user
   const isAdmin = user ? isSysAdmin(user) : false
-  const isCoord = user ? isCoordLevel(user) : false
-  const isGestor = user ? isGestorLevel(user) : false
   const isDiretor = user ? isDiretoriaLevel(user) : false
   const isUPBAdmin = user ? isUpbAdmin(user) : false
   const isRhAdminUser = user ? hasRhAdminAccess(user) : false
@@ -84,11 +78,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isItinerantLeader = user?.isItinerantLeader === true
   const isVisitasAdmin    = user?.isVisitasAdmin === true
 
-  // Empresa com acesso à gamificação completa; demais vão apenas à Universidade
-  const hasGamification = user ? hasGamificationAccess(user) : false
-
-  // Redirect: usuário sem gamificação é mandado para universidade,
-  // exceto admins de empresa que podem acessar /empresa/* também
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/login?error=SessionRevoked')
@@ -102,79 +91,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [user, pathname, router])
 
-  useEffect(() => {
-    if (!user || user.mustChangePassword) return
-    if (hasGamification) return
-    const allowedPaths = ['/universidade', '/app/perfil', '/app/visitas', '/app/alterar-senha']
-    const onAllowed = allowedPaths.some(p => pathname.startsWith(p))
-    const onEmpresa = pathname.startsWith('/empresa')
-    const onUPBAdmin = pathname.startsWith('/admin/upb') && isUPBAdmin
-    if (!onAllowed && !(isEmpresaAdmin && onEmpresa) && !onUPBAdmin) {
-      router.replace(isEmpresaAdmin ? '/empresa' : '/universidade')
-    }
-  }, [user, hasGamification, isEmpresaAdmin, isUPBAdmin, pathname, router])
-
   // Build sectioned navigation — memoized to avoid rebuilding on every render
   const sections: NavSection[] = useMemo(() => {
   const _sections: NavSection[] = []
 
-  // ── Usuários sem gamificação: sidebar mínima ─────────────────────────────
-  if (!hasGamification) {
-    if (isEmpresaAdmin) {
-      _sections.push({
-        label: 'Minha Empresa',
-        items: [
-          { href: '/empresa',          label: 'Painel da Empresa',      icon: Building2 },
-          { href: '/empresa/usuarios', label: 'Colaboradores',          icon: Users },
-          { href: '/empresa/funcoes',  label: 'Funções',                icon: Briefcase },
-          ...(isUPBAdmin ? [{ href: '/admin/upb', label: 'Gerenciar Universidade', icon: GraduationCap }] : []),
-        ],
-      })
-    }
-    _sections.push({
-      label: 'Portal',
-      items: [
-        { href: '/universidade', label: 'Universidade PB', icon: GraduationCap },
-        { href: '/app/perfil',   label: 'Perfil',          icon: User },
-      ],
-    })
-  }
-
-  // ── Zona: Atividades ─────────────────────────────────────────────────────
-  if (hasGamification) {
-    _sections.push({
-      label: 'Atividades',
-      items: [
-        ...(!isAdmin && !isGestor ? [{ href: '/app/inicio', label: 'Início', icon: Home }] : []),
-        { href: '/app/hoje',      label: 'Hoje',      icon: CheckSquare },
-      ],
-    })
-
-    // ── Zona: Recompensas ─────────────────────────────────────────────────
-    _sections.push({
-      label: 'Meu desenvolvimento',
-      items: [
-        {
-          href: '/app/pontos',
-          label: 'Carteira',
-          icon: Coins,
-          children: [
-            { href: '/app/conquistas',  label: 'Conquistas',    icon: Star },
-          ],
-        },
-        { href: '/app/ranking', label: 'Ranking', icon: Trophy },
-      ],
-    })
-
-    // ── Zona: Aprender ────────────────────────────────────────────────────
-    _sections.push({
-      label: 'Aprender',
-      items: [
-        { href: '/universidade', label: 'Universidade', icon: GraduationCap },
-        { href: '/app/ajuda',    label: 'Ajuda',        icon: HelpCircle },
-        { href: '/app/perfil',   label: 'Meu Perfil',   icon: User },
-      ],
-    })
+  _sections.push({
+    label: 'Portal',
+    items: [
+      { href: '/app/inicio', label: 'Início', icon: Home },
+      { href: '/universidade', label: 'Universidade', icon: GraduationCap },
+      { href: '/app/ajuda', label: 'Ajuda', icon: HelpCircle },
+      { href: '/app/perfil', label: 'Meu Perfil', icon: User },
+    ],
+  })
+  if (isUPBAdmin && !isAdmin) {
+    _sections.push({ label: 'Universidade', items: [
+      { href: '/admin/upb', label: 'Gerenciar Universidade', icon: GraduationCap },
+    ] })
   }
 
   // ── Zona: Visitas (condicional) ───────────────────────────────────────────
@@ -191,30 +124,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     _sections.push({ label: 'Visitas', items: visitasItems })
   }
 
-  // ── Zona: Equipe (condicional) ────────────────────────────────────────────
-  if (isCoord || isGestor) {
-    const equipeItems: NavItem[] = []
-    if (isCoord) {
-      equipeItems.push({ href: '/gestor/dashboard',    label: 'Dashboard',        icon: DashboardIcon })
-      equipeItems.push({ href: '/coord/aprovacoes',    label: 'Aprovações',       icon: ShieldCheck })
-      equipeItems.push({ href: '/coord/atividades',    label: 'Atividades',       icon: Settings })
-    } else if (isGestor) {
-      equipeItems.push({ href: '/gestor/dashboard',    label: 'Dashboard',        icon: DashboardIcon })
-      equipeItems.push({ href: '/gestor/aprovacoes',   label: 'Aprovações',       icon: ShieldCheck })
-      equipeItems.push({ href: '/gestor/relatorio',    label: 'Relatório',        icon: ClipboardList })
-      equipeItems.push({ href: '/gestor/metas',        label: 'Metas',            icon: Target })
-      equipeItems.push({ href: '/app/cockpit',         label: 'Cockpit',          icon: BarChart3 })
-      if (isDiretor) {
-        equipeItems.push({ href: '/gestor/auditoria', label: 'Auditoria', icon: ClipboardList })
-      }
-    }
-    if (equipeItems.length > 0) {
-      _sections.push({ label: 'Equipe', items: equipeItems })
-    }
+  if (isDiretor && !isAdmin) {
+    _sections.push({ label: 'Gestão', items: [
+      { href: '/gestor/auditoria', label: 'Auditoria', icon: ClipboardList },
+    ] })
   }
 
   // ── Zona: Empresa (condicional) ───────────────────────────────────────────
-  if ((isEmpresaAdmin || isAdmin) && hasGamification) {
+  if (isEmpresaAdmin || isAdmin) {
     _sections.push({
       label: 'Empresa',
       items: [
@@ -244,12 +161,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       variant: 'admin',
       items: [
         { href: '/admin',              label: 'Painel',         icon: LayoutDashboard },
-        { href: '/admin/aprovacoes',   label: 'Aprovações',     icon: ShieldCheck },
         { href: '/admin/usuarios',     label: 'Usuários',       icon: Users },
         { href: '/admin/empresas',     label: 'Empresas',       icon: Building2 },
         { href: '/admin/funcoes',      label: 'Funções',        icon: Settings },
         { href: '/admin/upb',          label: 'Universidade',   icon: GraduationCap },
-        { href: '/admin/metas',        label: 'Metas',          icon: Target },
         { href: '/admin/auditoria',    label: 'Auditoria',      icon: ClipboardList },
         { href: '/gente',              label: 'Gente',          icon: UsersRound },
         { href: '/talentos',           label: 'Banco de Talentos', icon: Users },
@@ -260,7 +175,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return _sections
-  }, [hasGamification, isAdmin, isGestor, isCoord, isDiretor,
+  }, [isAdmin, isDiretor,
       isUPBAdmin, isRhAdminUser, isEmpresaAdmin, isItinerantLeader, isVisitasAdmin])
 
   // Flat list for mobile bottom nav
@@ -578,24 +493,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </div>
   )
 
-  const mobileBottomItems: NavItem[] = hasGamification ? [
+  const mobileBottomItems: NavItem[] = [
     { href: '/app/inicio', label: 'Início', icon: Home },
-    { href: '/app/hoje', label: 'Hoje', icon: CheckSquare },
-    { href: '/app/pontos', label: 'Carteira', icon: Coins },
     { href: '/universidade', label: 'Universidade', icon: GraduationCap },
-    { href: '/app/perfil', label: 'Perfil', icon: User },
-  ] : [
-    ...(isEmpresaAdmin ? [{ href: '/empresa', label: 'Empresa', icon: Building2 }] : []),
-    { href: '/universidade', label: 'Universidade', icon: GraduationCap },
+    { href: '/app/ajuda', label: 'Ajuda', icon: HelpCircle },
     { href: '/app/perfil', label: 'Perfil', icon: User },
   ]
-
-  // Add a 5th contextual item
-  if (hasGamification && isCoord && !isAdmin) {
-    mobileBottomItems[2] = { href: '/coord/aprovacoes', label: 'Aprovações', icon: ShieldCheck }
-  } else if (hasGamification && isGestor && !isAdmin) {
-    mobileBottomItems[2] = { href: '/gestor/aprovacoes', label: 'Aprovações', icon: ShieldCheck }
-  }
 
   if (status !== 'authenticated') return (
     <div className={`portal-brand ${portalFont.variable} min-h-screen grid place-items-center`} role="status">

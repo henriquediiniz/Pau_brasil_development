@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  HelpCircle, Search, CheckSquare, Coins, GraduationCap, DollarSign,
+  HelpCircle, Search, GraduationCap, DollarSign,
   MapPin, ChevronDown, BookOpen, Shield, Clock,
   AlertCircle, X, ArrowRight, Lightbulb, FileText,
 } from 'lucide-react'
@@ -32,56 +32,6 @@ interface Modulo {
 
 const MODULOS: Modulo[] = [
   {
-    id: 'tarefas',
-    titulo: 'Tarefas & Atividades',
-    descricao: 'Como completar tarefas, registrar evidências e acompanhar seu histórico de atividades.',
-    icon: CheckSquare,
-    color: 'brand',
-    borderColor: 'border-brand-500/30',
-    bgColor: 'bg-brand-500/10',
-    textColor: 'text-brand-400',
-    guias: [
-      { titulo: 'Ver suas tarefas do dia', descricao: 'Acesse "Hoje" na sidebar para ver todas as tarefas pendentes do dia. As tarefas são organizadas por categoria e exibem o prazo e os pontos disponíveis.' },
-      { titulo: 'Completar uma tarefa', descricao: 'Clique em uma tarefa para abrir os detalhes. Selecione "Concluir" e, se necessário, anexe uma foto ou texto como evidência. Após o envio, a tarefa entra em fila de aprovação.' },
-      { titulo: 'Acompanhar aprovações', descricao: 'Na tela "Hoje", você vê o status das atividades: Pendente, Aprovada ou Reprovada. Tarefas reprovadas mostram o motivo do gestor.' },
-      { titulo: 'Tarefas avulsas', descricao: 'Gestores podem criar tarefas avulsas fora do ciclo normal. Você receberá uma notificação quando uma tarefa avulsa for atribuída a você.' },
-    ],
-    faq: [
-      { pergunta: 'Posso completar uma tarefa fora do prazo?', resposta: 'Não. Tarefas com prazo vencido são bloqueadas automaticamente. Converse com seu gestor para reagendar se necessário.' },
-      { pergunta: 'O que acontece se minha tarefa for reprovada?', resposta: 'Você não receberá os pontos e o status ficará como "Reprovado". O gestor pode justificar a reprovação. Não é possível reenviar a mesma tarefa.' },
-      { pergunta: 'Posso ver tarefas de outros colaboradores?', resposta: 'Não. Cada colaborador vê apenas suas próprias tarefas. Gestores têm acesso às tarefas da equipe pelo painel de aprovações.' },
-    ],
-    politicas: [
-      { titulo: 'Prazo de aprovação', detalhe: 'Gestores têm até 5 dias úteis para aprovar ou reprovar uma tarefa enviada.', icone: 'clock' },
-      { titulo: 'Evidências obrigatórias', detalhe: 'Tarefas marcadas como "requer evidência" exigem foto ou texto — sem isso, o envio é bloqueado.', icone: 'alert' },
-      { titulo: 'Integridade dos dados', detalhe: 'É proibido enviar evidências falsas ou de terceiros. Isso pode resultar em suspensão de acesso.', icone: 'shield' },
-    ],
-  },
-  {
-    id: 'pontos',
-    titulo: 'Pontos & Evolução',
-    descricao: 'Entenda como acumular pontos, acompanhar sua evolução e consultar o ranking.',
-    icon: Coins,
-    color: 'amber',
-    borderColor: 'border-amber-500/30',
-    bgColor: 'bg-amber-500/10',
-    textColor: 'text-amber-400',
-    guias: [
-      { titulo: 'Como ganhar pontos', descricao: 'Pontos são concedidos automaticamente ao ter uma tarefa aprovada pelo gestor. O valor varia conforme a tarefa. Certificados da UPB também concedem pontos.' },
-      { titulo: 'Ver seu saldo', descricao: 'Acesse "Carteira" na sidebar ou o card de pontos no Dashboard de Início. O saldo é atualizado em tempo real conforme aprovações ocorrem.' },
-      { titulo: 'Ver o Ranking', descricao: 'O Ranking mostra os colaboradores com mais pontos no período. É atualizado diariamente. Filtre por empresa ou unidade para comparar com sua equipe.' },
-    ],
-    faq: [
-      { pergunta: 'Os pontos expiram?', resposta: 'Atualmente os pontos não têm data de expiração. Porém, a empresa pode estabelecer ciclos de reset — verifique com seu gestor.' },
-      { pergunta: 'Posso transferir pontos para outro colaborador?', resposta: 'Não. Os pontos são pessoais e intransferíveis.' },
-      { pergunta: 'O ranking considera todos os períodos?', resposta: 'O ranking padrão exibe o mês atual. Existe um ranking geral (acumulado) disponível na tela de Ranking.' },
-    ],
-    politicas: [
-      { titulo: 'Pontos por tarefa', detalhe: 'Cada tarefa define seu valor em pontos. O valor é visível antes de você completar a tarefa.', icone: 'shield' },
-      { titulo: 'Estorno de pontos', detalhe: 'Se uma tarefa aprovada for revisada e reprovada posteriormente, os pontos são estornados automaticamente do saldo.', icone: 'alert' },
-    ],
-  },
-  {
     id: 'upb',
     titulo: 'Universidade Pau Brasil',
     descricao: 'Acesse cursos, assista episódios, faça quizzes e conquiste certificados.',
@@ -106,7 +56,6 @@ const MODULOS: Modulo[] = [
     politicas: [
       { titulo: 'Nota mínima para certificação', detalhe: 'É necessário acertar pelo menos 70% das questões do quiz para obter o certificado.', icone: 'shield' },
       { titulo: 'Pré-requisitos', detalhe: 'Alguns cursos exigem que outros sejam concluídos antes. Verifique os pré-requisitos na descrição do curso.', icone: 'alert' },
-      { titulo: 'Pontos no certificado', detalhe: 'Certificados concedidos por cursos que têm pontos configurados creditam automaticamente o saldo do colaborador.', icone: 'clock' },
     ],
   },
   {

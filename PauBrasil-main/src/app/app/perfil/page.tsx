@@ -2,8 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Building2, MapPin, Mail, LogOut, Star, Shield, Key, Eye, EyeOff, Loader2, Flame, Trophy, Lock, TrendingUp, Camera, Bell, BellOff } from 'lucide-react'
-import { getLevel, LEVEL_COLORS, LEVEL_BG } from '@/types'
+import { User, Building2, MapPin, Mail, LogOut, Shield, Key, Eye, EyeOff, Loader2, Lock, Camera, Bell, BellOff } from 'lucide-react'
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from '@/components/ui/toaster'
@@ -11,45 +10,10 @@ import Image from 'next/image'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { getRoleLabel, getUnitsLabel } from '@/lib/user-display'
 
-type Tab = 'perfil' | 'evolucao' | 'senha'
-
-interface Semana { semana: string; pts: number }
-interface EvolucaoData { semanas: Semana[]; streak: number; streakRecord: number }
-interface Badge { id: string; nome: string; descricao: string; icone: string; ganho: boolean; ganhoEm?: string }
+type Tab = 'perfil' | 'senha'
 
 interface NetworkUser { id: string; name: string; photoUrl: string | null; role: string }
 interface NetworkData { manager: NetworkUser | null; subordinates: NetworkUser[] }
-
-const BADGE_ICONS: Record<string, string> = {
-  primeiros_passos: '🎯', centuriao: '💯', mil_pontos: '⭐', elite: '🏆', lenda: '👑',
-  estudante: '📖', academico: '🎓', semana_em_chamas: '🔥', constancia: '💪', aprovado_de_primeira: '✅',
-}
-
-function BarChart({ semanas }: { semanas: Semana[] }) {
-  const max = Math.max(...semanas.map(s => s.pts), 1)
-  return (
-    <div className="flex items-end gap-1.5 h-24">
-      {semanas.map((s, i) => {
-        const pct = Math.max((s.pts / max) * 100, s.pts > 0 ? 4 : 0)
-        const isLast = i === semanas.length - 1
-        return (
-          <div key={s.semana} className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full flex flex-col justify-end" style={{ height: '80px' }}>
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: `${pct}%` }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className={`w-full rounded-t-sm ${isLast ? 'bg-brand-500' : 'bg-brand-500/30'}`}
-                style={{ minHeight: s.pts > 0 ? 3 : 0 }}
-              />
-            </div>
-            <span className="text-[9px] text-slate-600 leading-none">{s.semana.slice(5).replace('-', '/')}</span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
 
 export default function PerfilPage() {
   return (
@@ -63,13 +27,7 @@ function PerfilPageInner() {
   const { data: session, update: updateSession } = useSession()
   const user = session?.user
   const searchParams = useSearchParams()
-  const [balance, setBalance] = useState<{ confirmed: number } | null>(null)
-  const [tab, setTab] = useState<Tab>((searchParams.get('tab') as Tab) ?? 'perfil')
-
-  // Evolução state
-  const [evolucao, setEvolucao] = useState<EvolucaoData | null>(null)
-  const [badges, setBadges] = useState<Badge[]>([])
-  const [loadingEvolucao, setLoadingEvolucao] = useState(false)
+  const [tab, setTab] = useState<Tab>(searchParams.get('tab') === 'senha' ? 'senha' : 'perfil')
 
   // Rede state
   const [network, setNetwork] = useState<NetworkData | null>(null)
@@ -83,7 +41,6 @@ function PerfilPageInner() {
   const [savingPwd, setSavingPwd] = useState(false)
 
   useEffect(() => {
-    fetch('/api/pontos').then(r => r.json()).then(d => setBalance(d.balance))
     fetch('/api/me/network').then(r => r.json()).then(d => {
       if (d.user) setNetwork({ manager: d.user.manager, subordinates: d.user.subordinates })
     })
@@ -91,24 +48,9 @@ function PerfilPageInner() {
 
   useEffect(() => {
     const t = searchParams.get('tab') as Tab
-    if (t) setTab(t)
+    setTab(t === 'senha' ? 'senha' : 'perfil')
   }, [searchParams])
 
-  useEffect(() => {
-    if (tab === 'evolucao' && !evolucao) {
-      setLoadingEvolucao(true)
-      Promise.all([
-        fetch('/api/pontos/evolucao').then(r => r.json()),
-        fetch('/api/conquistas').then(r => r.json()),
-      ]).then(([ev, bg]) => {
-        setEvolucao(ev)
-        setBadges(bg)
-        setLoadingEvolucao(false)
-      })
-    }
-  }, [tab, evolucao])
-
-  const level = balance ? getLevel(balance.confirmed) : 'Bronze'
   const unitLabel = getUnitsLabel(user?.units)
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -280,9 +222,6 @@ function PerfilPageInner() {
         <div className="flex-1 mt-2 md:mt-0">
           <h2 className="text-xl font-display font-bold text-white">{user?.name}</h2>
           <div className="flex items-center justify-center md:justify-start gap-2 mt-2 flex-wrap">
-            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-medium ${LEVEL_BG[level]} ${LEVEL_COLORS[level]}`}>
-              <Star className="w-3 h-3" />{level}
-            </div>
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs text-slate-400">
               <Shield className="w-3 h-3" />{getRoleLabel(user?.role)}
             </div>
@@ -321,7 +260,7 @@ function PerfilPageInner() {
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-2xl bg-white/5">
-        {([['perfil', 'Meus Dados', User], ['evolucao', 'Evolução', TrendingUp], ['senha', 'Senha', Key]] as const).map(([key, label, Icon]) => (
+        {([['perfil', 'Meus Dados', User], ['senha', 'Senha', Key]] as const).map(([key, label, Icon]) => (
           <button key={key} onClick={() => setTab(key)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium transition-all
               ${tab === key ? 'bg-brand-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}>
@@ -347,16 +286,6 @@ function PerfilPageInner() {
               )
             })}
           </div>
-
-          {balance && (
-            <div className="rounded-2xl bg-brand-500/10 border border-brand-500/20 p-5">
-              <div className="flex items-center gap-2 mb-1">
-                <Star className="w-4 h-4 text-brand-400" />
-                <span className="text-sm text-slate-400">Pontos acumulados</span>
-              </div>
-              <div className="text-3xl font-display font-bold text-brand-400">{balance.confirmed.toLocaleString('pt-BR')} pts</div>
-            </div>
-          )}
 
           {pushSupported && (
             <div className="rounded-2xl bg-white/3 border border-white/8 p-5">
@@ -432,75 +361,6 @@ function PerfilPageInner() {
             </div>
           )}
         </>
-      )}
-
-      {tab === 'evolucao' && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-          {loadingEvolucao ? (
-            <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-brand-400 animate-spin" /></div>
-          ) : evolucao && (
-            <>
-              {/* Streak */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-orange-500/10 border border-orange-500/20 p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Flame className="w-4 h-4 text-orange-400" />
-                    <span className="text-xs text-slate-400">Sequência atual</span>
-                  </div>
-                  <div className="text-3xl font-display font-bold text-orange-400">{evolucao.streak}d</div>
-                  <div className="text-xs text-slate-500 mt-0.5">dias consecutivos</div>
-                </div>
-                <div className="rounded-2xl bg-white/3 border border-white/8 p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Trophy className="w-4 h-4 text-yellow-400" />
-                    <span className="text-xs text-slate-400">Recorde</span>
-                  </div>
-                  <div className="text-3xl font-display font-bold text-yellow-400">{evolucao.streakRecord}d</div>
-                  <div className="text-xs text-slate-500 mt-0.5">melhor sequência</div>
-                </div>
-              </div>
-
-              {/* Weekly chart */}
-              <div className="rounded-2xl bg-white/3 border border-white/8 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-4 h-4 text-brand-400" />
-                  <span className="text-sm font-medium text-white">Pontos nas últimas 8 semanas</span>
-                </div>
-                <BarChart semanas={evolucao.semanas} />
-                <div className="flex justify-between mt-2">
-                  <span className="text-[10px] text-slate-600">8 semanas atrás</span>
-                  <span className="text-[10px] text-slate-600">Esta semana</span>
-                </div>
-              </div>
-
-              {/* Badges */}
-              <div className="rounded-2xl bg-white/3 border border-white/8 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-4 h-4 text-brand-400" />
-                  <span className="text-sm font-medium text-white">Conquistas</span>
-                  <span className="ml-auto text-xs text-slate-500">{badges.filter(b => b.ganho).length}/{badges.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {badges.map(badge => (
-                    <div key={badge.id}
-                      className={`rounded-xl border p-3 flex items-start gap-3 transition-all ${badge.ganho
-                        ? 'bg-brand-500/10 border-brand-500/20'
-                        : 'bg-white/2 border-white/5 opacity-50'}`}>
-                      <div className="text-2xl leading-none shrink-0">{BADGE_ICONS[badge.id] ?? '🏅'}</div>
-                      <div className="min-w-0">
-                        <div className={`text-xs font-semibold leading-tight ${badge.ganho ? 'text-white' : 'text-slate-500'}`}>
-                          {badge.nome}
-                        </div>
-                        <div className="text-[10px] text-slate-600 mt-0.5 leading-tight">{badge.descricao}</div>
-                        {!badge.ganho && <Lock className="w-2.5 h-2.5 text-slate-700 mt-1" />}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </motion.div>
       )}
 
       {tab === 'senha' && (

@@ -37,7 +37,7 @@ export default async function GentePage() {
   // Defesa em profundidade: o middleware já barra, mas a página confere de novo
   // contra o usuário fresco do banco, não contra o token.
   const user = await getEffectiveSessionUser(session.user)
-  if (!canAccessGente(user)) redirect('/app/hoje')
+  if (!canAccessGente(user)) redirect('/app/inicio')
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
