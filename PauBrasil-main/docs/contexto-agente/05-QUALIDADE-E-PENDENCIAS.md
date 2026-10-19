@@ -113,3 +113,9 @@ O teste E2E de portal com banco exige opt-in `PORTAL_E2E_DB=1` e verifica explic
 ## Definição prática de pronto
 
 Uma tarefa só está pronta quando o comportamento solicitado está implementado, validado no nível apropriado e os limites são explicitados. Se o pedido inclui publicação, commit/push/build/publicação/login são etapas distintas. Registrar o commit e a URL de deploy quando existirem. Não confundir um relatório de causa com correção aplicada.
+
+## Limpeza de código legado — 19/10/2026
+
+Removidos 116 arquivos sem uso de versões anteriores: páginas e APIs de gamificação (hoje, pontos, conquistas, ranking, metas, atividades, aprovações, tasks, feed, global-goal, relatório/dashboard do gestor), loja/produtos/pedidos/resgates, visitas de líderes (check-in, face, obrigatórias), serviços `TaskService`/`StoreService`/`UserService`, libs órfãs (`points`, `badges`, `checklist`, `geo`, `visitas-api`, `redis`, `idempotency`…), componentes de `hoje` e testes de OBZ/financeiro/score cujo código já não existia. A fila offline de check-in saiu do `worker/index.js` (push mantido). Validado: `tsc`, lint, `npm test` (511 ok) e `next build` numa cópia. Tabelas e dados no banco **não** foram tocados; `RETIRED_PORTAL_PATHS` continua redirecionando links antigos.
+
+Pendências conscientes: o cron `daily-reminder` ainda consulta `taskInstance` e aponta para `/app/hoje`; `tests/e2e/portal-colaborador.spec.ts` ainda espera `/api/loja` e `/api/me/target`; rotas sem consumidor na UI mas fora do legado (`/api/auth/totp/verify|disable`, `/api/usuarios*`, `/api/me/photo`, `/api/gente/frontline/meses`, `/api/gente/pcd/metas`) foram mantidas.
