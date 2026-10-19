@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 3600
+// O banco é consultado em runtime; a build não depende de uma conexão ativa.
+export const dynamic = 'force-dynamic'
 
 const PREVIEW_COUNT = 10
 
@@ -53,7 +54,7 @@ export default async function UniversidadePBPage() {
     },
   })
 
-  // Exibe até 10 cursos aleatórios — troca a cada revalidação (1h)
+  // Exibe até 10 cursos aleatórios — troca a cada acesso
   const temporadas = shuffleAndPick(todas, PREVIEW_COUNT)
 
   const totalEpisodios = todas.reduce((acc, t) => acc + t.episodios.length, 0)

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export const revalidate = 3600
+// O banco é consultado em runtime; a build não depende de uma conexão ativa.
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const empresas = await prisma.empresa.findMany({
