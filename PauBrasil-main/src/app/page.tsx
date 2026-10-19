@@ -13,10 +13,12 @@ import {
 } from 'lucide-react'
 import { HubFooter, HubNav } from './_components/HubShell'
 import {
+  HubBrandStrip,
   HubCompanies,
   HubStory,
   HubTalentGuide,
 } from './_components/HubInteractive'
+import { HUB_COMPANIES, HUB_SEGMENT_COUNT } from '@/lib/hub-content'
 import styles from './_components/Hub.module.css'
 
 const montserrat = Montserrat({
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Grupo Pau Brasil — Raízes fortes, novos caminhos' },
   description:
     'Conheça o Grupo Pau Brasil, nossas empresas e unidades. Explore nossa história, a Universidade Pau Brasil e oportunidades de carreira.',
-  icons: { icon: '/brand/icone.png' },
+  icons: { icon: '/icons/icon-192.png' },
   openGraph: {
     title: 'Grupo Pau Brasil',
     description:
@@ -96,10 +98,16 @@ export default function HomePage() {
               </figure>
             </div>
             <div className={styles.heroBottom}>
-              <span>UM GRUPO. MUITAS POSSIBILIDADES.</span>
-              <a href="#empresas">
-                Descubra o que nos conecta <ArrowDown size={15} />
-              </a>
+              <div className={styles.heroBottomLabel}>
+                <span>Um grupo. Muitas possibilidades.</span>
+                <strong>
+                  {HUB_COMPANIES.length} empresas · {HUB_SEGMENT_COUNT}{' '}
+                  segmentos
+                </strong>
+              </div>
+              <nav aria-label="Acesso direto às empresas do grupo">
+                <HubBrandStrip variant="stacked" />
+              </nav>
             </div>
           </div>
         </section>
@@ -148,8 +156,8 @@ export default function HomePage() {
                 </h2>
               </div>
               <p>
-                Conheça as empresas do Grupo Pau Brasil, explore seus segmentos
-                e encontre nossas unidades.
+                Escolha uma empresa para conhecer suas áreas de atuação, suas
+                unidades e as oportunidades de carreira.
               </p>
             </div>
             <HubCompanies />

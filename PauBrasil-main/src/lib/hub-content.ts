@@ -7,11 +7,22 @@ export type HubCompany = {
   description: string
   activities: string[]
   units: { name: string; state: string }[]
+  /** Marca da empresa. `shape` define como a placa do card enquadra o arquivo. */
+  logo?: { src: string; shape: 'circle' | 'wide' }
+  /** Cor de fundo da placa da marca no card (harmoniza com o arquivo do logo). */
+  plate: string
+  /** Iniciais usadas quando ainda não há logo aprovado. */
+  monogram: string
+  /** Site próprio da empresa; quando definido, os links do hub levam direto para ele. */
+  externalUrl?: string
 }
 
 export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'bebidas',
+    logo: { src: '/logos/hub/bebidas.png', shape: 'wide' },
+    plate: '#000000',
+    monogram: 'PB',
     name: 'Pau Brasil Bebidas',
     segment: 'Distribuição',
     partner: 'Ambev',
@@ -35,7 +46,11 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'motos',
+    logo: { src: '/logos/hub/motos.png', shape: 'circle' },
+    plate: '#2a1214',
+    monogram: 'PM',
     name: 'Pau Brasil Motos',
+    externalUrl: 'https://www.paubrasilmotos.com.br/valedosaofrancisco/',
     segment: 'Mobilidade',
     partner: 'Honda',
     description:
@@ -49,6 +64,9 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'unida',
+    logo: { src: '/logos/hub/unida.png', shape: 'circle' },
+    plate: '#e9e4dd',
+    monogram: 'UC',
     name: 'Unida Construtora',
     segment: 'Construção',
     description:
@@ -58,6 +76,9 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'instituto-yso',
+    logo: { src: '/logos/hub/instituto-yso.png', shape: 'circle' },
+    plate: '#1c1a17',
+    monogram: 'IY',
     name: 'Instituto YSO',
     segment: 'Impacto social',
     description:
@@ -67,6 +88,8 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'original-start',
+    plate: '#7a1520',
+    monogram: 'OS',
     name: 'Original Start',
     segment: 'Inovação',
     description:
@@ -76,6 +99,9 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'hora-10',
+    logo: { src: '/logos/hub/hora-10.png', shape: 'wide' },
+    plate: '#000000',
+    monogram: 'H10',
     name: 'Hora 10',
     segment: 'Serviços',
     description:
@@ -85,6 +111,8 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'locadora',
+    plate: '#3b2a22',
+    monogram: 'LP',
     name: 'Locadora Pau Brasil',
     segment: 'Mobilidade',
     description:
@@ -94,6 +122,9 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'fazenda-divina',
+    logo: { src: '/logos/hub/fazenda-divina.png', shape: 'circle' },
+    plate: '#f4f0ea',
+    monogram: 'FD',
     name: 'Fazenda Divina',
     segment: 'Agro',
     description:
@@ -130,6 +161,11 @@ export const HUB_STORY = [
     note: 'Identidade visual fornecida pelo Grupo Pau Brasil.',
   },
 ]
+
+/** Empresas em destaque no topo da grade (maiores operações e parceiros de marca). */
+export const HUB_FEATURED = ['bebidas', 'motos'] as const
+
+export const HUB_SEGMENT_COUNT = new Set(HUB_COMPANIES.map((c) => c.segment)).size
 
 export const HUB_INTERESTS = [
   {
@@ -184,4 +220,9 @@ export function suggestHubCompanies(interestId: string): HubCompany[] {
   return HUB_COMPANIES.filter((company) =>
     (interest.companies as readonly string[]).includes(company.slug),
   )
+}
+
+/** Destino do link de uma empresa no hub: site próprio ou página interna. */
+export function hubCompanyHref(company: HubCompany): string {
+  return company.externalUrl ?? `/empresas/${company.slug}`
 }

@@ -147,3 +147,16 @@ test('troca obrigatoria de senha precede o destino por perfil sem criar loop', (
     assert.equal(resolveMiddlewareRedirect('/app/inicio', user, false), '/login?error=SessionRevoked')
   }
 })
+
+test('links de visitas retiradas voltam ao inicio, inclusive para lider e admin', () => {
+  const users = [
+    buildSessionUser({ isItinerantLeader: true }),
+    buildSessionUser({ isVisitasAdmin: true }),
+    buildSessionUser({ role: 'SYS_ADMIN' }),
+  ]
+  for (const user of users) {
+    for (const path of ['/app/visitas/checkin', '/app/visitas/dashboard', '/admin/visitas/obrigatorias']) {
+      assert.equal(resolveMiddlewareRedirect(path, user, true), '/app/inicio')
+    }
+  }
+})

@@ -1,5 +1,9 @@
 # Portal Pau Brasil
 
+## Contexto para desenvolvimento
+
+Comece por [docs/contexto-agente/00-LEIA-PRIMEIRO.md](docs/contexto-agente/00-LEIA-PRIMEIRO.md). Para transferir todo o contexto em um arquivo, use [CONTEXTO-COMPLETO.md](docs/contexto-agente/CONTEXTO-COMPLETO.md).
+
 ## Desenvolvimento
 
 Execute dentro da pasta `PauBrasil-main`:

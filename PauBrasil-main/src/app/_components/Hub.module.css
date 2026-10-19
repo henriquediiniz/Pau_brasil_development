@@ -57,7 +57,7 @@
   text-transform: uppercase;
   letter-spacing: 0.17em;
   font-weight: 600;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--wine);
   margin-bottom: 23px;
 }
@@ -71,7 +71,7 @@
   font-weight: 600;
 }
 .hub p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.85;
 }
 .button {
@@ -82,7 +82,7 @@
   padding: 16px 21px;
   background: var(--wine);
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   border: 1px solid transparent;
   border-radius: 3px;
@@ -107,7 +107,7 @@
   align-items: center;
   gap: 15px;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--wine);
 }
 .header {
@@ -138,7 +138,7 @@
 .desktopNav {
   display: flex;
   gap: 28px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
 }
 .desktopNav a {
@@ -151,7 +151,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   border: 1px solid #d9cec3;
   border-radius: 3px;
@@ -208,7 +208,7 @@
 .heroCopy > p {
   margin-top: 25px;
   color: #bbb5af;
-  font-size: 14px;
+  font-size: 15px;
 }
 .heroActions {
   display: flex;
@@ -222,7 +222,7 @@
   align-items: center;
   gap: 12px;
   color: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
 }
 .heroSignature {
@@ -231,7 +231,7 @@
   gap: 10px;
   margin-top: 44px;
   color: #a09b93;
-  font-size: 10px;
+  font-size: 12px;
 }
 .heroVisual {
   position: relative;
@@ -263,7 +263,7 @@
   color: #5a5149;
   border-top: 1px solid #d1c7bd;
   padding-top: 20px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .visualFooter strong {
   font-weight: 500;
@@ -278,18 +278,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 40px;
   border-top: 1px solid #373533;
   margin-top: 60px;
-  padding: 24px 0;
-  font-size: 9px;
-  letter-spacing: 0.12em;
+  padding: 26px 0 30px;
   color: #a9a29a;
 }
-.heroBottom a {
+.heroBottomLabel {
   display: flex;
-  align-items: center;
-  gap: 13px;
-  letter-spacing: 0;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.heroBottomLabel span {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.heroBottomLabel strong {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--sand);
+}
+.heroBottom nav {
+  min-width: 0;
 }
 .quickLinks {
   background: #eee8e0;
@@ -315,17 +327,17 @@
   padding-right: 0;
 }
 .quickLinks a > span {
-  font-size: 10px;
+  font-size: 12px;
   color: #967b66;
 }
 .quickLinks strong {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   display: block;
 }
 .quickLinks small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #72675e;
   margin-top: 3px;
 }
@@ -347,7 +359,7 @@
 .sectionHeading > p {
   max-width: 330px;
   color: #79716b;
-  font-size: 12px;
+  font-size: 14px;
 }
 .filters {
   display: flex;
@@ -359,7 +371,7 @@
   border: 1px solid #ded8d1;
   border-radius: 3px;
   padding: 8px 14px;
-  font-size: 10px;
+  font-size: 12px;
   color: #645b53;
   background: transparent;
   cursor: pointer;
@@ -373,71 +385,356 @@
 .filters button:hover {
   border-color: var(--wine);
 }
+
+/* ── Empresas: placas de marca e cards ─────────────────────────────── */
+.filterCount {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #ece5dc;
+  color: #6d5f53;
+  font-size: 11px;
+  font-weight: 600;
+}
+.filters button[aria-pressed="true"] .filterCount {
+  background: #ffffff26;
+  color: #fff;
+}
 .companyGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+}
+.companyGrid > li {
+  display: flex;
+  min-width: 0;
+  grid-column: span 4;
+}
+.companyGrid > li.companyFeatured {
+  grid-column: span 6;
 }
 .companyCard {
-  background: #fff;
-  border: 1px solid #e7e1da;
-  border-radius: 4px;
-  padding: 24px;
+  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  transition:
-    transform 0.2s,
-    border-color 0.2s;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #e7e1da;
+  border-radius: 10px;
+  overflow: hidden;
   color: var(--ink);
+  box-shadow: 0 1px 0 #00000005;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .companyCard:hover {
   transform: translateY(-4px);
-  border-color: #b59177;
+  border-color: #c9ab94;
+  box-shadow: 0 18px 40px -22px #4a1d1466;
+}
+.companyFeatured .companyCard {
+  flex-direction: row;
+}
+.brandPlateBox {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  isolation: isolate;
+}
+.plate_card {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+.companyFeatured .plate_card {
+  aspect-ratio: auto;
+  width: 46%;
+  min-height: 250px;
+}
+.plate_mini {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #00000014;
+}
+.plate_hero {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  margin-bottom: 30px;
+  box-shadow:
+    0 0 0 1px #ffffff1f,
+    0 18px 40px -18px #000;
+}
+.plateLogo {
+  object-fit: contain;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.plate_card .plateLogo {
+  padding: 13%;
+}
+.plate_card[data-shape="wide"] .plateLogo {
+  padding: 12% 16%;
+}
+.companyFeatured .plate_card .plateLogo {
+  padding: 15%;
+}
+.plate_mini .plateLogo,
+.plate_hero .plateLogo {
+  padding: 0;
+}
+.plate_mini[data-shape="wide"] .plateLogo {
+  padding: 5%;
+}
+.plate_hero[data-shape="wide"] .plateLogo {
+  padding: 10%;
+}
+.companyCard:hover .plateLogo {
+  transform: scale(1.06);
+}
+.plate_card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 90% at 50% 0%,
+    #ffffff14,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+.plateMonogram {
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  color: var(--sand);
+  line-height: 1;
+}
+.plate_mini .plateMonogram {
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+.plate_hero .plateMonogram {
+  font-size: 38px;
+}
+.companyBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 22px 22px 18px;
+  min-width: 0;
+}
+.companyFeatured .companyBody {
+  padding: 30px 30px 24px;
 }
 .companyTop {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 9px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #837366;
-}
-.companyTop svg {
-  color: var(--wine);
-}
-.companyIdentity {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--wine);
-  margin: 33px 0 18px;
-}
-.companyIdentity span {
-  font-size: 13px;
+  letter-spacing: 0.1em;
   font-weight: 600;
+  color: #8a7565;
+}
+.partnerTag {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  color: var(--wine);
+  background: #7a15200f;
+  border: 1px solid #7a152024;
+  padding: 3px 8px;
+  border-radius: 20px;
 }
 .companyCard h3 {
-  font-size: 16px;
-  letter-spacing: -0.04em;
-  line-height: 1.3;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  margin-top: 12px;
 }
-.companyCard > p {
-  font-size: 11px;
-  color: #81766d;
-  margin: 12px 0 25px;
-  line-height: 1.8;
+.companyFeatured .companyCard h3 {
+  font-size: 24px;
+}
+.companyCard .companyBody > p {
+  font-size: 13px;
+  color: #74685f;
+  margin: 10px 0 22px;
+  line-height: 1.7;
+}
+.companyFeatured .companyCard .companyBody > p {
+  font-size: 14px;
+  max-width: 380px;
 }
 .companyMore {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   border-top: 1px solid #eee8e2;
-  padding-top: 15px;
-  font-size: 9px;
+  padding-top: 14px;
+  margin-top: auto;
+  font-size: 12px;
   font-weight: 600;
   color: var(--wine);
-  margin-top: auto;
+}
+.companyArrow {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #e3d6ca;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    transform 0.25s;
+}
+.companyCard:hover .companyArrow {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff;
+  transform: rotate(45deg);
+}
+.companyCard:focus-visible {
+  outline-offset: 3px;
+}
+
+/* Faixa de marcas (hero, página de empresa e orientação de carreira) */
+.brandStrip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.brandStrip a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 4px 4px;
+  border-radius: 30px;
+  border: 1px solid #3a3633;
+  color: #d8d0c7;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+.brandStrip a:hover {
+  border-color: var(--sand);
+  background: #ffffff0d;
+  color: #fff;
+}
+.brandStrip .plate_mini {
+  width: 34px;
+  height: 34px;
+  box-shadow: none;
+}
+.brandStripStacked {
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+.brandStripStacked a {
+  flex-direction: column;
+  gap: 9px;
+  width: 92px;
+  padding: 6px 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  text-align: center;
+  white-space: normal;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #a9a29a;
+}
+.brandStripStacked .plate_mini {
+  width: 52px;
+  height: 52px;
+  box-shadow: 0 0 0 1px #ffffff1f;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.brandStripStacked a:hover .plate_mini {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 2px var(--sand);
+}
+.otherCompanies {
+  padding: 46px 0 56px;
+  background: var(--ink);
+}
+.otherCompanies .eyebrow {
+  color: var(--sand);
+}
+.otherCompanies .brandStrip {
+  justify-content: flex-start;
+}
+.companyHeroCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.activityPanel ul {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.activityPanel li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #443c35;
+  font-size: 14px;
+  color: #e2d6cb;
+}
+.activityPanel li svg {
+  color: var(--sand);
+  flex-shrink: 0;
+}
+.activityStat {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 24px;
+  color: #e2d6cb;
+}
+.activityStat strong {
+  font-size: 44px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  color: var(--sand);
+  line-height: 1;
+}
+.activityStat span {
+  font-size: 13px;
+}
+.talentResult a > span:not(.brandPlateBox) {
+  flex: 1;
+}
+.talentResult a {
+  align-items: center;
+}
+.talentResult .plate_mini {
+  width: 32px;
+  height: 32px;
 }
 .historySection {
   background: #eee8e0;
@@ -452,11 +749,11 @@
   color: #756b63;
   margin-top: 24px;
   max-width: 440px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .editorialTag {
   display: inline-block;
-  font-size: 9px;
+  font-size: 12px;
   color: #7b6b5d;
   border-left: 2px solid var(--wine);
   padding-left: 10px;
@@ -470,7 +767,7 @@
   display: block;
 }
 .historyPhoto figcaption {
-  font-size: 8px;
+  font-size: 11px;
   color: #7c6b5c;
   margin-top: 9px;
 }
@@ -490,10 +787,10 @@
   cursor: pointer;
   color: #877568;
   padding: 25px 12px 12px 0;
-  font-size: 11px;
+  font-size: 13px;
 }
 .timelineSteps button small {
-  font-size: 8px;
+  font-size: 11px;
   display: block;
   margin-bottom: 5px;
 }
@@ -536,7 +833,7 @@
   letter-spacing: -0.025em;
 }
 .storyPanel p {
-  font-size: 12px;
+  font-size: 14px;
   max-width: 780px;
   color: #6e6157;
   margin-top: 12px;
@@ -544,7 +841,7 @@
 .storyPanel small {
   display: block;
   margin-top: 15px;
-  font-size: 9px;
+  font-size: 12px;
   color: #806b5b;
 }
 .universitySection {
@@ -566,7 +863,7 @@
 .universityGrid > div > p {
   max-width: 480px;
   color: #e2c8c6;
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 24px;
 }
 .universitySection .heroActions {
@@ -579,7 +876,7 @@
   background: #ffffff05;
 }
 .learningEyebrow {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #dcc8b1;
@@ -609,15 +906,15 @@
   flex-shrink: 0;
 }
 .learningPath h3 {
-  font-size: 12px;
+  font-size: 14px;
 }
 .learningPath p {
-  font-size: 10px;
+  font-size: 12px;
   color: #e0c0bd;
   margin-top: 5px;
 }
 .learningPath small {
-  font-size: 9px;
+  font-size: 12px;
   align-self: start;
   margin-left: auto;
   color: #c98d90;
@@ -633,7 +930,7 @@
   color: var(--wine);
 }
 .talentGrid > div > p {
-  font-size: 12px;
+  font-size: 14px;
   color: #7a7068;
   max-width: 470px;
   margin-top: 25px;
@@ -643,7 +940,7 @@
   flex-direction: column;
   gap: 16px;
   margin-top: 28px;
-  font-size: 11px;
+  font-size: 13px;
   color: #6d635a;
 }
 .talentSteps span {
@@ -652,7 +949,7 @@
   gap: 15px;
 }
 .talentSteps b {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--wine);
   border: 1px solid #ded4c9;
@@ -670,7 +967,7 @@
   border-radius: 5px;
 }
 .talentGuide .eyebrow {
-  font-size: 9px;
+  font-size: 12px;
   margin-bottom: 15px;
 }
 .talentGuide h3 {
@@ -678,7 +975,7 @@
   letter-spacing: -0.04em;
 }
 .talentGuide > p {
-  font-size: 11px;
+  font-size: 13px;
   margin-top: 10px;
   color: #78695c;
 }
@@ -687,7 +984,7 @@
 }
 .talentGuide label {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   margin-bottom: 9px;
 }
@@ -697,7 +994,7 @@
   border: 1px solid #c9baaa;
   width: 100%;
   border-radius: 3px;
-  font-size: 11px;
+  font-size: 13px;
   padding: 14px 10px;
 }
 .talentGuide .button {
@@ -710,10 +1007,10 @@
   padding-top: 20px;
 }
 .talentResult strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 .talentResult p {
-  font-size: 10px;
+  font-size: 12px;
   color: #6c5b4c;
   margin: 9px 0 15px;
 }
@@ -722,18 +1019,18 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--wine);
   border-bottom: 1px solid #d1c0af;
 }
 .talentResult small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #78695c;
   margin-top: 15px;
 }
 .hub .contentNote {
-  font-size: 9px;
+  font-size: 12px;
   color: #847365;
   line-height: 1.8;
   margin-top: 24px;
@@ -767,7 +1064,7 @@
   gap: 12px;
 }
 .footerMain nav a {
-  font-size: 10px;
+  font-size: 12px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -781,7 +1078,7 @@
   display: flex;
   justify-content: space-between;
   padding: 22px 0;
-  font-size: 8px;
+  font-size: 11px;
   color: #a2978a;
 }
 .srOnly {
@@ -804,7 +1101,7 @@
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  font-size: 11px;
+  font-size: 13px;
   color: #b9b0a7;
   margin-bottom: 60px;
 }
@@ -826,7 +1123,7 @@
 .companyHeroGrid > div > p {
   color: #b9b0a7;
   margin: 27px 0;
-  font-size: 13px;
+  font-size: 14px;
   max-width: 520px;
 }
 .activityPanel {
@@ -841,7 +1138,7 @@
 .activityPanel > span {
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--sand);
 }
 .activityPanel > p {
@@ -850,7 +1147,7 @@
   justify-content: space-between;
   padding: 15px 0;
   border-bottom: 1px solid #443c35;
-  font-size: 12px;
+  font-size: 14px;
   color: #e2d6cb;
 }
 .unitControls {
@@ -877,13 +1174,13 @@
   border: 0;
   background: none;
   color: var(--ink);
-  font-size: 12px;
+  font-size: 14px;
   max-width: 100%;
   width: 270px;
 }
 .unitCount {
   color: #8e7b6b;
-  font-size: 10px !important;
+  font-size: 12px !important;
   margin: 25px 0 15px !important;
 }
 .unitGrid {
@@ -905,15 +1202,15 @@
   flex-shrink: 0;
 }
 .unitGrid h3 {
-  font-size: 13px;
+  font-size: 14px;
 }
 .unitGrid p {
-  font-size: 10px;
+  font-size: 12px;
   color: #8c7764;
 }
 .unitGrid article > span {
   margin-left: auto;
-  font-size: 9px;
+  font-size: 12px;
   color: #8c7764;
 }
 .emptyState {
@@ -934,7 +1231,7 @@
   font-size: 22px;
 }
 .emptyState p {
-  font-size: 12px;
+  font-size: 14px;
   max-width: 460px;
   color: #78695c;
 }
@@ -958,7 +1255,7 @@
   max-width: 550px;
 }
 .companyCta p {
-  font-size: 12px;
+  font-size: 14px;
   max-width: 520px;
   margin-top: 15px;
   color: #78695c;
@@ -989,10 +1286,10 @@
     gap: 18px;
   }
   .desktopNav a {
-    font-size: 10px;
+    font-size: 12px;
   }
   .portalLink {
-    font-size: 9px;
+    font-size: 12px;
   }
   .heroGrid {
     gap: 35px;
@@ -1012,28 +1309,19 @@
     gap: 20px;
   }
   .heroActions .button {
-    font-size: 10px;
+    font-size: 12px;
     gap: 10px;
     padding: 14px;
-  }
-  .companyGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .companyCard {
-    padding: 27px;
-  }
-  .companyIdentity {
-    margin-top: 22px;
   }
   .quickLinks a {
     padding-inline: 18px;
     gap: 12px;
   }
   .quickLinks strong {
-    font-size: 10px;
+    font-size: 12px;
   }
   .quickLinks small {
-    font-size: 8px;
+    font-size: 11px;
   }
   .quickLinks a > span {
     display: none;
@@ -1053,6 +1341,25 @@
   .footerMain {
     gap: 35px;
     grid-template-columns: 160px 1fr 190px;
+  }
+}
+@media (max-width: 1100px) {
+  .companyGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .companyGrid > li {
+    grid-column: span 1;
+  }
+  .companyGrid > li.companyFeatured {
+    grid-column: span 2;
+  }
+  .heroBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .brandStrip {
+    justify-content: flex-start;
   }
 }
 @media (max-width: 800px) {
@@ -1083,7 +1390,7 @@
   }
   .mobileNav a {
     padding: 10px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--ink);
     display: flex;
     align-items: center;
@@ -1104,19 +1411,16 @@
     padding: 0 5px 30px;
   }
   .heroCopy > p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .heroSignature {
-    font-size: 8px;
+    font-size: 11px;
   }
   .heroActions {
     gap: 15px;
   }
   .heroSecondary {
-    font-size: 10px;
-  }
-  .heroBottom {
-    font-size: 8px;
+    font-size: 12px;
   }
   .sectionHeading {
     gap: 30px;
@@ -1191,7 +1495,7 @@
     width: 120px;
   }
   .portalLink {
-    font-size: 8px;
+    font-size: 11px;
     padding: 10px;
     gap: 5px;
   }
@@ -1217,11 +1521,11 @@
     font-size: clamp(40px, 10vw, 58px);
   }
   .heroCopy .eyebrow {
-    font-size: 8px;
+    font-size: 11px;
     margin-bottom: 22px;
   }
   .heroCopy > p {
-    font-size: 12px;
+    font-size: 14px;
     margin-top: 20px;
   }
   .heroActions {
@@ -1229,12 +1533,12 @@
     margin-top: 27px;
   }
   .heroActions .button {
-    font-size: 10px;
+    font-size: 12px;
     padding: 15px 17px;
   }
   .heroSignature {
     margin-top: 25px;
-    font-size: 9px;
+    font-size: 12px;
   }
   .heroVisual {
     min-height: 320px;
@@ -1248,7 +1552,7 @@
     width: 230px;
   }
   .visualFooter {
-    font-size: 9px;
+    font-size: 12px;
     padding-top: 14px;
   }
   .brandYear {
@@ -1256,15 +1560,7 @@
   }
   .heroBottom {
     margin-top: 33px;
-    padding: 20px 0;
-  }
-  .heroBottom > span {
-    max-width: 150px;
-    font-size: 7px;
-  }
-  .heroBottom > a {
-    font-size: 8px;
-    gap: 7px;
+    padding: 22px 0 26px;
   }
   .quickLinks > .container {
     grid-template-columns: 1fr;
@@ -1283,10 +1579,10 @@
     display: block;
   }
   .quickLinks strong {
-    font-size: 11px;
+    font-size: 13px;
   }
   .quickLinks small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .sectionHeading {
     flex-direction: column;
@@ -1296,10 +1592,10 @@
   }
   .sectionHeading > p {
     max-width: 100%;
-    font-size: 11px;
+    font-size: 13px;
   }
   .eyebrow {
-    font-size: 8px;
+    font-size: 11px;
     margin-bottom: 18px;
   }
   .hub h2 {
@@ -1310,44 +1606,8 @@
     margin-bottom: 23px;
   }
   .filters button {
-    font-size: 9px;
+    font-size: 12px;
     padding: 8px 10px;
-  }
-  .companyGrid {
-    gap: 12px;
-  }
-  .companyCard {
-    padding: 17px;
-  }
-  .companyTop {
-    font-size: 7px;
-    letter-spacing: 0.03em;
-  }
-  .companyTop svg {
-    width: 16px;
-  }
-  .companyIdentity {
-    margin: 22px 0 15px;
-  }
-  .companyIdentity svg {
-    width: 22px;
-  }
-  .companyIdentity span {
-    font-size: 11px;
-  }
-  .companyCard h3 {
-    font-size: 14px;
-  }
-  .companyCard > p {
-    font-size: 10px;
-    margin-bottom: 20px;
-  }
-  .companyMore {
-    font-size: 8px;
-    gap: 5px;
-  }
-  .companyMore svg {
-    width: 13px;
   }
   .historyIntro {
     grid-template-columns: 1fr;
@@ -1360,13 +1620,13 @@
     margin-top: 40px;
   }
   .timelineSteps button {
-    font-size: 8px;
+    font-size: 11px;
     padding-top: 20px;
     padding-right: 8px;
     line-height: 1.5;
   }
   .timelineSteps button small {
-    font-size: 7px;
+    font-size: 11px;
   }
   .storyPanel {
     grid-template-columns: 45px 1fr;
@@ -1382,10 +1642,10 @@
     font-size: 18px;
   }
   .storyPanel p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .storyPanel small {
-    font-size: 8px;
+    font-size: 11px;
   }
   .universityGrid,
   .talentGrid {
@@ -1395,16 +1655,16 @@
     padding: 24px;
   }
   .learningPath h3 {
-    font-size: 11px;
+    font-size: 13px;
   }
   .learningPath p {
-    font-size: 9px;
+    font-size: 12px;
   }
   .learningPath > div {
     gap: 12px;
   }
   .learningEyebrow {
-    font-size: 8px;
+    font-size: 11px;
   }
   .talentGuide {
     padding: 25px;
@@ -1413,7 +1673,7 @@
     font-size: 24px;
   }
   .talentGrid .contentNote {
-    font-size: 9px;
+    font-size: 12px;
   }
   .footer {
     padding-top: 35px;
@@ -1424,16 +1684,16 @@
     padding-bottom: 28px;
   }
   .footerMain > p {
-    font-size: 13px;
+    font-size: 14px;
   }
   .footerMain nav {
     gap: 15px 20px;
   }
   .footerMain nav a {
-    font-size: 9px;
+    font-size: 12px;
   }
   .footerBottom {
-    font-size: 7px;
+    font-size: 11px;
     gap: 25px;
     align-items: start;
   }
@@ -1446,7 +1706,7 @@
   }
   .backLink {
     margin-bottom: 38px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .companyHero h1 {
     font-size: 44px;
@@ -1462,13 +1722,13 @@
     gap: 8px;
   }
   .unitGrid h3 {
-    font-size: 11px;
+    font-size: 13px;
   }
   .unitGrid p {
-    font-size: 9px;
+    font-size: 12px;
   }
   .unitGrid article > span {
-    font-size: 8px;
+    font-size: 11px;
   }
   .unitGrid svg {
     width: 17px;
@@ -1488,8 +1748,70 @@
     font-size: 26px;
   }
 }
+@media (max-width: 600px) {
+  #empresas .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: -20px;
+    padding-inline: 20px;
+  }
+  #empresas .filters button {
+    flex-shrink: 0;
+  }
+  .companyFeatured .plate_card .plateLogo {
+    padding: 10% 18%;
+  }
+  .companyGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .companyGrid > li,
+  .companyGrid > li.companyFeatured {
+    grid-column: auto;
+  }
+  .companyFeatured .companyCard {
+    flex-direction: column;
+  }
+  .companyFeatured .plate_card {
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+  .plate_card {
+    aspect-ratio: 16 / 8;
+  }
+  .companyFeatured .companyBody,
+  .companyBody {
+    padding: 20px;
+  }
+  .companyFeatured .companyCard h3 {
+    font-size: 20px;
+  }
+  .brandStrip {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: -20px;
+    padding-inline: 20px;
+    width: calc(100% + 40px);
+    max-width: 100vw;
+  }
+  .brandStrip::-webkit-scrollbar {
+    display: none;
+  }
+  .heroBottom nav {
+    width: 100%;
+  }
+  .plate_hero {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 24px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hub * {
+  .hub *,
+  .hub .plateLogo {
     transition: none !important;
     scroll-behavior: auto !important;
   }

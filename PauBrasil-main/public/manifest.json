@@ -1,38 +1,56 @@
 {
   "name": "Grupo Pau Brasil Portal",
   "short_name": "PauBrasil",
-  "description": "Portal corporativo e de engajamento do Grupo Pau Brasil",
-  "theme_color": "#00c951",
-  "background_color": "#0d0d14",
+  "description": "Portal corporativo do Grupo Pau Brasil",
+  "theme_color": "#7a1520",
+  "background_color": "#1a1a1a",
   "display": "standalone",
   "orientation": "portrait-primary",
   "scope": "/",
-  "start_url": "/app/hoje",
+  "start_url": "/app/inicio",
   "id": "/app/hoje",
-  "categories": ["productivity", "business"],
+  "categories": [
+    "productivity",
+    "business"
+  ],
   "lang": "pt-BR",
   "dir": "ltr",
   "shortcuts": [
     {
-      "name": "Checklist do Dia",
-      "short_name": "Hoje",
-      "description": "Ver e completar tarefas do dia",
-      "url": "/app/hoje",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "name": "Início",
+      "short_name": "Início",
+      "description": "Serviços do portal",
+      "url": "/app/inicio",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Universidade",
       "short_name": "UPB",
       "description": "Acessar treinamentos e episódios",
       "url": "/universidade",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "name": "Ranking",
-      "short_name": "Ranking",
-      "description": "Ver ranking de pontos",
-      "url": "/app/ranking",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "name": "Meu perfil",
+      "short_name": "Perfil",
+      "description": "Dados da conta e senha",
+      "url": "/app/perfil",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "icons": [

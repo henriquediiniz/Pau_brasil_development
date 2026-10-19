@@ -1,5 +1,7 @@
 # Mapa do Sistema
 
+> **Atualização de contexto — 19/10/2026:** Mapa histórico: módulos e contagens abaixo não representam integralmente a versão atual. Leia o [contexto atual](contexto-agente/00-LEIA-PRIMEIRO.md) e o [inventário técnico](contexto-agente/06-INVENTARIO-TECNICO.md) antes de desenvolver.
+
 ## Visão Geral
 
 Este projeto é um portal corporativo monolítico em Next.js com foco em operação interna, engajamento, gestão, universidade corporativa, financeiro/OBZ e score de clientes.

@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { Montserrat } from 'next/font/google'
-import { ArrowLeft, ArrowRight, ArrowUpRight, Building2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check } from 'lucide-react'
 import { HUB_COMPANIES } from '@/lib/hub-content'
 import { HubFooter, HubNav } from '@/app/_components/HubShell'
-import { HubUnits } from '@/app/_components/HubInteractive'
+import {
+  BrandPlate,
+  HubBrandStrip,
+  HubUnits,
+} from '@/app/_components/HubInteractive'
 import styles from '@/app/_components/Hub.module.css'
 
 const montserrat = Montserrat({
@@ -23,14 +27,17 @@ export function generateMetadata({
 }): Metadata {
   const company = HUB_COMPANIES.find((item) => item.slug === params.slug)
   return {
-    title: company?.name ?? 'Empresa não encontrada',
+    title: company
+      ? `${company.name} · Grupo Pau Brasil`
+      : 'Empresa não encontrada',
     description: company?.description,
-    icons: { icon: '/brand/icone.png' },
+    icons: { icon: '/icons/icon-192.png' },
   }
 }
 export default function CompanyPage({ params }: { params: { slug: string } }) {
   const company = HUB_COMPANIES.find((item) => item.slug === params.slug)
   if (!company) notFound()
+  if (company.externalUrl) redirect(company.externalUrl)
   return (
     <div className={`${styles.hub} ${montserrat.variable}`}>
       <HubNav />
@@ -41,7 +48,8 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
               <ArrowLeft size={17} /> Todas as empresas
             </Link>
             <div className={styles.companyHeroGrid}>
-              <div>
+              <div className={styles.companyHeroCopy}>
+                <BrandPlate company={company} size="hero" />
                 <span className={styles.eyebrow}>
                   {company.segment}
                   {company.partner ? ` · ${company.partner}` : ''}
@@ -56,14 +64,24 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                 </a>
               </div>
               <div className={styles.activityPanel}>
-                <Building2 size={36} strokeWidth={1} />
                 <span>Áreas de atuação</span>
-                {company.activities.map((activity) => (
-                  <p key={activity}>
-                    {activity}
-                    <ArrowUpRight size={17} />
-                  </p>
-                ))}
+                <ul>
+                  {company.activities.map((activity) => (
+                    <li key={activity}>
+                      <Check size={16} aria-hidden="true" />
+                      {activity}
+                    </li>
+                  ))}
+                </ul>
+                {company.units.length > 0 && (
+                  <a href="#unidades" className={styles.activityStat}>
+                    <strong>{company.units.length}</strong>
+                    <span>
+                      unidades em{' '}
+                      {new Set(company.units.map((u) => u.state)).size} estados
+                    </span>
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -100,6 +118,14 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                 : 'Falar com o grupo'}
               <ArrowUpRight size={18} />
             </Link>
+          </div>
+        </section>
+        <section className={styles.otherCompanies} aria-labelledby="outras">
+          <div className={styles.container}>
+            <span className={styles.eyebrow} id="outras">
+              Outras empresas do grupo
+            </span>
+            <HubBrandStrip current={company.slug} />
           </div>
         </section>
       </main>

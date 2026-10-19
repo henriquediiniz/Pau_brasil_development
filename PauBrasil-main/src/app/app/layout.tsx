@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   User, LayoutDashboard, Users, Settings, LogOut,
   ChevronLeft, ChevronRight, Menu, Bell, X, Key, ClipboardList,
-  GraduationCap, LayoutDashboard as DashboardIcon,
-  Search, Home, Building2, Briefcase, MapPin, HardDrive, Camera, HelpCircle,
+  GraduationCap,
+  Search, Home, Building2, Briefcase, HardDrive, HelpCircle,
   UsersRound, ArrowLeft, type LucideIcon,
 } from 'lucide-react'
 import { CommandMenu } from '@/components/ui/command-menu'
@@ -75,8 +75,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isUPBAdmin = user ? isUpbAdmin(user) : false
   const isRhAdminUser = user ? hasRhAdminAccess(user) : false
   const isEmpresaAdmin = user?.isEmpresaAdmin === true
-  const isItinerantLeader = user?.isItinerantLeader === true
-  const isVisitasAdmin    = user?.isVisitasAdmin === true
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -108,20 +106,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     _sections.push({ label: 'Universidade', items: [
       { href: '/admin/upb', label: 'Gerenciar Universidade', icon: GraduationCap },
     ] })
-  }
-
-  // ── Zona: Visitas (condicional) ───────────────────────────────────────────
-  if (isItinerantLeader || isAdmin || isVisitasAdmin) {
-    const visitasItems: NavItem[] = []
-    if (isItinerantLeader) {
-      visitasItems.push({ href: '/app/visitas/configurar-face', label: 'Config. Face', icon: Camera })
-      visitasItems.push({ href: '/app/visitas/checkin',         label: 'Check-in',    icon: MapPin })
-    }
-    if (isAdmin || isVisitasAdmin) {
-      visitasItems.push({ href: '/app/visitas/dashboard',         label: 'Dashboard',  icon: DashboardIcon })
-      visitasItems.push({ href: '/admin/visitas/obrigatorias',    label: 'Obrigações', icon: ClipboardList })
-    }
-    _sections.push({ label: 'Visitas', items: visitasItems })
   }
 
   if (isDiretor && !isAdmin) {
@@ -166,9 +150,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         { href: '/admin/funcoes',      label: 'Funções',        icon: Settings },
         { href: '/admin/upb',          label: 'Universidade',   icon: GraduationCap },
         { href: '/admin/auditoria',    label: 'Auditoria',      icon: ClipboardList },
-        { href: '/gente',              label: 'Gente',          icon: UsersRound },
-        { href: '/talentos',           label: 'Banco de Talentos', icon: Users },
-        { href: '/admin/operacoes',    label: 'Filiais',        icon: MapPin },
         { href: '/admin/backup',       label: 'Backup',         icon: HardDrive },
       ],
     })
@@ -176,7 +157,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return _sections
   }, [isAdmin, isDiretor,
-      isUPBAdmin, isRhAdminUser, isEmpresaAdmin, isItinerantLeader, isVisitasAdmin])
+      isUPBAdmin, isRhAdminUser, isEmpresaAdmin])
 
   // Flat list for mobile bottom nav
   const commandSections = useMemo(() => sections.map(section => ({
@@ -227,7 +208,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
     if (document.visibilityState === 'visible') return // skip when tab is focused
     try {
-      new Notification(title, { body, icon: '/brand/icone.png', badge: '/brand/icone.png' })
+      new Notification(title, { body, icon: '/icons/icon-192.png', badge: '/icons/icon-96.png' })
     } catch {}
   }
 

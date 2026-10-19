@@ -7,7 +7,7 @@ import {
   Users, Plus, Search, Loader2, Pencil, X, Eye, EyeOff, Check,
   Trash2, AlertTriangle, UserCheck, ChevronDown, ChevronRight,
   Shield, ShieldCheck, ShieldAlert, BookOpen, Building2,
-  CheckSquare, MapPin, Send,
+  CheckSquare, Send,
 } from 'lucide-react'
 import { toast } from '@/components/ui/toaster'
 import { canManageTeamByNivel, isSystemAdminRole } from '@/lib/auth-helpers'
@@ -83,8 +83,8 @@ type RoleValue = 'USER' | 'RH_ADMIN' | 'SYS_ADMIN'
 const MODULE_DEFS = [
   { key: 'isUPBAdmin' as const, label: 'Admin UPB', desc: 'Gerencia cursos, episódios e certificados', icon: BookOpen, color: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/20', bgActive: 'bg-sky-500/20 border-sky-400/40' },
   { key: 'isEmpresaAdmin' as const, label: 'Admin de Empresa', desc: 'Configura dados e operações da empresa', icon: Building2, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', bgActive: 'bg-emerald-500/20 border-emerald-400/40' },
-  { key: 'isItinerantLeader' as const, label: 'Líder Itinerante', desc: 'Check-in com GPS + face nas filiais', icon: MapPin, color: 'text-brand-400', bg: 'bg-brand-500/10 border-brand-500/20', bgActive: 'bg-brand-500/20 border-brand-400/40' },
-  { key: 'isVisitasAdmin' as const, label: 'Admin de Visitas', desc: 'Acessa dashboard e gerencia filiais', icon: MapPin, color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/20', bgActive: 'bg-indigo-500/20 border-indigo-400/40' },
+  // Visitas foi retirado do portal: as flags de líder itinerante e admin de visitas
+  // continuam no banco e são preservadas ao salvar, mas não são mais oferecidas aqui.
 ]
 
 type AccessFilter = 'todos' | 'admin' | 'upb' | 'aprovador'
@@ -104,8 +104,6 @@ function AccessBadges({ user }: { user: UserItem }) {
   const badges: { label: string; cls: string }[] = []
   if (user.isUPBAdmin) badges.push({ label: 'UPB', cls: 'bg-sky-500/15 text-sky-400 border-sky-500/30' })
   if (user.isEmpresaAdmin) badges.push({ label: 'Empresa', cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' })
-  if (user.isItinerantLeader) badges.push({ label: 'Líder', cls: 'bg-brand-500/15 text-brand-400 border-brand-500/30' })
-  if ((user as any).isVisitasAdmin) badges.push({ label: 'Visitas', cls: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' })
   if ((user.managedAreaIds?.length ?? 0) > 0) badges.push({ label: 'Aprov.', cls: 'bg-teal-500/15 text-teal-400 border-teal-500/30' })
   if (badges.length === 0) return <span className="text-slate-600 text-xs">—</span>
   return (

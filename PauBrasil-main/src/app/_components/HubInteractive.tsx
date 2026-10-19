@@ -1,32 +1,85 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ComponentProps } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   ArrowRight,
   ArrowUpRight,
-  Building2,
   MapPin,
   Search,
 } from 'lucide-react'
 import {
   HUB_COMPANIES,
+  HUB_FEATURED,
   HUB_INTERESTS,
   HUB_STORY,
+  hubCompanyHref,
   suggestHubCompanies,
   type HubCompany,
 } from '@/lib/hub-content'
 import styles from './Hub.module.css'
 
+/** Link para a empresa: abre o site próprio em nova aba quando existir. */
+function CompanyLink({
+  company,
+  ...props
+}: { company: HubCompany } & Omit<ComponentProps<typeof Link>, 'href'>) {
+  const href = hubCompanyHref(company)
+  if (company.externalUrl)
+    return <a href={href} target="_blank" rel="noopener noreferrer" {...props} />
+  return <Link href={href} {...props} />
+}
+
+/** Placa de marca: logo real sobre a cor da própria marca, ou monograma enquanto não há arquivo aprovado. */
+export function BrandPlate({
+  company,
+  size = 'card',
+}: {
+  company: HubCompany
+  size?: 'card' | 'mini' | 'hero'
+}) {
+  const sizes =
+    size === 'hero'
+      ? '(max-width: 800px) 220px, 300px'
+      : size === 'mini'
+        ? '56px'
+        : '(max-width: 600px) 45vw, (max-width: 1100px) 30vw, 260px'
+  return (
+    <span
+      className={`${styles.brandPlateBox} ${styles[`plate_${size}`]}`}
+      style={{ background: company.plate }}
+      data-shape={company.logo?.shape ?? 'monogram'}
+    >
+      {company.logo ? (
+        <Image
+          src={company.logo.src}
+          // Nos cards e na faixa o nome já aparece ao lado; o logo é decorativo.
+          alt={size === 'hero' ? `Logo ${company.name}` : ''}
+          fill
+          sizes={sizes}
+          className={styles.plateLogo}
+        />
+      ) : (
+        <span className={styles.plateMonogram} aria-hidden="true">
+          {company.monogram}
+        </span>
+      )}
+    </span>
+  )
+}
+
 export function HubCompanies() {
   const [filter, setFilter] = useState('Todos')
-  const segments = [
-    'Todos',
-    ...Array.from(new Set(HUB_COMPANIES.map((company) => company.segment))),
-  ]
+  const counts = HUB_COMPANIES.reduce<Record<string, number>>((acc, c) => {
+    acc[c.segment] = (acc[c.segment] ?? 0) + 1
+    return acc
+  }, {})
+  const segments = ['Todos', ...Object.keys(counts)]
   const companies = HUB_COMPANIES.filter(
     (company) => filter === 'Todos' || company.segment === filter,
   )
+  const showFeatured = filter === 'Todos'
   return (
     <>
       <div
@@ -42,36 +95,84 @@ export function HubCompanies() {
             onClick={() => setFilter(segment)}
           >
             {segment}
+            <span className={styles.filterCount} aria-hidden="true">
+              {segment === 'Todos' ? HUB_COMPANIES.length : counts[segment]}
+            </span>
           </button>
         ))}
       </div>
       <p className={styles.srOnly} role="status">
-        {companies.length} empresas encontradas
+        {companies.length}{' '}
+        {companies.length === 1 ? 'empresa encontrada' : 'empresas encontradas'}
       </p>
-      <div className={styles.companyGrid}>
-        {companies.map((company) => (
-          <Link
-            href={`/empresas/${company.slug}`}
-            key={company.slug}
-            className={styles.companyCard}
-          >
-            <div className={styles.companyTop}>
-              <span>{company.segment}</span>
-              <ArrowUpRight size={22} aria-hidden="true" />
-            </div>
-            <div className={styles.companyIdentity}>
-              <Building2 size={27} strokeWidth={1.3} aria-hidden="true" />
-              {company.partner && <span>{company.partner}</span>}
-            </div>
-            <h3>{company.name}</h3>
-            <p>{company.description}</p>
-            <span className={styles.companyMore}>
-              Conhecer a empresa <ArrowRight size={17} aria-hidden="true" />
-            </span>
-          </Link>
-        ))}
-      </div>
+      <ul className={styles.companyGrid}>
+        {companies.map((company) => {
+          const featured =
+            showFeatured &&
+            (HUB_FEATURED as readonly string[]).includes(company.slug)
+          return (
+            <li
+              key={company.slug}
+              className={featured ? styles.companyFeatured : undefined}
+            >
+              <CompanyLink
+                company={company}
+                className={styles.companyCard}
+              >
+                <BrandPlate company={company} />
+                <div className={styles.companyBody}>
+                  <div className={styles.companyTop}>
+                    <span>{company.segment}</span>
+                    {company.partner && (
+                      <span className={styles.partnerTag}>
+                        Parceiro {company.partner}
+                      </span>
+                    )}
+                  </div>
+                  <h3>{company.name}</h3>
+                  <p>{company.description}</p>
+                  <span className={styles.companyMore}>
+                    <span>
+                      {company.units.length > 0
+                        ? `${company.units.length} unidades`
+                        : 'Conhecer a empresa'}
+                    </span>
+                    <span className={styles.companyArrow} aria-hidden="true">
+                      <ArrowUpRight size={18} />
+                    </span>
+                  </span>
+                </div>
+              </CompanyLink>
+            </li>
+          )
+        })}
+      </ul>
     </>
+  )
+}
+
+/** Faixa de marcas: atalho direto para cada empresa do grupo. */
+export function HubBrandStrip({
+  current,
+  variant = 'pills',
+}: {
+  current?: string
+  variant?: 'pills' | 'stacked'
+}) {
+  const items = HUB_COMPANIES.filter((c) => c.slug !== current)
+  return (
+    <ul
+      className={`${styles.brandStrip} ${variant === 'stacked' ? styles.brandStripStacked : ''}`}
+    >
+      {items.map((company) => (
+        <li key={company.slug}>
+          <CompanyLink company={company} title={company.name}>
+            <BrandPlate company={company} size="mini" />
+            <span>{company.name}</span>
+          </CompanyLink>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -165,10 +266,11 @@ export function HubTalentGuide() {
             <strong>Negócios para você conhecer</strong>
             <p>{HUB_INTERESTS.find((item) => item.id === submitted)?.reason}</p>
             {companies.map((company) => (
-              <Link href={`/empresas/${company.slug}`} key={company.slug}>
-                {company.name}
-                <ArrowUpRight size={16} />
-              </Link>
+              <CompanyLink company={company} key={company.slug}>
+                <BrandPlate company={company} size="mini" />
+                <span>{company.name}</span>
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </CompanyLink>
             ))}
             <small>
               Esta orientação usa apenas o interesse escolhido. Não é uma oferta

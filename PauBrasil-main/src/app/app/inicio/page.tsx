@@ -16,7 +16,8 @@ export default async function InicioPage() {
     { href: '/app/perfil', icon: User, title: 'Meu perfil', description: 'Consulte seus dados e gerencie sua conta.' },
     { href: '/app/ajuda', icon: HelpCircle, title: 'Ajuda', description: 'Encontre orientações para usar o portal.' },
     ...(canManageEmpresa(user) ? [{ href: '/empresa', icon: Building2, title: 'Minha empresa', description: 'Gerencie colaboradores e funções.' }] : []),
-    ...(canAccessGente(user) ? [{ href: '/gente', icon: UsersRound, title: 'Gente & Cultura', description: 'Acesse recrutamento e gestão de pessoas.' }] : []),
+    // Gente & Talentos saíram da área de administração: o atalho fica só para o RH.
+    ...(canAccessGente(user) && !isSysAdmin(user) ? [{ href: '/gente', icon: UsersRound, title: 'Gente & Cultura', description: 'Acesse recrutamento e gestão de pessoas.' }] : []),
     ...(isSysAdmin(user) ? [{ href: '/admin', icon: Shield, title: 'Administração', description: 'Gerencie os acessos e as configurações do portal.' }] : []),
   ]
 

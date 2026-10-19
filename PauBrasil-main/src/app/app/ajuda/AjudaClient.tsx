@@ -3,8 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  HelpCircle, Search, GraduationCap, DollarSign,
-  MapPin, ChevronDown, BookOpen, Shield, Clock,
+  HelpCircle, Search, GraduationCap, ChevronDown, BookOpen, Shield, Clock,
   AlertCircle, X, ArrowRight, Lightbulb, FileText,
 } from 'lucide-react'
 
@@ -58,62 +57,7 @@ const MODULOS: Modulo[] = [
       { titulo: 'Pré-requisitos', detalhe: 'Alguns cursos exigem que outros sejam concluídos antes. Verifique os pré-requisitos na descrição do curso.', icone: 'alert' },
     ],
   },
-  {
-    id: 'obz',
-    titulo: 'OBZ — Orçamento de Base Zero',
-    descricao: 'Como lançar tendências, submeter justificativas e acompanhar o ciclo OBZ da sua área.',
-    icon: DollarSign,
-    color: 'purple',
-    borderColor: 'border-purple-500/30',
-    bgColor: 'bg-purple-500/10',
-    textColor: 'text-purple-400',
-    guias: [
-      { titulo: 'O que é OBZ', descricao: 'O OBZ é a metodologia de planejamento financeiro da empresa. Cada colaborador responsável por uma área deve lançar a tendência mensal de gastos nos pacotes atribuídos.' },
-      { titulo: 'Acessar seu OBZ', descricao: 'Clique em "Meu OBZ" na sidebar. Você verá os pacotes e áreas sob sua responsabilidade com o status de cada período.' },
-      { titulo: 'Lançar tendência', descricao: 'Selecione o pacote e a área, clique em "Lançar". Informe o valor previsto para o mês e confirme. O valor pode ser editado enquanto o período estiver aberto.' },
-      { titulo: 'Submeter justificativas', descricao: 'Quando um valor está acima ou abaixo do orçado, o sistema solicita justificativa. Clique em "Justificativas", preencha o motivo e envie para aprovação do gestor.' },
-      { titulo: 'Acompanhar aprovações', descricao: 'Veja o status das suas justificativas em tempo real. Aprovadas geram notificação; reprovadas podem ser corrigidas e resubmetidas.', badge: 'Novo' },
-    ],
-    faq: [
-      { pergunta: 'Qual o prazo para lançar a tendência?', resposta: 'O prazo é definido pelo gestor OBZ de cada período. Você receberá um e-mail de lembrete quando o prazo estiver próximo.' },
-      { pergunta: 'Posso alterar um lançamento já feito?', resposta: 'Sim, enquanto o período estiver aberto. Após o fechamento pelo admin, os lançamentos ficam bloqueados para edição.' },
-      { pergunta: 'O que acontece se eu não lançar no prazo?', resposta: 'Seu gestor é notificado sobre o atraso. O período pode ser estendido ou o lançamento pode ser feito pelo admin.' },
-      { pergunta: 'Onde vejo o histórico de lançamentos?', resposta: 'No painel "Meu OBZ", clique no pacote e selecione o mês desejado. Todos os lançamentos e justificativas ficam registrados.' },
-    ],
-    politicas: [
-      { titulo: 'Períodos de lançamento', detalhe: 'O admin define os períodos de abertura e fechamento. Fora do período, lançamentos são bloqueados.', icone: 'clock' },
-      { titulo: 'Justificativas obrigatórias', detalhe: 'Variações acima do threshold configurado (geralmente 10%) exigem justificativa antes do fechamento.', icone: 'alert' },
-      { titulo: 'Responsabilidade', detalhe: 'O dono da área é o único responsável pelos lançamentos de seus pacotes. Reatribuições devem ser solicitadas ao gestor OBZ.', icone: 'shield' },
-    ],
-  },
-  {
-    id: 'visitas',
-    titulo: 'Visitas de Líderes',
-    descricao: 'Como realizar check-in nas filiais, configurar reconhecimento facial e acompanhar obrigações.',
-    icon: MapPin,
-    color: 'indigo',
-    borderColor: 'border-indigo-500/30',
-    bgColor: 'bg-indigo-500/10',
-    textColor: 'text-indigo-400',
-    guias: [
-      { titulo: 'Configurar reconhecimento facial', descricao: 'Antes do primeiro check-in, vá em Visitas → Config. Face. Tire uma foto nítida do seu rosto com boa iluminação. Essa referência será usada para validar presenças.', badge: 'Obrigatório' },
-      { titulo: 'Fazer check-in em uma filial', descricao: 'Vá em Visitas → Check-in. Selecione a filial visitada, tire uma selfie e confirme. O sistema valida sua localização GPS e compara com a foto de referência.' },
-      { titulo: 'Ver histórico de visitas', descricao: 'No Dashboard de Visitas, você vê todas as visitas realizadas com data, filial, foto e status de validação (GPS + Face).' },
-      { titulo: 'Acompanhar visitas obrigatórias', descricao: 'Em Visitas → Obrigações, você vê as filiais que devem ser visitadas no período, quantas visitas foram feitas e o status de compliance.', badge: 'Líderes' },
-    ],
-    faq: [
-      { pergunta: 'O GPS precisa estar ativado?', resposta: 'Sim. O check-in valida se você está dentro do raio da filial. Sem GPS ativado, o check-in é bloqueado.' },
-      { pergunta: 'O que fazer se o reconhecimento facial falhar?', resposta: 'Certifique-se de estar em local bem iluminado e de frente para a câmera. Se persistir, refaça a Config. Face com uma nova foto de referência.' },
-      { pergunta: 'Posso fazer check-in em filiais que não são as minhas?', resposta: 'Sim. Líderes itinerantes podem visitar qualquer filial. O registro é vinculado ao seu usuário independentemente da filial.' },
-      { pergunta: 'Com que frequência devo visitar cada filial?', resposta: 'As obrigações de visita são configuradas pelo admin. Verifique em Visitas → Obrigações para ver os requisitos da sua rota.' },
-    ],
-    politicas: [
-      { titulo: 'Raio de validade GPS', detalhe: 'O check-in é válido apenas dentro do raio cadastrado de cada filial (definido pelo admin na configuração da operação).', icone: 'shield' },
-      { titulo: 'Intervalo mínimo entre visitas', detalhe: 'Para evitar duplicatas, o sistema exige intervalo mínimo de 30 minutos entre check-ins na mesma filial.', icone: 'clock' },
-      { titulo: 'Foto obrigatória', detalhe: 'Toda visita exige foto validada. Check-ins sem validação facial são marcados como inválidos no relatório.', icone: 'alert' },
-    ],
-  },
-
+  // OBZ e Visitas foram retirados do portal; seus guias saíram junto.
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -241,7 +185,7 @@ export default function AjudaClient() {
           {/* Pills de stats */}
           <div className="flex flex-wrap gap-3">
             {[
-              { label: `${MODULOS.length} módulos`, icon: BookOpen },
+              { label: `${MODULOS.length} ${MODULOS.length === 1 ? 'módulo' : 'módulos'}`, icon: BookOpen },
               { label: `${totalGuias} guias`, icon: FileText },
               { label: `${totalFaq} perguntas`, icon: Lightbulb },
             ].map(({ label, icon: Icon }) => (

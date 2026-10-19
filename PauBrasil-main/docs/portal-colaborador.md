@@ -1,5 +1,7 @@
 # Portal do colaborador — versão inicial
 
+> **Atualização de contexto — 19/10/2026:** Documento da versão anterior à simplificação de 19/10/2026. Atividades, carteira, conquistas e ranking foram retirados da experiência do portal. Leia [produto e decisões atuais](contexto-agente/01-PRODUTO-E-DECISOES.md). Referências abaixo a navegação e testes antigos são históricas.
+
 O portal reutiliza as funções existentes de início, atividades, pontos, ranking,
 conquistas, perfil e Universidade Pau Brasil. A navegação respeita os acessos de
 cada perfil: colaboradores de outras empresas continuam com a Universidade e
