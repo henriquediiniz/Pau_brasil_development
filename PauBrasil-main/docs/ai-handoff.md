@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Hub: foto do fundador e efeitos | Claude | concluido | 2026-10-20: retrato + frase do fundador, cortina, entrada do hero, logo que cresce, contadores, brilho do cursor, textura de papel, entrada da pagina de empresa, revelacao ao rolar, barra de progresso | Corrigir 2 E2E do hub que ja falhavam |
 | Contexto consolidado e produção 19/10 | Codex | concluído | Documentação completa em `docs/contexto-agente/`; produção validada no commit `f77afba` | Consultar índice atual antes de retomar desenvolvimento |
 | Portal do colaborador e identidade 2026 | Codex | concluido | 2026-10-16: paleta, login/navegacao/atividades corrigidos, loja suspensa; 6 E2E + 42 testes aprovados | Aguardar requisitos dos supervisores |
 | Hub institucional e marca 2026 | Codex | concluido | 2026-10-16: home e 8 empresas, marca nova, filtros e orientacao editorial; tsc e 3 E2E aprovados | Receber acervo e cadastro oficial; definir encaminhamento real entre empresas |
@@ -249,6 +250,9 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
+- Claude — efeitos do hub, rodada 2 (2026-10-20)
+  - objetivo concluido; arquivos em posse: nenhum
+
 - Codex — consolidação de contexto (2026-10-19)
   - objetivo concluído: documentação atual para transferência a um novo agente
   - arquivos em posse: nenhum; pacote de contexto concluído
@@ -406,6 +410,30 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-20 - Claude - Nome do fundador
+
+- Usuario confirmou o fundador: Zenildo. Nome aplicado na legenda do retrato, no texto alternativo e na assinatura da frase em `src/app/page.tsx`.
+- Parecer do outro agente: pendente.
+
+### 2026-10-20 - Claude - Efeitos do hub, rodada 2
+
+- Frase do fundador fornecida pelo usuario ("Nascemos no sertão da Paraíba e aprendemos que excelência não tem CEP.") em `blockquote` na secao Historia, atribuida a "Fundador do Grupo Pau Brasil" (nome ainda nao confirmado).
+- `HubEffects.tsx` (novo): `HubCountUp` (conta ate o valor ao aparecer; SSR ja traz o valor final; leitor de tela recebe o numero final) nos totais de empresas/segmentos do hero; `HubHeroGlow` (brilho que segue o cursor, so com mouse).
+- CSS: logo do hero revelada de baixo para cima por mascara (o arquivo e PNG, nao ha tracado SVG para desenhar), grao de papel fixo a 5% de opacidade, entrada coreografada em `/empresas/[slug]` (classe `companyEnter`). Tudo desligado com movimento reduzido.
+- Linha do tempo com datas: adiada a pedido do usuario.
+- Validacao: tsc sem erros nos arquivos do hub; screenshots no meio e no fim das animacoes; `hub.spec.ts` 1/3, as mesmas 2 falhas preexistentes da rodada anterior.
+- Parecer do outro agente: pendente.
+
+### 2026-10-20 - Claude - Foto do fundador e efeitos no hub
+
+- Pedido: usar o acervo do marketing com foco no Grupo (fotos de revenda/Bebidas descartadas pelo usuario); colocar a foto do fundador e efeitos discretos.
+- `public/brand/fundador.jpg` (1066x1600, sem EXIF) substitui a "aplicacao ilustrativa" da fachada na secao Historia; legenda "Fundador · Grupo Pau Brasil" sem nome, aguardando confirmacao.
+- `HubReveal.tsx` (novo): IntersectionObserver revela blocos `data-reveal`; sem JS ou com movimento reduzido tudo aparece normal. Cards de empresas ficaram de fora (o filtro recria os itens).
+- CSS: entrada em cascata do hero, cortina no retrato via `::before` (clip-path no proprio bloco impedia o observer de detecta-lo), P&B→cor no hover, barra de progresso no header com `animation-timeline: scroll()` (so onde ha suporte).
+- Validacao: tsc sem erros nos arquivos do hub; screenshots desktop/mobile. `hub.spec.ts`: 1/3 aprovado; as 2 falhas ja existiam sem esta mudanca (conferido com stash): `/empresas/motos` redireciona ao site externo e a faixa de logos do hero transborda em 320-768px.
+- Ambiente: `npm ci` nesta pasta nova; `.claude/launch.json` criado para o servidor de preview.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-19 - Codex - Consolidação de contexto, portal e produção
 

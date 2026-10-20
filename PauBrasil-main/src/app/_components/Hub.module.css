@@ -1816,3 +1816,347 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Fundador e efeitos de movimento (out/2026) ────────────────────── */
+.historyIntro {
+  grid-template-columns: 1fr minmax(0, 420px);
+}
+.founderPhoto {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #0d0b0a;
+  border-radius: 180px 4px 4px 4px;
+  box-shadow: 0 40px 80px -40px #3b1d1480;
+}
+.founderPhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  display: block;
+  filter: grayscale(1) contrast(1.05);
+  transition:
+    filter 1.2s ease,
+    transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.founderPhoto:hover img {
+  filter: grayscale(0.15) contrast(1.05);
+  transform: scale(1.03);
+}
+.founderPhoto figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 80px 28px 24px;
+  background: linear-gradient(0deg, #0d0b0af2, #0d0b0a00);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.founderPhoto figcaption span {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sand);
+}
+.founderPhoto figcaption strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Hero: entrada em cascata no carregamento */
+@keyframes hubRise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hubBloom {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.heroCopy > * {
+  animation: hubRise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.heroCopy > :nth-child(2) {
+  animation-delay: 0.12s;
+}
+.heroCopy > :nth-child(3) {
+  animation-delay: 0.24s;
+}
+.heroCopy > :nth-child(4) {
+  animation-delay: 0.36s;
+}
+.heroCopy > :nth-child(5) {
+  animation-delay: 0.48s;
+}
+.heroVisual {
+  animation: hubBloom 1.2s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.brandPlate img {
+  transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.heroVisual:hover .brandPlate img {
+  transform: scale(1.04) rotate(-1deg);
+}
+
+/* Barra de progresso de leitura (só onde o navegador suporta animação por rolagem) */
+.scrollProgress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scrollProgress {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--wine);
+    transform-origin: left;
+    transform: scaleX(0);
+    animation: hubProgress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes hubProgress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Revelação ao rolar: só ativa depois que o JS confirma suporte */
+.hub[data-reveal-ready] [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.hub[data-reveal-ready] [data-reveal][data-shown] {
+  opacity: 1;
+  transform: none;
+}
+/* O retrato abre como uma cortina, de baixo para cima. A cortina é um
+   pseudo-elemento: clip-path no próprio bloco impediria o IntersectionObserver de vê-lo. */
+.hub[data-reveal-ready] .founderPhoto[data-reveal] {
+  opacity: 1;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+  transition:
+    background 0s 0.4s,
+    box-shadow 1s ease 1s;
+}
+.hub[data-reveal-ready] .founderPhoto[data-reveal][data-shown] {
+  background: #0d0b0a;
+  box-shadow: 0 40px 80px -40px #3b1d1480;
+}
+.hub[data-reveal-ready] .founderPhoto[data-reveal]::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  background: #eee8e0;
+  transform-origin: top;
+  transition: transform 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.15s;
+}
+.hub[data-reveal-ready] .founderPhoto[data-reveal][data-shown]::before {
+  transform: scaleY(0);
+}
+.hub[data-reveal-ready] .founderPhoto[data-reveal] img {
+  transform: scale(1.12);
+}
+.hub[data-reveal-ready] .founderPhoto[data-reveal][data-shown] img {
+  transform: none;
+}
+.hub[data-reveal-ready] .founderPhoto[data-reveal][data-shown]:hover img {
+  transform: scale(1.03);
+}
+
+@media (max-width: 800px) {
+  .historyIntro {
+    grid-template-columns: 1fr;
+  }
+  .founderPhoto {
+    justify-self: start;
+    max-width: 360px;
+    border-top-left-radius: 130px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .heroCopy > *,
+  .heroVisual,
+  .scrollProgress {
+    animation: none !important;
+  }
+  .scrollProgress {
+    display: none !important;
+  }
+}
+
+/* ── Efeitos, rodada 2 (out/2026) ──────────────────────────────────── */
+
+/* Frase do fundador */
+.founderQuote {
+  margin: 34px 0 0;
+  max-width: 470px;
+}
+.founderQuote::before {
+  content: '\201C';
+  display: block;
+  height: 34px;
+  font-size: 72px;
+  line-height: 1;
+  color: var(--wine);
+  opacity: 0.85;
+}
+.hub .founderQuote p {
+  font-size: clamp(19px, 1.7vw, 23px);
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+.founderQuote em {
+  font-style: normal;
+  color: var(--wine);
+}
+.founderQuote footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a7767;
+}
+.founderQuote footer::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: #b99178;
+}
+
+/* Contadores */
+.countUp {
+  display: inline-block;
+  min-width: 1ch;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Hero: brilho do cursor */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    520px circle at var(--gx, 50%) var(--gy, 50%),
+    #dcc8b11f,
+    #7a152014 40%,
+    transparent 70%
+  );
+  transition: opacity 0.6s ease;
+}
+.heroGlow[data-active='true'] {
+  opacity: 1;
+}
+
+/* Hero: a árvore da marca "cresce" de baixo para cima */
+@keyframes hubGrow {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
+  }
+}
+.brandPlate img {
+  -webkit-mask-image: linear-gradient(to top, #000 45%, transparent 55%);
+  mask-image: linear-gradient(to top, #000 45%, transparent 55%);
+  -webkit-mask-size: 100% 220%;
+  mask-size: 100% 220%;
+  -webkit-mask-position: 0 100%;
+  mask-position: 0 100%;
+  animation: hubGrow 1.8s 0.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* Textura de papel: grão quase invisível sobre a página */
+.hub::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .7 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Página da empresa: entrada coreografada */
+.companyEnter .backLink {
+  animation: hubRise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.companyEnter .companyHeroCopy > * {
+  animation: hubRise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.companyEnter .companyHeroCopy > :first-child {
+  animation-name: hubBloom;
+  animation-duration: 1s;
+}
+.companyEnter .companyHeroCopy > :nth-child(2) {
+  animation-delay: 0.15s;
+}
+.companyEnter .companyHeroCopy > :nth-child(3) {
+  animation-delay: 0.25s;
+}
+.companyEnter .companyHeroCopy > :nth-child(4) {
+  animation-delay: 0.35s;
+}
+.companyEnter .companyHeroCopy > :nth-child(5) {
+  animation-delay: 0.45s;
+}
+.companyEnter .activityPanel {
+  animation: hubRise 1s 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brandPlate img,
+  .companyEnter .backLink,
+  .companyEnter .companyHeroCopy > *,
+  .companyEnter .activityPanel {
+    animation: none !important;
+  }
+  .brandPlate img {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .heroGlow {
+    display: none;
+  }
+}

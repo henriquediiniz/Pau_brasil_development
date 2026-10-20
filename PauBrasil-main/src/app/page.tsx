@@ -18,6 +18,8 @@ import {
   HubStory,
   HubTalentGuide,
 } from './_components/HubInteractive'
+import { HubReveal } from './_components/HubReveal'
+import { HubCountUp, HubHeroGlow } from './_components/HubEffects'
 import { HUB_COMPANIES, HUB_SEGMENT_COUNT } from '@/lib/hub-content'
 import styles from './_components/Hub.module.css'
 
@@ -42,10 +44,12 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className={`${styles.hub} ${montserrat.variable}`}>
+    <div className={`${styles.hub} ${montserrat.variable}`} data-hub-root>
+      <HubReveal />
       <HubNav />
       <main id="conteudo">
         <section className={styles.hero} aria-labelledby="hub-title">
+          <HubHeroGlow />
           <div className={styles.container}>
             <div className={styles.heroGrid}>
               <div className={styles.heroCopy}>
@@ -101,8 +105,8 @@ export default function HomePage() {
               <div className={styles.heroBottomLabel}>
                 <span>Um grupo. Muitas possibilidades.</span>
                 <strong>
-                  {HUB_COMPANIES.length} empresas · {HUB_SEGMENT_COUNT}{' '}
-                  segmentos
+                  <HubCountUp value={HUB_COMPANIES.length} /> empresas ·{' '}
+                  <HubCountUp value={HUB_SEGMENT_COUNT} /> segmentos
                 </strong>
               </div>
               <nav aria-label="Acesso direto às empresas do grupo">
@@ -146,7 +150,7 @@ export default function HomePage() {
           className={`${styles.section} ${styles.companiesSection}`}
         >
           <div className={styles.container}>
-            <div className={styles.sectionHeading}>
+            <div className={styles.sectionHeading} data-reveal>
               <div>
                 <span className={styles.eyebrow}>Nosso ecossistema</span>
                 <h2>
@@ -170,7 +174,7 @@ export default function HomePage() {
         >
           <div className={styles.container}>
             <div className={styles.historyIntro}>
-              <div>
+              <div data-reveal>
                 <span className={styles.eyebrow}>
                   Nossa história, nosso futuro
                 </span>
@@ -183,20 +187,28 @@ export default function HomePage() {
                   Um espaço para reunir nossas origens, nossos negócios e as
                   pessoas que fazem o Grupo Pau Brasil acontecer.
                 </p>
+                <blockquote className={styles.founderQuote}>
+                  <p>
+                    Nascemos no sertão da Paraíba e aprendemos que excelência
+                    não tem <em>CEP.</em>
+                  </p>
+                  <footer>Zenildo, fundador do Grupo Pau Brasil</footer>
+                </blockquote>
                 <span className={styles.editorialTag}>
                   Memória do grupo · acervo em construção
                 </span>
               </div>
-              <figure className={styles.historyPhoto}>
+              <figure className={styles.founderPhoto} data-reveal>
                 <Image
-                  src="/brand/aplicacao-fachada.jpg"
-                  alt="Estudo de aplicação da nova marca em uma fachada, apresentado no manual de identidade"
-                  width={1168}
-                  height={592}
-                  sizes="(max-width: 700px) 100vw, 50vw"
+                  src="/brand/fundador.jpg"
+                  alt="Retrato de Zenildo, fundador do Grupo Pau Brasil"
+                  width={1066}
+                  height={1600}
+                  sizes="(max-width: 800px) 80vw, 420px"
                 />
                 <figcaption>
-                  Nova identidade · aplicação ilustrativa do manual da marca
+                  <span>Onde tudo começou</span>
+                  <strong>Zenildo · Fundador do Grupo Pau Brasil</strong>
                 </figcaption>
               </figure>
             </div>
@@ -209,7 +221,7 @@ export default function HomePage() {
           className={`${styles.section} ${styles.universitySection}`}
         >
           <div className={`${styles.container} ${styles.universityGrid}`}>
-            <div>
+            <div data-reveal>
               <span className={styles.eyebrow}>
                 <GraduationCap size={19} /> Universidade Pau Brasil
               </span>
@@ -235,7 +247,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className={styles.learningPath}>
+            <div className={styles.learningPath} data-reveal>
               <span className={styles.learningEyebrow}>
                 Aprendizagem em cada etapa
               </span>
@@ -278,7 +290,7 @@ export default function HomePage() {
           className={`${styles.section} ${styles.talentsSection}`}
         >
           <div className={`${styles.container} ${styles.talentGrid}`}>
-            <div>
+            <div data-reveal>
               <span className={styles.eyebrow}>Carreiras e talentos</span>
               <h2>
                 O próximo capítulo

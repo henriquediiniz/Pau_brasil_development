@@ -42,7 +42,9 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
     <div className={`${styles.hub} ${montserrat.variable}`}>
       <HubNav />
       <main id="conteudo">
-        <section className={`${styles.section} ${styles.companyHero}`}>
+        <section
+          className={`${styles.section} ${styles.companyHero} ${styles.companyEnter}`}
+        >
           <div className={styles.container}>
             <Link href="/#empresas" className={styles.backLink}>
               <ArrowLeft size={17} /> Todas as empresas

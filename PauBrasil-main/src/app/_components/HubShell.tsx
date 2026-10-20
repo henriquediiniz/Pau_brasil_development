@@ -17,6 +17,7 @@ export function HubNav() {
   const [open, setOpen] = useState(false)
   return (
     <header className={styles.header}>
+      <span className={styles.scrollProgress} aria-hidden="true" />
       <a href="#conteudo" className={styles.skip}>
         Pular para o conteúdo
       </a>
