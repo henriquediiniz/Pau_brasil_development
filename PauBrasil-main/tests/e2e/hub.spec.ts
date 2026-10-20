@@ -71,8 +71,14 @@ test('empresas: unidades filtráveis e catálogo incompleto explícito', async (
   await page.getByRole('button', { name: 'Limpar filtros' }).click()
   await expect(page.locator('#unidades article')).toHaveCount(8)
   await page.screenshot({ path: '/tmp/paubrasil-brand/empresa-bebidas.png', fullPage: true })
-  await page.goto('/empresas/motos')
+  await page.goto('/empresas/unida')
   await expect(page.getByText('Novos endereços em breve.')).toBeVisible()
+  // A Motos tem site próprio: a página interna redireciona sem abrir o site externo no teste.
+  const motos = await page.request.get('/empresas/motos', { maxRedirects: 0 })
+  expect(motos.status()).toBe(307)
+  expect(motos.headers()['location']).toBe(
+    'https://www.paubrasilmotos.com.br/valedosaofrancisco/',
+  )
   const response = await page.goto('/empresas/nao-existe')
   expect(response?.status()).toBe(404)
 })
