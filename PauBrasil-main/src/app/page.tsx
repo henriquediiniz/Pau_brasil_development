@@ -165,6 +165,19 @@ export default function HomePage() {
               </p>
             </div>
             <HubCompanies />
+            <div className={styles.partnersStrip} data-reveal>
+              <span>Parcerias que movem nossos negócios</span>
+              <ul>
+                {HUB_COMPANIES.filter((company) => company.partner).map(
+                  (company) => (
+                    <li key={company.slug}>
+                      <strong>{company.partner}</strong>
+                      <small>{company.name}</small>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -192,7 +205,15 @@ export default function HomePage() {
                     Nascemos no sertão da Paraíba e aprendemos que excelência
                     não tem <em>CEP.</em>
                   </p>
-                  <footer>Zenildo, fundador do Grupo Pau Brasil</footer>
+                  <footer>
+                    <Image
+                      src="/brand/assinatura-zenildo.png"
+                      alt="Zenildo Oliveira, presidente do Grupo Pau Brasil"
+                      width={900}
+                      height={408}
+                      sizes="200px"
+                    />
+                  </footer>
                 </blockquote>
                 <span className={styles.editorialTag}>
                   Memória do grupo · acervo em construção
@@ -201,14 +222,14 @@ export default function HomePage() {
               <figure className={styles.founderPhoto} data-reveal>
                 <Image
                   src="/brand/fundador.jpg"
-                  alt="Retrato de Zenildo, fundador do Grupo Pau Brasil"
+                  alt="Retrato de Zenildo Oliveira, fundador do Grupo Pau Brasil"
                   width={1066}
                   height={1600}
                   sizes="(max-width: 800px) 80vw, 420px"
                 />
                 <figcaption>
                   <span>Onde tudo começou</span>
-                  <strong>Zenildo · Fundador do Grupo Pau Brasil</strong>
+                  <strong>Zenildo Oliveira · Fundador</strong>
                 </figcaption>
               </figure>
             </div>
@@ -281,6 +302,28 @@ export default function HomePage() {
                 </div>
                 <small>03</small>
               </div>
+              <ul className={styles.programs} aria-label="Programas do grupo">
+                <li>
+                  <Image
+                    src="/brand/programa-capacitar.png"
+                    alt="Capacitar · Grupo Pau Brasil"
+                    width={640}
+                    height={302}
+                    sizes="180px"
+                  />
+                  <span>Capacitação das equipes</span>
+                </li>
+                <li>
+                  <Image
+                    src="/brand/programa-td-lideres.jpg"
+                    alt="T&D Líderes · Grupo Pau Brasil"
+                    width={640}
+                    height={393}
+                    sizes="180px"
+                  />
+                  <span>Treinamento e desenvolvimento de líderes</span>
+                </li>
+              </ul>
             </div>
           </div>
         </section>

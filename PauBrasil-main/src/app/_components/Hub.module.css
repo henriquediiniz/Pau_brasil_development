@@ -2160,3 +2160,105 @@
     display: none;
   }
 }
+
+/* ── Acervo do Drive de logos (out/2026) ───────────────────────────── */
+
+/* Assinatura de Zenildo Oliveira no lugar do crédito em texto */
+.founderQuote footer::before {
+  display: none;
+}
+.founderQuote footer img {
+  width: 190px;
+  height: auto;
+  display: block;
+  opacity: 0.88;
+}
+
+/* Programas reais da Universidade */
+.programs {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 22px 0 0;
+  border-top: 1px solid #a04b53;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.programs li {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 4px;
+  background: #fff;
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.programs li:hover {
+  transform: translateY(-3px);
+}
+.programs img {
+  width: 100%;
+  height: 64px;
+  object-fit: contain;
+}
+.programs span {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #5a5149;
+}
+
+/* Faixa de parceiros de marca, tipográfica */
+.partnersStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 34px;
+  padding: 22px 0 0;
+  border-top: 1px solid #e7e1da;
+}
+.partnersStrip > span {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a7767;
+}
+.partnersStrip ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 44px;
+}
+.partnersStrip li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.partnersStrip strong {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+.partnersStrip small {
+  font-size: 12px;
+  color: #8a7767;
+}
+
+@media (max-width: 800px) {
+  .partnersStrip {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .partnersStrip ul {
+    flex-wrap: wrap;
+    gap: 14px 30px;
+  }
+}
+@media (max-width: 600px) {
+  .programs {
+    grid-template-columns: 1fr;
+  }
+}

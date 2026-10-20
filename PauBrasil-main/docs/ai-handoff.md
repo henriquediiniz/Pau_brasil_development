@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Hub: logos do Drive do grupo | Claude | concluido | 2026-10-20: logos Original Start e Locadora, assinatura Zenildo Oliveira, programas Capacitar e T&D Lideres, faixa de parceiros; Original Start corrigida para Moto Pecas | Confirmar descricao da Original Start e uso das marcas Ambev/Honda |
 | Limpeza de codigo morto | Claude | concluido | 2026-10-20: 21 arquivos, ~20 funcoes e 20 dependencias sem uso removidos; `jose` declarado | Revisar o que foi mantido de proposito (ver registro) |
 | Hub: foto do fundador e efeitos | Claude | concluido | 2026-10-20: retrato + frase do fundador, cortina, entrada do hero, logo que cresce, contadores, brilho do cursor, textura de papel, entrada da pagina de empresa, revelacao ao rolar, barra de progresso | Corrigir E2E mobile do hub (faixa de logos transborda) |
 | Contexto consolidado e produção 19/10 | Codex | concluído | Documentação completa em `docs/contexto-agente/`; produção validada no commit `f77afba` | Consultar índice atual antes de retomar desenvolvimento |
@@ -251,7 +252,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — varredura de codigo morto (2026-10-20)
+- Claude — acervo do Drive de logos (2026-10-20)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -411,6 +412,16 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-20 - Claude - Logos do Drive do grupo no hub
+
+- Fonte: pasta "Logos" do Google Drive enviada pelo usuario (18 subpastas). Baixados com autorizacao: logos de Original Start e Locadora, logotipo de Zenildo Oliveira, Capacitar, T&D Lideres e o PDF do Grupo.
+- `public/logos/hub/original-start.png` e `locadora.png` (cards e faixa do hero deixam de usar monograma); `public/brand/assinatura-zenildo.png` substitui o credito em texto da frase; nome completo "Zenildo Oliveira" na legenda e no alt.
+- **Correcao de conteudo:** a logo oficial da Original Start diz "Moto Pecas". Empresa passou de "Inovacao" para "Mobilidade", descricao de loja de pecas para motos, e entrou nos interesses Vendas e Mecanica. O interesse "Inovacao e negocios" e o segmento "Inovacao" deixaram de existir (hero agora conta 6 segmentos). Confirmar com o usuario.
+- Universidade: cards dos programas Capacitar e T&D Lideres abaixo das tres etapas. Empresas: faixa tipografica de parceiros (Ambev, Honda) gerada de `partner` em `hub-content.ts`; sem logos de terceiros (o Drive nao tem a marca Ambev).
+- Nao feito: logo desenhada por traco. O PDF do Drive e a marca antiga verde com bandeira, nao a identidade 2026, e nao ha potrace na maquina para vetorizar o PNG atual.
+- Validacao: tsc 0 erros; screenshots desktop/mobile; `hub.spec.ts` 2/3 (contagens de Mobilidade e Mecanica atualizadas para 3; falha mobile preexistente da faixa de logos).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-20 - Claude - Varredura de codigo morto
 

@@ -88,13 +88,14 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'original-start',
-    plate: '#7a1520',
+    // A logo oficial (Drive de logos do grupo) identifica a empresa como "Moto Peças".
+    logo: { src: '/logos/hub/original-start.png', shape: 'wide' },
+    plate: '#f4f0ea',
     monogram: 'OS',
     name: 'Original Start',
-    segment: 'Inovação',
-    description:
-      'Iniciativas de inovação, empreendedorismo e desenvolvimento de novos negócios.',
-    activities: ['Empreendedorismo', 'Novos negócios'],
+    segment: 'Mobilidade',
+    description: 'Loja de peças para motocicletas, ao lado de quem vive sobre duas rodas.',
+    activities: ['Peças para motocicletas'],
     units: [],
   },
   {
@@ -111,7 +112,8 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'locadora',
-    plate: '#3b2a22',
+    logo: { src: '/logos/hub/locadora.png', shape: 'wide' },
+    plate: '#f4f0ea',
     monogram: 'LP',
     name: 'Locadora Pau Brasil',
     segment: 'Mobilidade',
@@ -145,7 +147,7 @@ export const HUB_STORY = [
   {
     label: 'Nossos negócios',
     title: 'Diferentes caminhos. O mesmo grupo.',
-    text: 'Bebidas, mobilidade, construção, agro, serviços, inovação e impacto social. Conheça as empresas que compõem o Grupo Pau Brasil e descubra suas áreas de atuação.',
+    text: 'Bebidas, mobilidade, construção, agro, serviços e impacto social. Conheça as empresas que compõem o Grupo Pau Brasil e descubra suas áreas de atuação.',
     note: 'Explore as empresas e as unidades disponíveis nesta primeira versão.',
   },
   {
@@ -178,13 +180,13 @@ export const HUB_INTERESTS = [
   {
     id: 'comercial',
     label: 'Vendas e atendimento',
-    companies: ['bebidas', 'motos', 'locadora'],
+    companies: ['bebidas', 'motos', 'original-start', 'locadora'],
     reason: 'Negócios com atuação comercial e relacionamento com clientes.',
   },
   {
     id: 'mecanica',
     label: 'Mecânica e manutenção',
-    companies: ['motos', 'locadora'],
+    companies: ['motos', 'original-start', 'locadora'],
     reason: 'Negócios ligados a veículos, peças e assistência técnica.',
   },
   {
@@ -198,12 +200,6 @@ export const HUB_INTERESTS = [
     label: 'Pessoas e educação',
     companies: ['hora-10', 'instituto-yso'],
     reason: 'Atuação em gestão de pessoas, educação e projetos sociais.',
-  },
-  {
-    id: 'inovacao',
-    label: 'Inovação e negócios',
-    companies: ['original-start'],
-    reason: 'Iniciativas de empreendedorismo e novos negócios.',
   },
   {
     id: 'agro',

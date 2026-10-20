@@ -10,7 +10,7 @@ test('hub: empresas, história e orientação de talentos', async ({ page }) => 
   const companies = page.locator('#empresas')
   await expect(companies.getByRole('link')).toHaveCount(8)
   await page.getByRole('button', { name: 'Mobilidade', exact: true }).click()
-  await expect(companies.getByRole('link')).toHaveCount(2)
+  await expect(companies.getByRole('link')).toHaveCount(3)
   await expect(
     companies.getByRole('heading', { name: 'Pau Brasil Motos' }),
   ).toBeVisible()
@@ -23,7 +23,7 @@ test('hub: empresas, história e orientação de talentos', async ({ page }) => 
   await page.getByLabel('Sua área de interesse').selectOption('mecanica')
   await page.getByRole('button', { name: 'Explorar possibilidades' }).click()
   const result = page.locator('#talentos [role="status"]')
-  await expect(result.getByRole('link')).toHaveCount(2)
+  await expect(result.getByRole('link')).toHaveCount(3)
   await expect(
     result.getByRole('link', { name: 'Pau Brasil Motos' }),
   ).toBeVisible()
