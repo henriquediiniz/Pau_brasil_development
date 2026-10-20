@@ -303,4 +303,3 @@ export async function updateProvisionedUser(params: {
   return after
 }
 
-export { USER_SELECT as PROVISIONED_USER_SELECT }

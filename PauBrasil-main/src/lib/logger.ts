@@ -56,14 +56,3 @@ export const log = makeLogger()
 export function createRequestLogger(requestId?: string) {
   return log.child({ requestId: requestId ?? 'no-id' })
 }
-
-export function logError(
-  err: unknown,
-  context: Record<string, unknown> = {},
-  message = 'Erro inesperado'
-) {
-  const error = err instanceof Error
-    ? { message: err.message, stack: err.stack, name: err.name }
-    : { message: String(err) }
-  log.error({ err: error, ...context }, message)
-}

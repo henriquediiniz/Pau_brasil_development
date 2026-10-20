@@ -57,7 +57,7 @@ const nextConfig = {
       faz esse tratamento para lucide-react e recharts por padrao; framer-motion
       e xlsx ficam de fora da lista e precisam ser declarados.
     */
-    optimizePackageImports: ['framer-motion', 'lucide-react', 'recharts', 'date-fns'],
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'date-fns'],
     serverActions: { allowedOrigins: ['localhost:3000'] },
     instrumentationHook: true,
   },

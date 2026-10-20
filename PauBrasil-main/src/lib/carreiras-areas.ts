@@ -135,19 +135,6 @@ export const CARREIRAS_GRUPOS: CargoGrupo[] = [
 /** Lista flat de todos os cargos válidos — usada para validação no backend */
 export const TODOS_CARGOS = CARREIRAS_GRUPOS.flatMap(g => g.cargos) as [string, ...string[]]
 
-/**
- * Dado um array de cargos, retorna os slugs dos grupos correspondentes (sem duplicatas).
- * Usado para derivar `gruposInteresse` a partir de `cargosInteresse`.
- */
-export function getCargosGrupos(cargos: string[]): string[] {
-  const slugs = cargos.flatMap(cargo =>
-    CARREIRAS_GRUPOS
-      .filter(g => g.cargos.includes(cargo))
-      .map(g => g.slug)
-  )
-  return Array.from(new Set(slugs))
-}
-
 /** State machine — transições permitidas entre etapas de candidatura */
 export const TRANSICOES_VALIDAS: Record<string, string[]> = {
   /*

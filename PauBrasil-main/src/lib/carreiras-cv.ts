@@ -1,74 +1,4 @@
-import { createHash, randomUUID } from 'crypto'
-
-export interface UploadedCvEntry {
-  token: string
-  publicId: string
-  url: string
-  originalFilename: string
-  sizeBytes: number
-  mimeType: string
-  createdAt: number
-  expiresAt: number
-}
-
-const UPLOAD_TTL_MS = 30 * 60 * 1000
-
-const globalForCarreirasCv = globalThis as typeof globalThis & {
-  carreirasCvUploads?: Map<string, UploadedCvEntry>
-}
-
-const uploadRegistry = globalForCarreirasCv.carreirasCvUploads ?? new Map<string, UploadedCvEntry>()
-
-if (!globalForCarreirasCv.carreirasCvUploads) {
-  globalForCarreirasCv.carreirasCvUploads = uploadRegistry
-}
-
-function purgeExpiredUploads(now = Date.now()) {
-  for (const [token, entry] of Array.from(uploadRegistry.entries())) {
-    if (entry.expiresAt <= now) {
-      uploadRegistry.delete(token)
-    }
-  }
-}
-
-export function registerUploadedCv(params: Omit<UploadedCvEntry, 'token' | 'createdAt' | 'expiresAt'>) {
-  purgeExpiredUploads()
-
-  const token = randomUUID()
-  const createdAt = Date.now()
-  const entry: UploadedCvEntry = {
-    token,
-    createdAt,
-    expiresAt: createdAt + UPLOAD_TTL_MS,
-    ...params,
-  }
-
-  uploadRegistry.set(token, entry)
-  return entry
-}
-
-export function getUploadedCv(token: string) {
-  purgeExpiredUploads()
-
-  const entry = uploadRegistry.get(token)
-  if (!entry) return null
-  if (entry.expiresAt <= Date.now()) {
-    uploadRegistry.delete(token)
-    return null
-  }
-  return entry
-}
-
-export function consumeUploadedCv(token: string) {
-  const entry = getUploadedCv(token)
-  if (!entry) return null
-  uploadRegistry.delete(token)
-  return entry
-}
-
-export function forgetUploadedCv(token: string) {
-  uploadRegistry.delete(token)
-}
+import { createHash } from 'crypto'
 
 export async function destroyUploadedCv(publicId: string) {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME
@@ -96,17 +26,4 @@ export async function destroyUploadedCv(publicId: string) {
   })
 
   return response.ok
-}
-
-export async function discardUploadedCv(token: string) {
-  const entry = getUploadedCv(token)
-  if (!entry) return
-
-  forgetUploadedCv(token)
-
-  try {
-    await destroyUploadedCv(entry.publicId)
-  } catch (error) {
-    console.error('[carreiras-cv] failed to destroy uploaded cv', { token, publicId: entry.publicId, error })
-  }
 }

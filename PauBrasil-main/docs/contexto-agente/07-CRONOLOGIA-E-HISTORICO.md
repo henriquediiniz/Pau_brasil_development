@@ -91,7 +91,7 @@ Os documentos abaixo permanecem no repositório. Eles são fontes históricas, n
 | `docs/portal-colaborador.md` | Versão de 16/10; partes de atividades/pontos foram superadas em 19/10. |
 | `docs/plano-integracao-recrutamento.md` | Direção e regras para construir Gente nativamente; não copiar PII/credenciais do projeto externo. |
 | `docs/auditoria-2026-09-22.md` | Auditoria de uma base/estado anterior; revalidar cada achado antes de corrigir ou afirmar que persiste. |
-| `docs/visitas-lideres-guia.html` | Guia funcional de visitas; conferir API/código atual e integrações reais. |
+| `docs/visitas-lideres-guia.html` | Removido em 20/10/2026 junto com os guias de OBZ: os módulos não existem mais. Consultar o histórico do Git se necessário. |
 | Guias HTML de OBZ | Referência histórica de módulo legado, não roteiro de reativação. |
 
 O histórico registra decisões sobre importações com sobreposição por entidade, cargos/descritivos, Frontline, quadro, PCD/aprendiz, sucessão, filtros por polo e retenção de CV. Antes de alterar esses domínios, ler a seção relevante e o código correspondente. Números de candidaturas/colaboradores citados nesses registros são de contextos antigos, não do banco recém-provisionado nesta sessão.

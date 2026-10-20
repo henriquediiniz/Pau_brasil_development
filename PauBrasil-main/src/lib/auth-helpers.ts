@@ -67,11 +67,6 @@ export function canManageTeam(u: SessionUser) {
   return isGestorLevel(u) || isCoordLevel(u)
 }
 
-/** Can manage task definitions in legacy gestor flows */
-export function canManageActivityDefinitions(u: SessionUser) {
-  return isGestorLevel(u)
-}
-
 /** Can manage Universidade content */
 export function isUpbAdmin(u: SessionUser) {
   return isSysAdmin(u) || u.isUPBAdmin === true

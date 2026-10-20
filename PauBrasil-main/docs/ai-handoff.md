@@ -76,7 +76,8 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
-| Hub: foto do fundador e efeitos | Claude | concluido | 2026-10-20: retrato + frase do fundador, cortina, entrada do hero, logo que cresce, contadores, brilho do cursor, textura de papel, entrada da pagina de empresa, revelacao ao rolar, barra de progresso | Corrigir 2 E2E do hub que ja falhavam |
+| Limpeza de codigo morto | Claude | concluido | 2026-10-20: 21 arquivos, ~20 funcoes e 20 dependencias sem uso removidos; `jose` declarado | Revisar o que foi mantido de proposito (ver registro) |
+| Hub: foto do fundador e efeitos | Claude | concluido | 2026-10-20: retrato + frase do fundador, cortina, entrada do hero, logo que cresce, contadores, brilho do cursor, textura de papel, entrada da pagina de empresa, revelacao ao rolar, barra de progresso | Corrigir E2E mobile do hub (faixa de logos transborda) |
 | Contexto consolidado e produção 19/10 | Codex | concluído | Documentação completa em `docs/contexto-agente/`; produção validada no commit `f77afba` | Consultar índice atual antes de retomar desenvolvimento |
 | Portal do colaborador e identidade 2026 | Codex | concluido | 2026-10-16: paleta, login/navegacao/atividades corrigidos, loja suspensa; 6 E2E + 42 testes aprovados | Aguardar requisitos dos supervisores |
 | Hub institucional e marca 2026 | Codex | concluido | 2026-10-16: home e 8 empresas, marca nova, filtros e orientacao editorial; tsc e 3 E2E aprovados | Receber acervo e cadastro oficial; definir encaminhamento real entre empresas |
@@ -250,7 +251,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — efeitos do hub, rodada 2 (2026-10-20)
+- Claude — varredura de codigo morto (2026-10-20)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -410,6 +411,23 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-20 - Claude - Varredura de codigo morto
+
+- Ferramenta: `knip` + conferencia manual de cada item (uso interno, referencias dinamicas, historico do Git).
+- Arquivos removidos: `generate-icons.js` (gerava icones provisorios laranja e sobrescreveria os oficiais), `scripts/test-email.ts` (remetente "OBZ Portal" e Gmail pessoal fixo), `src/lib/format.ts`, guias HTML de OBZ e visitas, `public/brand/aplicacao-fachada.jpg`, 6 logos antigos em `public/logos` (substituidos por `logos/hub/`) e 8 fotos de pessoas em `public/fotos` que nunca foram referenciadas no codigo e ficavam publicas.
+- Codigo removido: skeletons e e-mails do OBZ, `REWARDS_STORE_ENABLED`, `canManageActivityDefinitions`, `getCargosGrupos`, `RESULTADO_LABEL`, `logError`, alias `PROVISIONED_USER_SELECT`, registro de uploads em memoria de `carreiras-cv.ts` (nada chamava `registerUploadedCv`; `destroyUploadedCv` segue).
+- Dependencias removidas (20): `@auth/prisma-adapter`, 11 pacotes `@radix-ui/*` (fica `react-dialog`), `@vladmandic/face-api`, `class-variance-authority`, `clsx`, `next-cloudinary`, `recharts`, `tailwind-merge`, `vitest`, `@vitest/ui`. `jose` passou a ser dependencia declarada (ja era importado direto). `recharts` saiu de `optimizePackageImports`.
+- Mantidos de proposito: `worker/index.js` (custom worker do next-pwa), seeds `prisma/seed-*.ts` e `prisma/vincular-vagas-descritivo.ts` (scripts manuais), `scripts/test-usuarios.ts`, exportacoes usadas so dentro do proprio arquivo e tipos exportados.
+- Alerta: `scripts/test-usuarios.ts` tem senha padrao de admin fixa no codigo; confirmar que nao e a senha real de producao.
+- Validacao: tsc 0 erros; `npm test` 511 aprovados/0 falhas; `next build` compilou e gerou 84 paginas (precisou de `NODE_OPTIONS=--dns-result-order=ipv4first` para baixar as fontes nesta maquina; avisos de `DATABASE_URL` por falta de env local); `hub.spec.ts` 2/3, falha mobile preexistente.
+- Parecer do outro agente: pendente.
+
+### 2026-10-20 - Claude - Teste do hub alinhado ao link externo da Motos
+
+- `tests/e2e/hub.spec.ts`: o aviso "Novos endereços em breve." passa a ser conferido na Unida; `/empresas/motos` agora deve responder 307 para o site da Pau Brasil Motos (comportamento pedido pelo usuario, sem abrir o site externo no teste).
+- Resultado: 2/3 aprovados; resta a falha preexistente da faixa de logos do hero transbordando em 320-768 px.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-20 - Claude - Nome do fundador
 

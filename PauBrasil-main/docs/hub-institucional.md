@@ -5,7 +5,7 @@ A entrada pública `/` reúne empresas, história, universidade e carreiras. A i
 ## Conteúdo e identidade
 
 - Manual fornecido: `manual_pau_brasil.pdf`, páginas 3–5: vinho `#7A1520`, preto `#1A1A1A`, areia `#DCC8B1` e Montserrat. Logos originais preservados em `public/brand/`.
-- A fotografia de fachada é uma aplicação **ilustrativa** extraída da página 6 do manual, identificada como tal na interface; não representa uma sede verificada.
+- A seção História usa o retrato de Zenildo, fundador, e a frase dele fornecida pelo usuário (out/2026). A antiga aplicação ilustrativa de fachada do manual foi retirada.
 - As oito empresas e suas atividades vêm do conteúdo da home anterior. As associações Ambev e Honda foram informadas pelo usuário.
 - As oito unidades de Bebidas vêm de `prisma/seed-empresas.ts`. Estados conferidos com `prisma/seed-operations.ts` e cadastro de operações do projeto. É uma relação inicial, não uma consulta ao cadastro operacional ativo.
 - As demais empresas exibem ausência de informações de unidades. Nenhum endereço ou contato foi inventado.

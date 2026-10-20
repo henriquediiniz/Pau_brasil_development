@@ -44,12 +44,6 @@ export function definicaoEtapa(chave: string): DefinicaoEtapa {
   return POR_CHAVE.get(chave) ?? { chave, label: chave, ordem: 99 }
 }
 
-export const RESULTADO_LABEL: Record<ResultadoEtapa, string> = {
-  OK: 'Aprovado',
-  NAO: 'Reprovado',
-  NA: 'Não se aplica',
-}
-
 export interface EtapaRegistrada {
   chave: string
   resultado: ResultadoEtapa
