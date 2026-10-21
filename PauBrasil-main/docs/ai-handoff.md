@@ -253,9 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — cadastro da newsletter no portal (2026-10-21)
-  - objetivo: campanhas da newsletter cadastradas por Gente/admin em `/gente/newsletter`, fotos no PostgreSQL, home lendo do banco
-  - arquivos em posse: `prisma/schema.prisma`, nova migration, `src/app/api/gente/newsletter/**`, `src/app/api/public/newsletter/**`, `src/app/gente/newsletter/**`, `src/app/gente/_components/DockGente.tsx`, `src/lib/newsletter.ts`, `src/lib/audit.ts`, `src/app/page.tsx`, `src/app/_components/HubNewsletter.tsx`, `src/lib/hub-content.ts`
+- Claude — remocao das tabelas legadas OBZ/Score e diagnostico de upload de CV (2026-10-21)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -415,6 +413,14 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-21 - Claude - Tabelas legadas removidas e upload de CV quebrado em producao
+
+- Remocao autorizada pelo usuario. Antes: as 15 tabelas OBZ*/Score* estavam VAZIAS em producao e no local, e nenhum usuario tinha `isObzAdmin`/`isScoreAdmin`. Migration `20261021220000_drop_legacy_obz_score` (escrita a mao: DROP das 15 tabelas, das 2 colunas em User e dos enums OBZJustStatus/OBZJustTipo). Aplicada local e em producao; producao ficou com 0 tabelas legadas, usuarios e newsletter intactos.
+- Drift restante entre schema e banco: apenas indices (AuditLog x2, Notification, RecCargo_publicarNoSite_idx). Sem dado envolvido; nao tratado.
+- **CRITICO - upload de CV em producao:** `/api/carreiras/upload-cv` responde 500 "Configuracao de upload indisponivel" (testado com PDF vazio) porque faltam `CLOUDINARY_CLOUD_NAME`/`CLOUDINARY_CV_PRESET` na Vercel. A candidatura so e enviada depois do upload, entao NENHUM candidato consegue concluir; producao tem 0 candidaturas desde 19/10. Tambem sem armazenamento: importacao de CV pelo RH, link do CV na ficha, laudo PCD (Vercel Blob privado, sem `BLOB_READ_WRITE_TOKEN`), foto de perfil (`/api/upload`) e download de backup.
+- Acao depende do usuario: configurar Cloudinary (credenciais da conta) e/ou criar um Vercel Blob privado ligado ao projeto. Alternativa em codigo a discutir: migrar CV/laudo para Blob ou banco.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-21 - Claude - Cadastro da newsletter no portal (implementado e validado localmente; producao pendente)
 
