@@ -2,10 +2,12 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ComponentProps,
   type CSSProperties,
+  type RefObject,
 } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -187,6 +189,90 @@ export function HubBrandStrip({
 
 const ERA_MS = 10000
 
+// useLayoutEffect desenha a estrada antes da pintura; no servidor cai para useEffect, sem aviso.
+const useBeforePaint = typeof window === 'undefined' ? useEffect : useLayoutEffect
+
+type RoadShape = { width: number; height: number; d: string; pins: [number, number][] }
+
+/** Curva suave (Catmull-Rom convertida em Bézier) passando por todos os pontos. */
+function smoothPath(points: [number, number][]) {
+  let d = `M${points[0][0]},${points[0][1]}`
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] ?? points[i]
+    const p1 = points[i]
+    const p2 = points[i + 1]
+    const p3 = points[i + 2] ?? p2
+    const t = 1 / 6
+    d += ` C${(p1[0] + (p2[0] - p0[0]) * t).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) * t).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) * t).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) * t).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`
+  }
+  return d
+}
+
+/**
+ * Estrada sinuosa ao lado dos anos: mede a posição de cada ano e passa por todos, alternando os lados.
+ * Fica numa faixa estreita à esquerda, então nunca corta a tela nem pede rolagem horizontal.
+ */
+function EraRoad({ list, era }: { list: RefObject<HTMLOListElement>; era: number }) {
+  const [shape, setShape] = useState<RoadShape | null>(null)
+
+  useBeforePaint(() => {
+    const element = list.current
+    if (!element) return
+    const draw = () => {
+      const width = parseFloat(getComputedStyle(element).getPropertyValue('--road')) || 110
+      const height = element.offsetHeight
+      const top = element.getBoundingClientRect().top
+      const left = width * 0.3
+      const right = width * 0.68
+      const pins = Array.from(element.querySelectorAll<HTMLElement>('[data-year]')).map(
+        (year, index): [number, number] => {
+          const box = year.getBoundingClientRect()
+          return [index % 2 ? right : left, box.top - top + box.height / 2 + 12]
+        },
+      )
+      if (!pins.length) return setShape(null)
+      const first = pins[0]
+      const last = pins[pins.length - 1]
+      setShape({
+        width,
+        height,
+        pins,
+        // Entra e sai na mesma coluna do primeiro e do último pino, sem curva sobrando nas pontas.
+        d: smoothPath([[first[0], 0], ...pins, [last[0], height]]),
+      })
+    }
+    draw()
+    const observer = new ResizeObserver(draw)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [list, era])
+
+  if (!shape) return null
+  const lane = shape.width >= 100 ? 24 : 18
+  return (
+    <svg
+      className={styles.eraRoad}
+      viewBox={`0 0 ${shape.width} ${shape.height}`}
+      width={shape.width}
+      height={shape.height}
+      aria-hidden="true"
+    >
+      <path d={shape.d} fill="none" stroke="#e2d6c8" strokeWidth={lane + 10} strokeLinecap="round" />
+      <path d={shape.d} fill="none" stroke="#353130" strokeWidth={lane} strokeLinecap="round" />
+      <path d={shape.d} fill="none" stroke="#eadfcd" strokeWidth={2} strokeDasharray="9 8" />
+      {shape.pins.map(([x, y], index) => (
+        <g key={index} className={styles.eraPin} style={{ '--i': index } as CSSProperties}>
+          <path
+            d={`M${x},${y + 2} L${x - 8.3},${y - 14} A11,11 0 1 1 ${x + 8.3},${y - 14} Z`}
+            fill="var(--wine)"
+          />
+          <circle cx={x} cy={y - 21} r={4.2} fill="#fff" />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
 /**
  * Linha do tempo do grupo, dividida em eras; cada era lista os anos e as empresas citadas.
  * As eras avançam sozinhas enquanto a seção está na tela, com pausa no hover, no foco e no botão.
@@ -198,6 +284,7 @@ export function HubTimeline() {
   const [visible, setVisible] = useState(false)
   const [reduced, setReduced] = useState(false)
   const root = useRef<HTMLDivElement>(null)
+  const list = useRef<HTMLOListElement>(null)
   const era = HUB_ERAS[active]
   const last = HUB_ERAS.length - 1
   const running = visible && !paused && !held && !reduced
@@ -301,18 +388,28 @@ export function HubTimeline() {
             )}
           </div>
         </div>
-        <ol className={styles.eraYears}>
+        <div className={styles.eraTrack}>
+        <EraRoad list={list} era={active} />
+        <ol ref={list} className={styles.eraYears}>
           {HUB_ERAS[active].years.map((item, index) => (
             <li
               key={item.year}
               style={{ '--i': index } as CSSProperties}
             >
-              <span className={styles.eraYear}>{item.year}</span>
+              <span className={styles.eraYear} data-year>
+                {item.year}
+              </span>
               <div>
                 <ul>
-                  {item.events.map((event) => (
-                    <li key={event}>{event}</li>
-                  ))}
+                  {item.events.map((event) => {
+                    const award = event.startsWith('*')
+                    return (
+                      <li key={event} className={award ? styles.eraAward : undefined}>
+                        {award && <span className={styles.srOnly}>Reconhecimento: </span>}
+                        {award ? event.slice(1) : event}
+                      </li>
+                    )
+                  })}
                 </ul>
                 {item.companies && (
                   <div className={styles.eraBrands}>
@@ -332,6 +429,7 @@ export function HubTimeline() {
             </li>
           ))}
         </ol>
+        </div>
       </div>
     </div>
   )

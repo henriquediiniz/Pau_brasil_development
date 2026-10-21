@@ -2421,3 +2421,82 @@
   width: 34px;
   height: 34px;
 }
+
+/* Linha do tempo em formato de estrada sinuosa (proposta da diretoria) */
+.eraTrack {
+  position: relative;
+}
+.eraYears {
+  --road: 112px;
+  border-left: 0;
+}
+.eraYears > li {
+  padding: 14px 0 14px var(--road);
+}
+.eraYears > li::before {
+  display: none;
+}
+.eraYears > li:first-child {
+  padding-top: 4px;
+}
+/* O ano fica no topo da linha: sem isso o item de grade estica e a estrada mede o centro errado */
+.eraYears .eraYear {
+  align-self: start;
+}
+.eraRoad {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+  animation: roadIn 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes roadIn {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 -20px 0);
+  }
+}
+@keyframes pinDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.eraPin {
+  animation: pinDrop 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.25s + var(--i, 0) * 110ms);
+}
+.eraYears ul li.eraAward::before {
+  content: '★';
+  width: auto;
+  height: auto;
+  top: 0;
+  background: none;
+  color: #b88c0b;
+  font-size: 12px;
+}
+.eraYears ul li.eraAward {
+  color: var(--ink);
+  font-weight: 500;
+}
+@media (max-width: 800px) {
+  .eraYears {
+    --road: 62px;
+  }
+  .eraYears > li {
+    padding-left: var(--road);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eraRoad,
+  .eraPin {
+    animation: none;
+  }
+}

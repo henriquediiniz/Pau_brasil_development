@@ -253,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — passagem automatica das eras (2026-10-21)
+- Claude — linha do tempo em formato de estrada (2026-10-21)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +413,20 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-21 - Claude - Era 2003-2009 mais curta e sem 2026
+
+- Pedido do usuario para caber na tela de apresentacao: textos da era 2003-2009 condensados (sem perder fatos), sem selos de empresa nessa era e espacamento entre anos de 18 para 14 px.
+- Ano 2026 (nova identidade visual) retirado da linha do tempo; era "Novas fronteiras" passa a 2017-2025.
+- Parecer do outro agente: pendente.
+
+### 2026-10-21 - Claude - Linha do tempo em formato de estrada
+
+- Referencia da diretoria: HTML "nossa-historia-estrada-standalone" (estrada vertical sinuosa) e imagem horizontal 1994-2025. Adaptado para manter abas de eras e passagem automatica, sem rolagem horizontal.
+- `EraRoad` em `HubInteractive.tsx`: SVG (acostamento, asfalto, faixa tracejada e pinos vinho) desenhado a partir da posicao medida de cada ano, alternando os lados; redesenha com ResizeObserver; entra com clip de cima para baixo e pinos em cascata. Gotcha: o ano precisa de `align-self: start` no grid, senao o item estica e o centro medido fica errado.
+- Dados: era 1 completada com 1995, 1997, 1999, 2001 e 2002 do material da diretoria (alimentos, Bonamezza, usinas, Skol, cotas de Zenildo, 1a revenda Brahma); 1994 passa a citar a Comercial Industrial de Alimentos Pau Brasil Ltda. Reconhecimentos marcados com "*" (estrela dourada). A legenda "Reconhecimentos e titulos" foi retirada a pedido do usuario (ficava solta no fim da estrada).
+- Validacao: tsc 0 erros; prints de viewport desktop/mobile com pinos alinhados; sem transbordo novo; `hub.spec.ts` 2/3 (falha mobile preexistente).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-21 - Claude - Passagem automatica das eras da linha do tempo
 

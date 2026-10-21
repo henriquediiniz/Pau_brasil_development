@@ -141,10 +141,12 @@ export const HUB_COMPANIES: HubCompany[] = [
 
 /**
  * História do grupo em eras. Fontes: apresentação "01 Integração 1ª parte Pau Brasil e Ambev"
- * (origem em 1994, prêmios PEX) e a linha do tempo oficial 2003–2025 enviada pelo usuário.
+ * (origem em 1994, prêmios PEX), a linha do tempo oficial 2003–2025 e o material "Nossa
+ * História" da diretoria (1994–2002), enviados pelo usuário.
  */
 export type HubTimelineYear = {
   year: string
+  /** Eventos que começam com "*" são reconhecimentos e títulos (exibidos com estrela). */
   events: string[]
   /** Empresas do grupo citadas no ano; exibidas como selos. */
   companies?: string[]
@@ -175,10 +177,36 @@ export const HUB_ERAS: HubEra[] = [
       {
         year: '1994',
         events: [
-          'Zenildo Rodrigues de Oliveira e Fábio Tyrone Braga de Oliveira fundam a Pau Brasil Distribuidora em Sousa (PB), em 14 de janeiro.',
+          'Zenildo Rodrigues de Oliveira e Fábio Tyrone Braga de Oliveira fundam em Sousa (PB), em 14 de janeiro, a Comercial Industrial de Alimentos Pau Brasil Ltda, distribuidora de alimentos.',
         ],
       },
-      { year: '2002', events: ['Nasce a Pau Brasil Bebidas.'], companies: ['bebidas'] },
+      {
+        year: '1995',
+        events: [
+          'Distribuição da Técnica Brasileira de Alimentos (Bonamezza) na Paraíba e no Rio Grande do Norte.',
+        ],
+      },
+      {
+        year: '1997',
+        events: ['Abertura da distribuição Bonamezza em Pernambuco, com sede em Recife (PE).'],
+      },
+      {
+        year: '1999',
+        events: ['Início da comercialização das usinas de açúcar e álcool de PE, AL, PB, SP e GO.'],
+      },
+      {
+        year: '2001',
+        events: ['Início das negociações para levar a marca Skol a todo o interior da Paraíba.'],
+      },
+      {
+        year: '2002',
+        events: [
+          'Zenildo Oliveira assume, com a família, todas as cotas da Pau Brasil Ltda.',
+          'Início das operações com Skol no sertão paraibano.',
+          'Incorporação da 1ª revenda da marca Brahma, em Sousa (PB): nasce a Pau Brasil Bebidas.',
+        ],
+        companies: ['bebidas'],
+      },
     ],
   },
   {
@@ -191,45 +219,34 @@ export const HUB_ERAS: HubEra[] = [
       {
         year: '2003',
         events: [
-          'Incorporação da 2ª revenda, da marca Antarctica, em Sousa (PB).',
-          'A Pau Brasil se torna a primeira revenda tri-marca do Nordeste.',
+          '2ª revenda Antarctica, em Sousa (PB): a primeira revenda tri-marca do Nordeste.',
         ],
-        companies: ['bebidas'],
       },
-      { year: '2004', events: ['3ª revenda incorporada: Antarctica de Pombal (PB).'] },
+      { year: '2004', events: ['3ª revenda: Antarctica de Pombal (PB).'] },
       {
         year: '2005',
         events: [
-          'Zenildo é convidado para um seminário Pepsico/Ambev em Nova York (EUA).',
-          'Lançado o plano de ser o primeiro embaixador Ambev do Nordeste.',
+          'Seminário Pepsico/Ambev em Nova York e o plano de ser o 1º embaixador Ambev do Nordeste.',
         ],
       },
       {
         year: '2006',
-        events: [
-          '4ª revenda incorporada: Antarctica de Itaporanga (PB).',
-          'Leão de Bronze no PEX Ambev.',
-        ],
+        events: ['4ª revenda: Antarctica de Itaporanga (PB).', '*Leão de Bronze no PEX Ambev.'],
       },
       {
         year: '2007',
-        events: [
-          '5ª e 6ª revendas: Antarctica de Catolé do Rocha e de São Bento (PB).',
-          'Leão de Ouro no PEX Ambev.',
-        ],
+        events: ['5ª e 6ª revendas: Catolé do Rocha e São Bento (PB).', '*Leão de Ouro no PEX Ambev.'],
       },
       {
         year: '2008',
-        events: ['Lançamento da Conveniência Pau Brasil em Sousa (PB).', 'Leão de Ouro no PEX Ambev.'],
+        events: ['Conveniência Pau Brasil em Sousa (PB).', '*Leão de Ouro no PEX Ambev.'],
       },
       {
         year: '2009',
         events: [
           'Nasce a Hora 10, marca de lojas para o varejo.',
-          'Título de Embaixador no PEX Ambev.',
-          'Zenildo participa do ciclo de embaixadores na incorporação InBev/Anheuser-Busch, nos EUA.',
+          '*Embaixador no PEX Ambev; Zenildo integra o ciclo de embaixadores da InBev/Anheuser-Busch (EUA).',
         ],
-        companies: ['hora-10'],
       },
     ],
   },
@@ -282,7 +299,7 @@ export const HUB_ERAS: HubEra[] = [
   },
   {
     label: 'Novas fronteiras',
-    range: '2017 — 2026',
+    range: '2017 — 2025',
     title: 'Além da Paraíba, sem perder a raiz.',
     summary:
       'Pernambuco e Bahia, novos empreendimentos, os maiores reconhecimentos da Ambev e novas empresas no grupo.',
@@ -309,22 +326,23 @@ export const HUB_ERAS: HubEra[] = [
       },
       {
         year: '2022',
-        events: ['Título no Programa de Excelência Ambev de Operação: DPO Sustentável.'],
+        events: ['*Título no Programa de Excelência Ambev de Operação: DPO Sustentável.'],
         companies: ['bebidas'],
       },
       {
         year: '2023',
         events: [
-          'Leão de Prata: 2ª melhor revenda do Brasil, em Sousa (PB).',
+          '*Leão de Prata: 2ª melhor revenda do Brasil, em Sousa (PB).',
           'Lançamento do Domus Jardins, em João Pessoa (PB).',
-          'Grupo Pau Brasil em 1º lugar em arrecadação de ICMS na Paraíba.',
+          '*Grupo Pau Brasil em 1º lugar em arrecadação de ICMS na Paraíba.',
         ],
         companies: ['bebidas', 'unida'],
       },
       {
         year: '2024',
         events: [
-          'Inauguração da operação da revenda em Guarabira (PB) e título de Embaixador Revenda Ambev.',
+          'Inauguração da operação da revenda em Guarabira (PB).',
+          '*Título de Embaixador Revenda Pau Brasil Ambev.',
           'Nascem a Fazenda Divina e a Pau Brasil Locadora, em Sousa (PB).',
           'Nova sede da Pau Brasil Motos em Petrolina (PE) e nasce a Original Start Motopeças.',
         ],
@@ -338,10 +356,6 @@ export const HUB_ERAS: HubEra[] = [
           'Supermercado Hora 10 em Soledade (PB) e entrega do Unigreen, em João Pessoa (PB).',
         ],
         companies: ['bebidas', 'instituto-yso', 'hora-10', 'unida'],
-      },
-      {
-        year: '2026',
-        events: ['Nova identidade visual: a árvore como símbolo de origem, crescimento e pertencimento.'],
       },
     ],
   },
