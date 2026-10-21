@@ -389,7 +389,6 @@ export function HubTimeline() {
           </div>
         </div>
         <div className={styles.eraTrack}>
-        <EraRoad list={list} era={active} />
         <ol ref={list} className={styles.eraYears}>
           {HUB_ERAS[active].years.map((item, index) => (
             <li
@@ -429,6 +428,9 @@ export function HubTimeline() {
             </li>
           ))}
         </ol>
+        {/* Depois da lista de propósito: o ref da lista precisa estar ligado quando a estrada mede os anos.
+            Em desenvolvimento o StrictMode remonta e mascarava isso; em produção a estrada não aparecia. */}
+        <EraRoad list={list} era={active} />
         </div>
       </div>
     </div>

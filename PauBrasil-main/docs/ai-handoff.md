@@ -414,6 +414,14 @@ Use este formato:
 
 ## Registro de Rodadas
 
+### 2026-10-21 - Claude - Estrada da linha do tempo nao aparecia em producao
+
+- Sintoma: em producao (e em `next build` local) a estrada nao era desenhada, sem erro no console; em `next dev` funcionava.
+- Causa: `EraRoad` vinha antes do `<ol ref>` no JSX. No layout effect do primeiro mount o ref da lista ainda nao estava ligado, o efeito saia cedo e nao observava nada. Em dev o StrictMode remonta os efeitos e mascarava o problema.
+- Correcao: `EraRoad` renderizado depois da lista. Validado com `next build` + `next start` local (svg presente e pinos alinhados).
+- Licao: testar componentes com refs entre irmaos tambem no build de producao.
+- Parecer do outro agente: pendente.
+
 ### 2026-10-21 - Claude - Era 2003-2009 mais curta e sem 2026
 
 - Pedido do usuario para caber na tela de apresentacao: textos da era 2003-2009 condensados (sem perder fatos), sem selos de empresa nessa era e espacamento entre anos de 18 para 14 px.
