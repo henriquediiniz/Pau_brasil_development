@@ -2500,3 +2500,417 @@
     animation: none;
   }
 }
+
+/* ── Newsletter, trabalhe conosco e cabeçalho (out/2026) ───────────── */
+
+/* Cabeçalho com fonte maior (pedido da reunião de alinhamento) */
+.desktopNav {
+  gap: 30px;
+  font-size: 15px;
+}
+.portalLink {
+  font-size: 14px;
+  padding: 13px 17px;
+}
+.logo img {
+  width: 140px;
+}
+.mobileNav a {
+  font-size: 16px;
+}
+
+/* Newsletter: primeira coisa da página */
+.newsletter {
+  background: var(--paper);
+  padding: 44px 0 52px;
+  border-bottom: 1px solid #e7e1da;
+}
+.newsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 56px;
+  align-items: center;
+}
+.newsCopy .eyebrow {
+  margin-bottom: 18px;
+}
+@keyframes newsPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 #7a152059;
+  }
+  50% {
+    box-shadow: 0 0 0 6px #7a152000;
+  }
+}
+.newsLive {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--wine);
+  animation: newsPulse 2s ease-in-out infinite;
+}
+.newsText {
+  min-height: 210px;
+  animation: hubRise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.newsText small {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a7565;
+}
+.hub .newsText h3 {
+  margin-top: 10px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+}
+.hub .newsText p {
+  margin-top: 14px;
+  font-size: 15px;
+  color: #5e544c;
+  max-width: 460px;
+}
+.newsText em {
+  display: block;
+  margin-top: 12px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--wine);
+}
+.newsTabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+}
+.newsTabs button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 9px 14px;
+  border: 1px solid #cfc1b3;
+  border-radius: 4px;
+  background: #fff;
+  color: #3f3732;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+.newsTabs button small {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a7565;
+}
+.newsTabs button:hover {
+  border-color: var(--wine);
+}
+.newsTabs button[aria-pressed='true'] {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff;
+}
+.newsTabs button[aria-pressed='true'] small {
+  color: #f0d9d2;
+}
+.newsTabs .newsPause {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+}
+.newsStage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1f1a17;
+  box-shadow: 0 30px 60px -36px #3b1d1480;
+}
+.newsBars {
+  position: absolute;
+  z-index: 3;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 5px;
+}
+.newsBars span {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: #ffffff4d;
+  overflow: hidden;
+}
+.newsBars span[data-state='done'] {
+  background: #fff;
+}
+.newsBars i {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform-origin: left;
+  animation: eraProgress linear forwards;
+}
+@keyframes newsIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.newsSlides {
+  position: absolute;
+  inset: 0;
+  animation: newsIn 0.7s ease both;
+}
+.newsSlide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.newsSlide[data-active='true'] {
+  opacity: 1;
+}
+.newsBlur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(22px) brightness(0.75);
+}
+.newsSlide img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.04);
+  transition: transform 3s ease-out;
+}
+.newsSlide[data-active='true'] img {
+  transform: none;
+}
+
+/* Frase da reunião: "Acreditamos em nossa gente" */
+.manifesto {
+  background: var(--paper);
+  padding: 96px 0;
+  text-align: center;
+  border-bottom: 1px solid #e7e1da;
+}
+.hub .manifesto p {
+  font-size: clamp(36px, 5.4vw, 76px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+}
+.manifesto em {
+  font-style: normal;
+  color: var(--wine);
+}
+.manifesto span {
+  display: block;
+  margin-top: 18px;
+  font-size: 15px;
+  color: #6e6157;
+}
+
+@media (max-width: 1100px) {
+  .desktopNav {
+    gap: 18px;
+    font-size: 13px;
+  }
+  .portalLink {
+    font-size: 12px;
+    padding: 11px 13px;
+  }
+  .newsGrid {
+    gap: 36px;
+  }
+}
+@media (max-width: 800px) {
+  .newsletter {
+    padding: 30px 0 36px;
+  }
+  .newsGrid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .newsStage {
+    order: -1;
+    aspect-ratio: 4 / 3;
+  }
+  .newsText {
+    min-height: 0;
+  }
+  .manifesto {
+    padding: 64px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .newsLive,
+  .newsText,
+  .newsSlides {
+    animation: none;
+  }
+  .newsSlide img {
+    transition: none;
+    transform: none;
+  }
+}
+.newsPreload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+/* Fonte maior sem quebrar os links em telas intermediárias */
+.desktopNav a,
+.portalLink {
+  white-space: nowrap;
+}
+@media (max-width: 1320px) {
+  .desktopNav {
+    gap: 20px;
+    font-size: 14px;
+  }
+  .portalLink {
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+}
+@media (max-width: 1100px) {
+  .desktopNav {
+    gap: 16px;
+    font-size: 13px;
+  }
+  .portalLink {
+    font-size: 12px;
+    padding: 11px 12px;
+  }
+}
+
+/* Ajustes da newsletter: foto inteira, setas, barras clicáveis */
+.newsSlide img {
+  position: absolute;
+  inset: 0;
+}
+.newsStage:focus-visible {
+  outline: 3px solid #bb8c08;
+  outline-offset: 4px;
+}
+.newsBars {
+  top: 10px;
+  gap: 4px;
+}
+.newsBars button {
+  flex: 1;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.newsBars button > span {
+  position: relative;
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: #ffffff4d;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+.newsBars button:hover > span {
+  background: #ffffff80;
+}
+.newsBars button[data-state='done'] > span {
+  background: #fff;
+}
+.newsArrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 1px solid #ffffff59;
+  border-radius: 50%;
+  background: #1a1a1a59;
+  color: #fff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition:
+    opacity 0.3s,
+    background 0.2s,
+    transform 0.2s;
+}
+.newsArrowPrev {
+  left: 14px;
+}
+.newsArrowNext {
+  right: 14px;
+}
+.newsStage:hover .newsArrow,
+.newsStage:focus-within .newsArrow {
+  opacity: 1;
+}
+.newsArrow:hover {
+  background: var(--wine);
+  border-color: var(--wine);
+}
+.newsArrowPrev:hover {
+  transform: translateX(-2px);
+}
+.newsArrowNext:hover {
+  transform: translateX(2px);
+}
+.newsCounter {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  bottom: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1a1a1a73;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+/* Telas de toque não têm hover: setas sempre visíveis, menores */
+@media (hover: none) {
+  .newsArrow {
+    opacity: 1;
+    width: 38px;
+    height: 38px;
+    margin-top: -19px;
+  }
+}

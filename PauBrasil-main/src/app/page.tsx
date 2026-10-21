@@ -19,6 +19,8 @@ import {
   HubTalentGuide,
 } from './_components/HubInteractive'
 import { HubReveal } from './_components/HubReveal'
+import { HubNewsletter } from './_components/HubNewsletter'
+import { listarNewsletterPublicada } from '@/lib/newsletter'
 import { HubCountUp, HubHeroGlow } from './_components/HubEffects'
 import {
   HUB_COMPANIES,
@@ -50,12 +52,17 @@ export const metadata: Metadata = {
 // Chrome no Android) inverta as cores e apague a assinatura e as fotos.
 export const viewport: Viewport = { colorScheme: 'only light' }
 
-export default function HomePage() {
+// A newsletter vem do banco; a página é regerada a cada 5 min e na hora em que Gente publica (revalidatePath).
+export const revalidate = 300
+
+export default async function HomePage() {
+  const newsletter = await listarNewsletterPublicada()
   return (
     <div className={`${styles.hub} ${montserrat.variable}`} data-hub-root>
       <HubReveal />
       <HubNav />
       <main id="conteudo">
+        <HubNewsletter items={newsletter} />
         <section className={styles.hero} aria-labelledby="hub-title">
           <HubHeroGlow />
           <div className={styles.container}>
@@ -336,13 +343,25 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className={styles.manifesto} aria-label="Nosso jeito">
+          <div className={styles.container} data-reveal>
+            <p>
+              Acreditamos em <em>nossa gente.</em>
+            </p>
+            <span>
+              Cada conquista do Grupo Pau Brasil começa nas pessoas que fazem
+              parte dele.
+            </span>
+          </div>
+        </section>
+
         <section
           id="talentos"
           className={`${styles.section} ${styles.talentsSection}`}
         >
           <div className={`${styles.container} ${styles.talentGrid}`}>
             <div data-reveal>
-              <span className={styles.eyebrow}>Carreiras e talentos</span>
+              <span className={styles.eyebrow}>Trabalhe conosco</span>
               <h2>
                 O próximo capítulo
                 <br />

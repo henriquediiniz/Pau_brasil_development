@@ -419,3 +419,21 @@ export function suggestHubCompanies(interestId: string): HubCompany[] {
 export function hubCompanyHref(company: HubCompany): string {
   return company.externalUrl ?? `/empresas/${company.slug}`
 }
+
+/**
+ * Formato de uma campanha da newsletter no site. As campanhas são cadastradas no módulo
+ * Gente (/gente/newsletter) e lidas do banco por src/lib/newsletter.ts.
+ */
+export type HubNewsPhoto = { src: string; blur: string; width: number; height: number; alt: string }
+
+export type HubNews = {
+  slug: string
+  title: string
+  /** Rótulo curto de data exibido no seletor (ex.: "25 set"). */
+  date: string
+  company: string
+  unit: string
+  summary: string
+  tagline?: string
+  photos: HubNewsPhoto[]
+}

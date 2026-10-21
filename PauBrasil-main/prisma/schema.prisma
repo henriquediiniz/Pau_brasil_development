@@ -1396,3 +1396,46 @@ model QuadroAprendiz {
   @@index([situacao])
   @@index([terminoContrato])
 }
+
+// ─── Newsletter do site institucional ────────────────────────────────────────
+// Campanhas internas (endomarketing) exibidas no topo da home. Cadastradas pelo
+// módulo Gente. As fotos ficam no próprio banco, já reduzidas no navegador
+// (~150 KB), porque o projeto não tem armazenamento público de arquivos.
+
+model NewsletterPost {
+  id          String            @id @default(cuid())
+  title       String
+  /// Rótulo curto exibido no site, ex.: "25 set" ou "Setembro".
+  dateLabel   String
+  /// Data usada para ordenar (mais recente primeiro).
+  eventDate   DateTime
+  /// Slug da empresa no hub (src/lib/hub-content.ts), ex.: "bebidas".
+  company     String
+  unit        String
+  summary     String
+  tagline     String?
+  published   Boolean           @default(true)
+  createdById String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  photos      NewsletterPhoto[]
+
+  @@index([published, eventDate])
+}
+
+model NewsletterPhoto {
+  id        String         @id @default(cuid())
+  postId    String
+  post      NewsletterPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  position  Int
+  alt       String
+  width     Int
+  height    Int
+  mimeType  String
+  data      Bytes
+  /// Miniatura minúscula em data URI, usada como fundo desfocado.
+  blur      String
+  createdAt DateTime       @default(now())
+
+  @@index([postId, position])
+}

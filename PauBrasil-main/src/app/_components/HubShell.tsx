@@ -9,8 +9,9 @@ import styles from './Hub.module.css'
 const links = [
   { href: '/#historia', label: 'O grupo' },
   { href: '/#empresas', label: 'Nossas empresas' },
+  { href: '/#newsletter', label: 'Newsletter' },
   { href: '/#universidade', label: 'Universidade' },
-  { href: '/#talentos', label: 'Carreiras' },
+  { href: '/#talentos', label: 'Trabalhe conosco' },
 ]
 
 export function HubNav() {

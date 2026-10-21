@@ -253,7 +253,9 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — linha do tempo em formato de estrada (2026-10-21)
+- Claude — cadastro da newsletter no portal (2026-10-21)
+  - objetivo: campanhas da newsletter cadastradas por Gente/admin em `/gente/newsletter`, fotos no PostgreSQL, home lendo do banco
+  - arquivos em posse: `prisma/schema.prisma`, nova migration, `src/app/api/gente/newsletter/**`, `src/app/api/public/newsletter/**`, `src/app/gente/newsletter/**`, `src/app/gente/_components/DockGente.tsx`, `src/lib/newsletter.ts`, `src/lib/audit.ts`, `src/app/page.tsx`, `src/app/_components/HubNewsletter.tsx`, `src/lib/hub-content.ts`
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +415,39 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-21 - Claude - Cadastro da newsletter no portal (implementado e validado localmente; producao pendente)
+
+- Decisao do usuario: conteudo de endomarketing cadastrado pelo portal. Primeira entrega: newsletter.
+- Banco: `NewsletterPost` e `NewsletterPhoto` (fotos em bytea, ~150 KB cada, reduzidas no navegador). Migration `20261021195235_add_newsletter` ESCRITA A MAO, puramente aditiva.
+  - **Gotcha critico:** `prisma migrate dev` gerou junto DROP das tabelas legadas de OBZ (12) e Score (3) e das colunas `isObzAdmin`/`isScoreAdmin`, que sairam do schema na limpeza mas seguem no banco. Nunca aplicar migration gerada sem revisar. Remover essas tabelas exige decisao propria do usuario.
+- Por que bytea: producao NAO tem `BLOB_READ_WRITE_TOKEN` nem credenciais Cloudinary (conferido em `vercel env ls`). Isso tambem indica que uploads de CV/laudo provavelmente falham hoje em producao — pendencia a reportar.
+- Rotas: `/api/gente/newsletter` (GET/POST), `/[id]` (GET/PATCH/DELETE; PATCH reordena fotos e textos alternativos), `/[id]/fotos` (POST multipart, valida tipo pelo conteudo, limite 1,5 MB e 12 fotos), `/[id]/fotos/[fotoId]` (DELETE), `/api/public/newsletter/foto/[id]` (publica com cache imutavel se publicada; rascunho so para Gente). Todas via `autenticarGente`, com auditoria `GENTE_NEWSLETTER_*` e `revalidatePath('/')`.
+- Permissao: quem acessa o modulo Gente (RH_ADMIN, SYS_ADMIN) publica para qualquer empresa do hub; restricao por empresa nao implementada (sem mapeamento hub <-> Empresa).
+- Telas: `/gente/newsletter` (lista) e `/gente/newsletter/[id]` (criar com `nova`, editar, fotos com reordenacao/descricao, excluir). Item "Newsletter do site" no dock do Gente.
+- Home: `listarNewsletterPublicada()` (8 mais recentes publicadas com foto), `revalidate = 300`; sem banco/sem campanhas a secao some. Dados estaticos `HUB_NEWS` removidos; fotos de Sousa movidas para `prisma/seed-data/newsletter/` e carregadas por `prisma/seed-newsletter.ts` (dry-run por padrao, `--gravar` grava, idempotente).
+- Ambiente local recriado nesta pasta: PostgreSQL 16 extraido em `.local-dev/` (`bash .local-dev/postgres.sh start|stop|status|psql`), `.env.development.local`, conta local RH em `.local-dev/contas-teste.env` (tudo fora do Git).
+- Validacao: tsc 0; `npm test` 511/0; E2E manual com Playwright (home le do banco, login RH, criar campanha, enviar foto, aparece no site, excluir some, API sem login 401); `next build` + `next start` com banco local; `hub.spec.ts` 2/3 (falha mobile preexistente).
+- Producao (com ok explicito do usuario, 2026-10-21): `prisma migrate deploy` aplicou so `add_newsletter` no Neon (23 -> 24 migrations, schema em dia); `seed-newsletter.ts --gravar` criou as 3 campanhas de Sousa (11 fotos). Credenciais lidas de `vercel env pull` em arquivo temporario, apagado em seguida.
+- Parecer do outro agente: pendente.
+
+### 2026-10-21 - Claude - Ajustes da newsletter
+
+- Bug de zoom: a foto usava `height: 100%` dentro de um grid de linha automatica e era desenhada com a altura natural (ex.: 1262 px numa moldura de 444 px). Agora a imagem e absoluta (inset 0) com `object-fit: contain`; fotos verticais aparecem inteiras.
+- Mais lenta: 4 s por foto (`PHOTO_MS`).
+- Navegacao: setas anterior/proxima sobre a foto (aparecem no hover/foco; sempre visiveis em telas de toque), barras clicaveis para pular de foto, contador "n / total", deslizar o dedo no celular e setas do teclado com o carrossel em foco. Nas pontas, passa para a campanha vizinha.
+- Validacao: tsc 0 erros; navegacao testada com Playwright; sem transbordo novo; `hub.spec.ts` 2/3 (falha mobile preexistente).
+- Parecer do outro agente: pendente.
+
+### 2026-10-21 - Claude - Newsletter, trabalhe conosco, frase e cabecalho (reuniao de alinhamento)
+
+- Pedidos da reuniao: newsletter, trabalhe conosco, frase "Acreditamos em nossa gente", fonte maior no cabecalho, endomarketing (este ultimo so sugestoes, sem implementacao).
+- `HubNewsletter.tsx` (novo) logo no inicio da home, antes do hero: campanhas de setembro da revenda de Sousa (Setembro Amarelo, Dia do Administrador 09/09, Dia Nacional do Transito 25/09), conforme calendario do plano de comunicacao no Canva. Fotos passam a cada 2,5 s (`PHOTO_MS`), barras estilo stories, seletor de campanha, pausa no hover/foco/botao, desligado com movimento reduzido; fundo desfocado da propria foto para fotos verticais; proxima foto pre-carregada na troca de campanha.
+- Dados em `HUB_NEWS` (`hub-content.ts`), prontos para outras empresas/unidades. Fotos em `public/newsletter/<campanha>/` (1400 px, sem EXIF, + miniatura -blur). Foto duplicada do Dia do Administrador usada uma vez; video do Dia do Transito (7 MB) nao incluido.
+- Cabecalho: links 15 px (14 px ate 1320, 13 px ate 1100), sem quebra de linha; novo link "Newsletter"; "Carreiras" virou "Trabalhe conosco" (mesmo destino #talentos), assim como o eyebrow da secao.
+- Faixa "Acreditamos em nossa gente." entre Universidade e Trabalhe conosco.
+- Validacao: tsc 0 erros; prints 1440/1180/390; cabecalho em 1 linha de 860 a 1440; `next build` + `next start` local com rotacao e fotos ok e estrada presente; `hub.spec.ts` 2/3 (falha mobile preexistente da faixa de logos; transbordo novo do blur corrigido).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-21 - Claude - Estrada da linha do tempo nao aparecia em producao
 
