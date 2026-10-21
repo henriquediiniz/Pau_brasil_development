@@ -1767,15 +1767,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 18%;
+  object-position: 50% 14%;
   display: block;
-  filter: grayscale(1) contrast(1.05);
   transition:
-    filter 1.2s ease,
     transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .founderPhoto:hover img {
-  filter: grayscale(0.15) contrast(1.05);
   transform: scale(1.03);
 }
 .founderPhoto figcaption {
@@ -2397,4 +2394,30 @@
   .eraYears > li {
     animation: none;
   }
+}
+
+/* Passagem automática das eras: linha de progresso sob a aba ativa */
+@keyframes eraProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.eraProgress {
+  position: absolute;
+  left: 0;
+  right: 12px;
+  top: -1px;
+  height: 2px;
+  background: var(--wine);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: eraProgress linear forwards;
+}
+.eraNav .eraPause {
+  margin-left: 6px;
+  width: 34px;
+  height: 34px;
 }

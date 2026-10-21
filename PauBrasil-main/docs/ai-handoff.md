@@ -253,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — feedbacks do hub e linha do tempo (2026-10-21)
+- Claude — passagem automatica das eras (2026-10-21)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +413,21 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-21 - Claude - Passagem automatica das eras da linha do tempo
+
+- Pedido do chefe: as eras avancam sozinhas a cada 10 s (`ERA_MS`; 7 s foi testado e o usuario preferiu 10 s), voltando ao inicio apos a ultima, so com a secao visivel (IntersectionObserver), pausando no hover/foco e por botao (WCAG 2.2.2); desligado com movimento reduzido. Clique manual reinicia a contagem.
+- Linha de progresso vinho sob a aba ativa; so existe enquanto a contagem roda, para ficar em sincronia com o timer.
+- Validacao: tsc 0 erros; teste manual com Playwright (troca no tempo configurado, mantem com hover); `hub.spec.ts` 2/3 (falha mobile preexistente).
+- Parecer do outro agente: pendente.
+
+### 2026-10-21 - Claude - Logos em fundo unico e foto colorida do fundador
+
+- Proposta B escolhida pelo usuario (previa comparativa A/B/C feita fora do repositorio): todas as placas de marca usam `HUB_PLATE` (#f1ebe3) em `hub-content.ts`.
+- `bebidas.png` virou versao escura com fundo transparente; `hora-10.png` sem o fundo preto embutido.
+- `public/brand/fundador.jpg` trocado pela foto colorida em fundo cinza (pedido do chefe: a P&B ficava apagada); filtro grayscale removido do CSS.
+- Validacao: tsc 0 erros; screenshots; `hub.spec.ts` 2/3 (falha mobile preexistente da faixa de logos).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-21 - Claude - Feedbacks do hub e linha do tempo real
 

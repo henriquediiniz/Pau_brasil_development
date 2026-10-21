@@ -9,7 +9,7 @@ export type HubCompany = {
   units: { name: string; state: string }[]
   /** Marca da empresa. `shape` define como a placa do card enquadra o arquivo. */
   logo?: { src: string; shape: 'circle' | 'wide' }
-  /** Cor de fundo da placa da marca no card (harmoniza com o arquivo do logo). */
+  /** Fundo da placa da marca; hoje todas usam HUB_PLATE para a grade ficar harmônica. */
   plate: string
   /** Iniciais usadas quando ainda não há logo aprovado. */
   monogram: string
@@ -17,11 +17,14 @@ export type HubCompany = {
   externalUrl?: string
 }
 
+/** Fundo único das placas de marca: o areia da identidade, sobre o qual todas as logos funcionam. */
+const HUB_PLATE = '#f1ebe3'
+
 export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'bebidas',
     logo: { src: '/logos/hub/bebidas.png', shape: 'wide' },
-    plate: '#000000',
+    plate: HUB_PLATE,
     monogram: 'PB',
     name: 'Pau Brasil Bebidas',
     segment: 'Distribuição',
@@ -47,7 +50,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'motos',
     logo: { src: '/logos/hub/motos.png', shape: 'circle' },
-    plate: '#2a1214',
+    plate: HUB_PLATE,
     monogram: 'PM',
     name: 'Pau Brasil Motos',
     externalUrl: 'https://www.paubrasilmotos.com.br/valedosaofrancisco/',
@@ -65,7 +68,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'unida',
     logo: { src: '/logos/hub/unida.png', shape: 'circle' },
-    plate: '#e9e4dd',
+    plate: HUB_PLATE,
     monogram: 'UC',
     name: 'Unida Construtora',
     segment: 'Construção',
@@ -77,8 +80,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'instituto-yso',
     logo: { src: '/logos/hub/instituto-yso.png', shape: 'circle' },
-    // Champanhe: destaca a logo preta e dourada do instituto.
-    plate: 'radial-gradient(circle at 50% 40%, #f6eee3 0%, #dcc6a6 100%)',
+    plate: HUB_PLATE,
     monogram: 'IY',
     name: 'Instituto YSO',
     segment: 'Saúde e estética',
@@ -91,7 +93,7 @@ export const HUB_COMPANIES: HubCompany[] = [
     slug: 'original-start',
     // A logo oficial (Drive de logos do grupo) identifica a empresa como "Moto Peças".
     logo: { src: '/logos/hub/original-start.png', shape: 'wide' },
-    plate: '#f4f0ea',
+    plate: HUB_PLATE,
     monogram: 'OS',
     name: 'Original Start',
     segment: 'Mobilidade',
@@ -102,7 +104,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'hora-10',
     logo: { src: '/logos/hub/hora-10.png', shape: 'wide' },
-    plate: '#000000',
+    plate: HUB_PLATE,
     monogram: 'H10',
     name: 'Hora 10',
     segment: 'Varejo',
@@ -114,7 +116,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'locadora',
     logo: { src: '/logos/hub/locadora.png', shape: 'wide' },
-    plate: '#f4f0ea',
+    plate: HUB_PLATE,
     monogram: 'LP',
     name: 'Locadora Pau Brasil',
     segment: 'Mobilidade',
@@ -126,7 +128,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   {
     slug: 'fazenda-divina',
     logo: { src: '/logos/hub/fazenda-divina.png', shape: 'circle' },
-    plate: '#f4f0ea',
+    plate: HUB_PLATE,
     monogram: 'FD',
     name: 'Fazenda Divina',
     segment: 'Agro',

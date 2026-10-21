@@ -1,6 +1,12 @@
 'use client'
 
-import { useState, type ComponentProps, type CSSProperties } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+  type CSSProperties,
+} from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -8,6 +14,8 @@ import {
   ArrowRight,
   ArrowUpRight,
   MapPin,
+  Pause,
+  Play,
   Search,
 } from 'lucide-react'
 import {
@@ -177,13 +185,57 @@ export function HubBrandStrip({
   )
 }
 
-/** Linha do tempo do grupo, dividida em eras; cada era lista os anos e as empresas citadas. */
+const ERA_MS = 10000
+
+/**
+ * Linha do tempo do grupo, dividida em eras; cada era lista os anos e as empresas citadas.
+ * As eras avançam sozinhas enquanto a seção está na tela, com pausa no hover, no foco e no botão.
+ */
 export function HubTimeline() {
   const [active, setActive] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [held, setHeld] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [reduced, setReduced] = useState(false)
+  const root = useRef<HTMLDivElement>(null)
   const era = HUB_ERAS[active]
   const last = HUB_ERAS.length - 1
+  const running = visible && !paused && !held && !reduced
+
+  useEffect(() => {
+    setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    const element = root.current
+    if (!element) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.35 },
+    )
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  // `active` nas dependências reinicia a contagem quando a era muda, inclusive por clique.
+  useEffect(() => {
+    if (!running) return
+    const timer = window.setTimeout(
+      () => setActive((index) => (index === last ? 0 : index + 1)),
+      ERA_MS,
+    )
+    return () => window.clearTimeout(timer)
+  }, [running, active, last])
+
   return (
-    <div className={styles.storyTimeline}>
+    <div
+      ref={root}
+      className={styles.storyTimeline}
+      data-running={running}
+      onMouseEnter={() => setHeld(true)}
+      onMouseLeave={() => setHeld(false)}
+      onFocus={() => setHeld(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setHeld(false)
+      }}
+    >
       <div
         className={styles.timelineSteps}
         role="group"
@@ -200,6 +252,14 @@ export function HubTimeline() {
             <span className={styles.timelineDot} />
             <small>{item.range}</small>
             {item.label}
+            {/* Só existe enquanto a contagem roda: remonta junto com o timer e os dois ficam em sincronia */}
+            {active === index && running && (
+              <span
+                className={styles.eraProgress}
+                style={{ animationDuration: `${ERA_MS}ms` } as CSSProperties}
+                aria-hidden="true"
+              />
+            )}
           </button>
         ))}
       </div>
@@ -229,6 +289,16 @@ export function HubTimeline() {
             >
               <ArrowRight size={17} />
             </button>
+            {!reduced && (
+              <button
+                type="button"
+                className={styles.eraPause}
+                onClick={() => setPaused((value) => !value)}
+                aria-label={paused ? 'Retomar passagem automática' : 'Pausar passagem automática'}
+              >
+                {paused ? <Play size={15} /> : <Pause size={15} />}
+              </button>
+            )}
           </div>
         </div>
         <ol className={styles.eraYears}>
