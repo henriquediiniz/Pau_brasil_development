@@ -72,19 +72,20 @@ export const HUB_COMPANIES: HubCompany[] = [
     description:
       'Desenvolvimento de empreendimentos imobiliários e projetos de construção civil.',
     activities: ['Empreendimentos imobiliários', 'Construção civil'],
-    units: [],
+    units: [{ name: 'João Pessoa', state: 'PB' }],
   },
   {
     slug: 'instituto-yso',
     logo: { src: '/logos/hub/instituto-yso.png', shape: 'circle' },
-    plate: '#1c1a17',
+    // Champanhe: destaca a logo preta e dourada do instituto.
+    plate: 'radial-gradient(circle at 50% 40%, #f6eee3 0%, #dcc6a6 100%)',
     monogram: 'IY',
     name: 'Instituto YSO',
-    segment: 'Impacto social',
+    segment: 'Saúde e estética',
     description:
-      'Projetos sociais e educacionais voltados ao desenvolvimento da comunidade.',
-    activities: ['Projetos sociais', 'Educação e comunidade'],
-    units: [],
+      'Um dos grandes nomes da estética na Paraíba: cuidado, harmonia e saúde em um só lugar.',
+    activities: ['Estética', 'Saúde e bem-estar'],
+    units: [{ name: 'Sousa', state: 'PB' }],
   },
   {
     slug: 'original-start',
@@ -94,9 +95,9 @@ export const HUB_COMPANIES: HubCompany[] = [
     monogram: 'OS',
     name: 'Original Start',
     segment: 'Mobilidade',
-    description: 'Loja de peças para motocicletas, ao lado de quem vive sobre duas rodas.',
+    description: 'Motopeças em Petrolina (PE), ao lado de quem vive sobre duas rodas.',
     activities: ['Peças para motocicletas'],
-    units: [],
+    units: [{ name: 'Petrolina', state: 'PE' }],
   },
   {
     slug: 'hora-10',
@@ -104,10 +105,10 @@ export const HUB_COMPANIES: HubCompany[] = [
     plate: '#000000',
     monogram: 'H10',
     name: 'Hora 10',
-    segment: 'Serviços',
+    segment: 'Varejo',
     description:
-      'Soluções em gestão de pessoas e processos para o grupo e parceiros.',
-    activities: ['Gestão de pessoas', 'Gestão de processos'],
+      'Rede de lojas e supermercado que leva o varejo do grupo a cidades do interior da Paraíba.',
+    activities: ['Lojas de varejo', 'Supermercado'],
     units: [],
   },
   {
@@ -120,7 +121,7 @@ export const HUB_COMPANIES: HubCompany[] = [
     description:
       'Locação de veículos e gestão de frotas para a mobilidade empresarial.',
     activities: ['Locação de veículos', 'Gestão de frotas'],
-    units: [],
+    units: [{ name: 'Sousa', state: 'PB' }],
   },
   {
     slug: 'fazenda-divina',
@@ -132,35 +133,215 @@ export const HUB_COMPANIES: HubCompany[] = [
     description:
       'Produção agropecuária com foco em pecuária e desenvolvimento genético.',
     activities: ['Pecuária', 'Desenvolvimento genético'],
-    units: [],
+    units: [{ name: 'Sousa', state: 'PB' }],
   },
 ]
 
-// As fases são editoriais: não estabelecem datas nem uma ordem histórica não confirmada.
-export const HUB_STORY = [
+/**
+ * História do grupo em eras. Fontes: apresentação "01 Integração 1ª parte Pau Brasil e Ambev"
+ * (origem em 1994, prêmios PEX) e a linha do tempo oficial 2003–2025 enviada pelo usuário.
+ */
+export type HubTimelineYear = {
+  year: string
+  events: string[]
+  /** Empresas do grupo citadas no ano; exibidas como selos. */
+  companies?: string[]
+}
+
+export type HubEra = {
+  label: string
+  range: string
+  title: string
+  summary: string
+  years: HubTimelineYear[]
+}
+
+export const HUB_FOUNDING = {
+  date: '14 de janeiro de 1994',
+  city: 'Sousa, sertão da Paraíba',
+  founders: 'Zenildo Rodrigues de Oliveira e Fábio Tyrone Braga de Oliveira',
+}
+
+export const HUB_ERAS: HubEra[] = [
   {
-    label: 'Nossas raízes',
-    title: 'Uma história feita de pessoas.',
-    text: 'O Grupo Pau Brasil reúne negócios de diferentes segmentos com raízes no Nordeste. Este espaço vai preservar as pessoas, as memórias e os acontecimentos que construíram essa trajetória.',
-    note: 'Acervo histórico em preparação · datas e fotografias serão incorporadas após validação.',
+    label: 'As raízes',
+    range: '1994 — 2002',
+    title: 'Um sonho, dois jovens e uma rifa.',
+    summary:
+      'Sem capital e ainda menores de idade, os fundadores foram emancipados pelos pais para registrar a empresa. O dinheiro para começar veio de uma rifa de um bode.',
+    years: [
+      {
+        year: '1994',
+        events: [
+          'Zenildo Rodrigues de Oliveira e Fábio Tyrone Braga de Oliveira fundam a Pau Brasil Distribuidora em Sousa (PB), em 14 de janeiro.',
+        ],
+      },
+      { year: '2002', events: ['Nasce a Pau Brasil Bebidas.'], companies: ['bebidas'] },
+    ],
   },
   {
-    label: 'Nossos negócios',
-    title: 'Diferentes caminhos. O mesmo grupo.',
-    text: 'Bebidas, mobilidade, construção, agro, serviços e impacto social. Conheça as empresas que compõem o Grupo Pau Brasil e descubra suas áreas de atuação.',
-    note: 'Explore as empresas e as unidades disponíveis nesta primeira versão.',
+    label: 'Expansão no sertão',
+    range: '2003 — 2009',
+    title: 'De revenda local a referência no Nordeste.',
+    summary:
+      'Novas revendas incorporadas pela Paraíba, os primeiros prêmios da Ambev e o nascimento da Hora 10.',
+    years: [
+      {
+        year: '2003',
+        events: [
+          'Incorporação da 2ª revenda, da marca Antarctica, em Sousa (PB).',
+          'A Pau Brasil se torna a primeira revenda tri-marca do Nordeste.',
+        ],
+        companies: ['bebidas'],
+      },
+      { year: '2004', events: ['3ª revenda incorporada: Antarctica de Pombal (PB).'] },
+      {
+        year: '2005',
+        events: [
+          'Zenildo é convidado para um seminário Pepsico/Ambev em Nova York (EUA).',
+          'Lançado o plano de ser o primeiro embaixador Ambev do Nordeste.',
+        ],
+      },
+      {
+        year: '2006',
+        events: [
+          '4ª revenda incorporada: Antarctica de Itaporanga (PB).',
+          'Leão de Bronze no PEX Ambev.',
+        ],
+      },
+      {
+        year: '2007',
+        events: [
+          '5ª e 6ª revendas: Antarctica de Catolé do Rocha e de São Bento (PB).',
+          'Leão de Ouro no PEX Ambev.',
+        ],
+      },
+      {
+        year: '2008',
+        events: ['Lançamento da Conveniência Pau Brasil em Sousa (PB).', 'Leão de Ouro no PEX Ambev.'],
+      },
+      {
+        year: '2009',
+        events: [
+          'Nasce a Hora 10, marca de lojas para o varejo.',
+          'Título de Embaixador no PEX Ambev.',
+          'Zenildo participa do ciclo de embaixadores na incorporação InBev/Anheuser-Busch, nos EUA.',
+        ],
+        companies: ['hora-10'],
+      },
+    ],
   },
   {
-    label: 'Nossa gente',
-    title: 'Crescer também é compartilhar.',
-    text: 'A Universidade Pau Brasil conecta colaboradores ao conhecimento produzido dentro do grupo. Carreiras e banco de talentos abrem caminhos para quem deseja fazer parte dessa história.',
-    note: 'Acesse os cursos e o portal de carreiras pelos links abaixo.',
+    label: 'Novos negócios',
+    range: '2011 — 2016',
+    title: 'O grupo ganha novos caminhos.',
+    summary:
+      'Chegam as motos Honda, a nova marca do Grupo Pau Brasil, o programa de sócios e a construção civil.',
+    years: [
+      {
+        year: '2011',
+        events: [
+          'Abertura da loja Hora 10 em Cajazeiras (PB).',
+          '7ª revenda incorporada: tri-marca Espinharas, de Patos (PB).',
+        ],
+        companies: ['hora-10'],
+      },
+      {
+        year: '2012',
+        events: [
+          'Aquisição da Fórmula H Motos Honda, de Sousa (PB): nasce a Pau Brasil Motos.',
+          'Criação da nova logo do Grupo Pau Brasil.',
+        ],
+        companies: ['motos'],
+      },
+      {
+        year: '2014',
+        events: [
+          'Abertura da Hora 10 em Patos (PB) e criação da revenda Pau Brasil Patos.',
+          '8ª incorporação: CDD Ambev do Cariri, Curimataú e Vale do Sabugi (PB).',
+          'Criado o Programa Donos Pau Brasil, com Francisco Alisson Aragão como primeiro sócio.',
+        ],
+        companies: ['hora-10', 'bebidas'],
+      },
+      {
+        year: '2015',
+        events: ['Homologação do DAP, Departamento de Peças da Pau Brasil Motos.'],
+        companies: ['motos'],
+      },
+      {
+        year: '2016',
+        events: [
+          'Hora 10 abre lojas em Monteiro e Soledade (PB).',
+          'Nasce a Unida Construtora e Incorporadora, em João Pessoa (PB).',
+        ],
+        companies: ['hora-10', 'unida'],
+      },
+    ],
   },
   {
-    label: 'Nova identidade · 2026',
-    title: 'As mesmas raízes. Um novo capítulo.',
-    text: 'A nova identidade visual traz a árvore como símbolo de origem, crescimento e pertencimento. A marca acompanha este novo espaço de encontro entre as empresas e as pessoas do grupo.',
-    note: 'Identidade visual fornecida pelo Grupo Pau Brasil.',
+    label: 'Novas fronteiras',
+    range: '2017 — 2026',
+    title: 'Além da Paraíba, sem perder a raiz.',
+    summary:
+      'Pernambuco e Bahia, novos empreendimentos, os maiores reconhecimentos da Ambev e novas empresas no grupo.',
+    years: [
+      {
+        year: '2017',
+        events: ['Pau Brasil Motos chega a Petrolina (PE) e Juazeiro (BA).'],
+        companies: ['motos'],
+      },
+      { year: '2019', events: ['Abertura da Hora 10 em Pombal (PB).'], companies: ['hora-10'] },
+      {
+        year: '2020',
+        events: [
+          'Entrega do Edifício Unimare, em João Pessoa (PB).',
+          'Pau Brasil Motos abre em Campina Grande (PB).',
+          'Lançamento do projeto Pit Stop Hora 10.',
+        ],
+        companies: ['unida', 'motos', 'hora-10'],
+      },
+      {
+        year: '2021',
+        events: ['Hora 10 abre lojas em Princesa Isabel e Tavares (PB).'],
+        companies: ['hora-10'],
+      },
+      {
+        year: '2022',
+        events: ['Título no Programa de Excelência Ambev de Operação: DPO Sustentável.'],
+        companies: ['bebidas'],
+      },
+      {
+        year: '2023',
+        events: [
+          'Leão de Prata: 2ª melhor revenda do Brasil, em Sousa (PB).',
+          'Lançamento do Domus Jardins, em João Pessoa (PB).',
+          'Grupo Pau Brasil em 1º lugar em arrecadação de ICMS na Paraíba.',
+        ],
+        companies: ['bebidas', 'unida'],
+      },
+      {
+        year: '2024',
+        events: [
+          'Inauguração da operação da revenda em Guarabira (PB) e título de Embaixador Revenda Ambev.',
+          'Nascem a Fazenda Divina e a Pau Brasil Locadora, em Sousa (PB).',
+          'Nova sede da Pau Brasil Motos em Petrolina (PE) e nasce a Original Start Motopeças.',
+        ],
+        companies: ['bebidas', 'fazenda-divina', 'locadora', 'motos', 'original-start'],
+      },
+      {
+        year: '2025',
+        events: [
+          'Revenda em Brumado (BA), com filiais em Barra da Estiva e Caculé.',
+          'Nasce o Instituto YSO, em Sousa (PB).',
+          'Supermercado Hora 10 em Soledade (PB) e entrega do Unigreen, em João Pessoa (PB).',
+        ],
+        companies: ['bebidas', 'instituto-yso', 'hora-10', 'unida'],
+      },
+      {
+        year: '2026',
+        events: ['Nova identidade visual: a árvore como símbolo de origem, crescimento e pertencimento.'],
+      },
+    ],
   },
 ]
 
@@ -180,7 +361,7 @@ export const HUB_INTERESTS = [
   {
     id: 'comercial',
     label: 'Vendas e atendimento',
-    companies: ['bebidas', 'motos', 'original-start', 'locadora'],
+    companies: ['bebidas', 'motos', 'original-start', 'locadora', 'hora-10'],
     reason: 'Negócios com atuação comercial e relacionamento com clientes.',
   },
   {
@@ -196,10 +377,10 @@ export const HUB_INTERESTS = [
     reason: 'Atuação em construção civil e empreendimentos imobiliários.',
   },
   {
-    id: 'pessoas',
-    label: 'Pessoas e educação',
-    companies: ['hora-10', 'instituto-yso'],
-    reason: 'Atuação em gestão de pessoas, educação e projetos sociais.',
+    id: 'estetica',
+    label: 'Saúde e estética',
+    companies: ['instituto-yso'],
+    reason: 'Atendimento em estética, harmonia e saúde.',
   },
   {
     id: 'agro',

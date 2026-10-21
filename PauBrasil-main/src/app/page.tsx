@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Montserrat } from 'next/font/google'
@@ -15,12 +15,16 @@ import { HubFooter, HubNav } from './_components/HubShell'
 import {
   HubBrandStrip,
   HubCompanies,
-  HubStory,
+  HubTimeline,
   HubTalentGuide,
 } from './_components/HubInteractive'
 import { HubReveal } from './_components/HubReveal'
 import { HubCountUp, HubHeroGlow } from './_components/HubEffects'
-import { HUB_COMPANIES, HUB_SEGMENT_COUNT } from '@/lib/hub-content'
+import {
+  HUB_COMPANIES,
+  HUB_FOUNDING,
+  HUB_SEGMENT_COUNT,
+} from '@/lib/hub-content'
 import styles from './_components/Hub.module.css'
 
 const montserrat = Montserrat({
@@ -41,6 +45,10 @@ export const metadata: Metadata = {
     type: 'website',
   },
 }
+
+// O hub só tem tema claro: impede que o modo escuro forçado do navegador (ex.: Samsung Internet,
+// Chrome no Android) inverta as cores e apague a assinatura e as fotos.
+export const viewport: Viewport = { colorScheme: 'only light' }
 
 export default function HomePage() {
   return (
@@ -216,7 +224,7 @@ export default function HomePage() {
                   </footer>
                 </blockquote>
                 <span className={styles.editorialTag}>
-                  Memória do grupo · acervo em construção
+                  Desde {HUB_FOUNDING.date} · {HUB_FOUNDING.city}
                 </span>
               </div>
               <figure className={styles.founderPhoto} data-reveal>
@@ -233,7 +241,7 @@ export default function HomePage() {
                 </figcaption>
               </figure>
             </div>
-            <HubStory />
+            <HubTimeline />
           </div>
         </section>
 

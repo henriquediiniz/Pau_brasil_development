@@ -16,10 +16,12 @@ test('hub: empresas, história e orientação de talentos', async ({ page }) => 
   ).toBeVisible()
   await page.getByRole('button', { name: 'Todos', exact: true }).click()
   await expect(companies.getByRole('link')).toHaveCount(8)
-  await page.getByRole('button', { name: '04 Nova identidade · 2026' }).click()
+  await page.getByRole('button', { name: /Novas fronteiras/ }).click()
   await expect(
-    page.getByRole('heading', { name: 'As mesmas raízes. Um novo capítulo.' }),
+    page.getByRole('heading', { name: 'Além da Paraíba, sem perder a raiz.' }),
   ).toBeVisible()
+  await page.getByRole('button', { name: 'Era anterior' }).click()
+  await expect(page.locator('#story-content')).toContainText('nasce a Pau Brasil Motos')
   await page.getByLabel('Sua área de interesse').selectOption('mecanica')
   await page.getByRole('button', { name: 'Explorar possibilidades' }).click()
   const result = page.locator('#talentos [role="status"]')
@@ -71,7 +73,7 @@ test('empresas: unidades filtráveis e catálogo incompleto explícito', async (
   await page.getByRole('button', { name: 'Limpar filtros' }).click()
   await expect(page.locator('#unidades article')).toHaveCount(8)
   await page.screenshot({ path: '/tmp/paubrasil-brand/empresa-bebidas.png', fullPage: true })
-  await page.goto('/empresas/unida')
+  await page.goto('/empresas/hora-10')
   await expect(page.getByText('Novos endereços em breve.')).toBeVisible()
   // A Motos tem site próprio: a página interna redireciona sem abrir o site externo no teste.
   const motos = await page.request.get('/empresas/motos', { maxRedirects: 0 })

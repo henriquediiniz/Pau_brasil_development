@@ -64,6 +64,13 @@
     overflow-x: hidden;
   }
 
+  /* Hub institucional: links internos (#empresas, #historia...) rolam suavemente até a seção */
+  @media (prefers-reduced-motion: no-preference) {
+    html:has([data-hub-root]) {
+      scroll-behavior: smooth;
+    }
+  }
+
   /* Scroll nativo e contenção de overscroll em todos os containers roláveis */
   .overflow-y-auto,
   .overflow-y-scroll {

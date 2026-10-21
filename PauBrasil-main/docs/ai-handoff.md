@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Hub: linha do tempo e feedbacks | Claude | concluido | 2026-10-21: linha do tempo 1994-2026 em eras; YSO e Hora 10 corrigidos; rolagem suave; color-scheme claro; filtros e selos mais fortes | Confirmar assinatura no Samsung Internet e cidades-sede adicionadas |
 | Hub: logos do Drive do grupo | Claude | concluido | 2026-10-20: logos Original Start e Locadora, assinatura Zenildo Oliveira, programas Capacitar e T&D Lideres, faixa de parceiros; Original Start corrigida para Moto Pecas | Confirmar descricao da Original Start e uso das marcas Ambev/Honda |
 | Limpeza de codigo morto | Claude | concluido | 2026-10-20: 21 arquivos, ~20 funcoes e 20 dependencias sem uso removidos; `jose` declarado | Revisar o que foi mantido de proposito (ver registro) |
 | Hub: foto do fundador e efeitos | Claude | concluido | 2026-10-20: retrato + frase do fundador, cortina, entrada do hero, logo que cresce, contadores, brilho do cursor, textura de papel, entrada da pagina de empresa, revelacao ao rolar, barra de progresso | Corrigir E2E mobile do hub (faixa de logos transborda) |
@@ -252,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — acervo do Drive de logos (2026-10-20)
+- Claude — feedbacks do hub e linha do tempo (2026-10-21)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -412,6 +413,16 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-21 - Claude - Feedbacks do hub e linha do tempo real
+
+- Rolagem suave: `html:has([data-hub-root])` com `scroll-behavior: smooth` em `globals.css` (respeita movimento reduzido); `data-hub-root` tambem na pagina de empresa.
+- Assinatura apagada no celular: era o modo escuro forcado do navegador. Home e paginas de empresa exportam `viewport.colorScheme = 'only light'` (so o hub; o portal mantem seus temas). Confirmar no Samsung Internet real.
+- Conteudo corrigido com base na linha do tempo oficial: Instituto YSO = saude e estetica (antes "impacto social"), plate champanhe; Hora 10 = varejo/supermercado (antes "gestao de pessoas"). Interesses: "Pessoas e educacao" virou "Saude e estetica"; Hora 10 entrou em Vendas. Cidades-sede adicionadas: YSO, Locadora e Fazenda (Sousa), Original Start (Petrolina-PE), Unida (Joao Pessoa). Rotulo de estado PE e plural "1 unidade" corrigidos.
+- Cores mais fortes: filtros com fundo branco e texto escuro, contadores vinho, selo "Parceiro" vinho solido, segmento dos cards mais escuro.
+- Linha do tempo: `HubStory` (4 capitulos editoriais) substituido por `HubTimeline` com `HUB_ERAS` (4 eras, 1994-2026, anos com eventos e selos das empresas). Fontes: PPTX "01 Integracao 1a parte Pau Brasil e Ambev" (fundacao em 14/01/1994 por Zenildo Rodrigues de Oliveira e Fabio Tyrone Braga de Oliveira, rifa do bode, PEX 2006-2009) e imagens da linha do tempo 2003-2025. CSS antigo de `storyPanel`/`historyPhoto` removido.
+- Validacao: tsc 0 erros; screenshots desktop/mobile; `hub.spec.ts` 2/3 (teste atualizado para eras e Hora 10 como empresa sem unidades); falha mobile preexistente da faixa de logos.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-20 - Claude - Logos do Drive do grupo no hub
 

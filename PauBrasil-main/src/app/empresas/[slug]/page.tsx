@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Montserrat } from 'next/font/google'
@@ -34,12 +34,15 @@ export function generateMetadata({
     icons: { icon: '/icons/icon-192.png' },
   }
 }
+export const viewport: Viewport = { colorScheme: 'only light' }
+
 export default function CompanyPage({ params }: { params: { slug: string } }) {
   const company = HUB_COMPANIES.find((item) => item.slug === params.slug)
   if (!company) notFound()
   if (company.externalUrl) redirect(company.externalUrl)
+  const states = new Set(company.units.map((unit) => unit.state)).size
   return (
-    <div className={`${styles.hub} ${montserrat.variable}`}>
+    <div className={`${styles.hub} ${montserrat.variable}`} data-hub-root>
       <HubNav />
       <main id="conteudo">
         <section
@@ -79,8 +82,8 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                   <a href="#unidades" className={styles.activityStat}>
                     <strong>{company.units.length}</strong>
                     <span>
-                      unidades em{' '}
-                      {new Set(company.units.map((u) => u.state)).size} estados
+                      {company.units.length === 1 ? 'unidade' : 'unidades'} em{' '}
+                      {states === 1 ? '1 estado' : `${states} estados`}
                     </span>
                   </a>
                 )}

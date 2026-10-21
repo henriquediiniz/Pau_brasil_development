@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, type ComponentProps } from 'react'
+import { useState, type ComponentProps, type CSSProperties } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
+  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   MapPin,
@@ -11,9 +12,9 @@ import {
 } from 'lucide-react'
 import {
   HUB_COMPANIES,
+  HUB_ERAS,
   HUB_FEATURED,
   HUB_INTERESTS,
-  HUB_STORY,
   hubCompanyHref,
   suggestHubCompanies,
   type HubCompany,
@@ -134,7 +135,7 @@ export function HubCompanies() {
                   <span className={styles.companyMore}>
                     <span>
                       {company.units.length > 0
-                        ? `${company.units.length} unidades`
+                        ? `${company.units.length} ${company.units.length === 1 ? 'unidade' : 'unidades'}`
                         : 'Conhecer a empresa'}
                     </span>
                     <span className={styles.companyArrow} aria-hidden="true">
@@ -176,17 +177,19 @@ export function HubBrandStrip({
   )
 }
 
-export function HubStory() {
+/** Linha do tempo do grupo, dividida em eras; cada era lista os anos e as empresas citadas. */
+export function HubTimeline() {
   const [active, setActive] = useState(0)
-  const story = HUB_STORY[active]
+  const era = HUB_ERAS[active]
+  const last = HUB_ERAS.length - 1
   return (
     <div className={styles.storyTimeline}>
       <div
         className={styles.timelineSteps}
         role="group"
-        aria-label="Capítulos da história do grupo"
+        aria-label="Eras da história do grupo"
       >
-        {HUB_STORY.map((item, index) => (
+        {HUB_ERAS.map((item, index) => (
           <button
             key={item.label}
             type="button"
@@ -195,25 +198,70 @@ export function HubStory() {
             onClick={() => setActive(index)}
           >
             <span className={styles.timelineDot} />
-            <small>0{index + 1}</small>
+            <small>{item.range}</small>
             {item.label}
           </button>
         ))}
       </div>
-      <div
-        id="story-content"
-        className={styles.storyPanel}
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <span className={styles.storyNumber} aria-hidden="true">
-          0{active + 1}
-        </span>
-        <div>
-          <h3>{story.title}</h3>
-          <p>{story.text}</p>
-          <small>{story.note}</small>
+      {/* key remonta o painel a cada troca de era, reiniciando a entrada em cascata */}
+      <div id="story-content" className={styles.eraPanel} key={active}>
+        <div className={styles.eraIntro}>
+          <span className={styles.eraRange}>{era.range}</span>
+          <h3>{era.title}</h3>
+          <p>{era.summary}</p>
+          <div className={styles.eraNav}>
+            <button
+              type="button"
+              onClick={() => setActive(active - 1)}
+              disabled={active === 0}
+              aria-label="Era anterior"
+            >
+              <ArrowLeft size={17} />
+            </button>
+            <span>
+              {active + 1} / {HUB_ERAS.length}
+            </span>
+            <button
+              type="button"
+              onClick={() => setActive(active + 1)}
+              disabled={active === last}
+              aria-label="Próxima era"
+            >
+              <ArrowRight size={17} />
+            </button>
+          </div>
         </div>
+        <ol className={styles.eraYears}>
+          {HUB_ERAS[active].years.map((item, index) => (
+            <li
+              key={item.year}
+              style={{ '--i': index } as CSSProperties}
+            >
+              <span className={styles.eraYear}>{item.year}</span>
+              <div>
+                <ul>
+                  {item.events.map((event) => (
+                    <li key={event}>{event}</li>
+                  ))}
+                </ul>
+                {item.companies && (
+                  <div className={styles.eraBrands}>
+                    {item.companies.map((slug) => {
+                      const company = HUB_COMPANIES.find((c) => c.slug === slug)
+                      if (!company) return null
+                      return (
+                        <span key={slug} title={company.name}>
+                          <BrandPlate company={company} size="mini" />
+                          <span className={styles.srOnly}>{company.name}</span>
+                        </span>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
   )
@@ -282,6 +330,12 @@ export function HubTalentGuide() {
       </div>
     </div>
   )
+}
+
+const STATE_NAMES: Record<string, string> = {
+  PB: 'Paraíba',
+  PE: 'Pernambuco',
+  BA: 'Bahia',
 }
 
 export function HubUnits({ company }: { company: HubCompany }) {
@@ -354,7 +408,7 @@ export function HubUnits({ company }: { company: HubCompany }) {
             <MapPin size={21} />
             <div>
               <h3>{unit.name}</h3>
-              <p>{unit.state === 'PB' ? 'Paraíba' : 'Bahia'}</p>
+              <p>{STATE_NAMES[unit.state] ?? unit.state}</p>
             </div>
             <span>{unit.state}</span>
           </article>
