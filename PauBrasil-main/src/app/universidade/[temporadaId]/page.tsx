@@ -4,13 +4,13 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap, CheckCircle2, PlayCircle, Clock, Loader2,
-  ChevronLeft, Award, X, Lock, FileQuestion, Send
+  ChevronLeft, Award, X, Lock, FileQuestion, Send, RotateCcw
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from '@/components/ui/toaster'
 
-interface Progresso { id: string; concluidoEm: string | null }
+interface Progresso { id: string; concluidoEm: string | null; posicaoSeg?: number; duracaoSeg?: number | null; vistoEm?: string }
 interface Episodio {
   id: string; titulo: string; descricao: string | null; videoUrl: string
   duracaoMin: number; ordem: number; publicado: boolean
@@ -30,6 +30,18 @@ interface Temporada {
   preRequisitosStatus: PreRequisito[]
 }
 
+/** Só retoma se a pessoa viu mais que o começo e não estava já no fim. */
+const RETOMAR_MIN_SEG = 10
+const RETOMAR_FIM_SEG = 15
+const SALVAR_A_CADA_MS = 10_000
+
+function formatarTempo(seg: number) {
+  const m = Math.floor(seg / 60)
+  const s = Math.floor(seg % 60)
+  const h = Math.floor(m / 60)
+  return h > 0 ? `${h}:${String(m % 60).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`
+}
+
 function extractYouTubeId(url: string): string | null {
   try {
     const u = new URL(url)
@@ -41,6 +53,8 @@ function extractYouTubeId(url: string): string | null {
 
 export default function TemporadaPage({ params }: { params: { temporadaId: string } }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const episodioPedido = searchParams.get('ep')
   const [temporada, setTemporada] = useState<Temporada | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeEp, setActiveEp] = useState<Episodio | null>(null)
@@ -54,18 +68,64 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
   const playerRef   = useRef<any>(null)
   const activeEpId = activeEp?.id
   const activeVideoUrl = activeEp?.videoUrl
+  // Retomar de onde parou
+  const [retomadoDe, setRetomadoDe] = useState<number | null>(null)
+  const posicaoSalvaRef = useRef(0)
+  posicaoSalvaRef.current = activeEp?.progressos[0]?.posicaoSeg ?? 0
+  const episodioAtualRef = useRef<string | null>(null)
+  episodioAtualRef.current = activeEpId ?? null
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/universidade/temporadas/${params.temporadaId}`)
     if (res.ok) {
       const data = await res.json()
       setTemporada(data)
-      setActiveEp((current) => current ?? data.episodios?.[0] ?? null)
+      // Abre no episódio pedido (?ep=), senão no último em andamento, senão no primeiro.
+      const episodios: Episodio[] = data.episodios ?? []
+      const emAndamento = episodios
+        .filter((e) => (e.progressos[0]?.posicaoSeg ?? 0) > 0 && !e.progressos[0]?.concluidoEm)
+        .sort((a, b) => (b.progressos[0]?.vistoEm ?? '').localeCompare(a.progressos[0]?.vistoEm ?? ''))[0]
+      const inicial = episodios.find((e) => e.id === episodioPedido) ?? emAndamento ?? episodios[0] ?? null
+      // Depois de recarregar (ex.: marcar assistido), mantém o episódio aberto com os dados novos.
+      setActiveEp((current) => (current ? episodios.find((e) => e.id === current.id) ?? current : inicial))
     }
     setLoading(false)
-  }, [params.temporadaId])
+  }, [params.temporadaId, episodioPedido])
 
   useEffect(() => { load() }, [load])
+
+  /** Envia a posição atual do player. Ao sair da página usa sendBeacon, que sobrevive ao fechamento. */
+  const salvarPosicao = useCallback((saindo = false) => {
+    const player = playerRef.current
+    const episodioId = episodioAtualRef.current
+    if (!player?.getCurrentTime || !episodioId) return
+    const posicaoSeg = Math.floor(player.getCurrentTime() || 0)
+    const duracaoSeg = Math.floor(player.getDuration?.() || 0) || undefined
+    if (posicaoSeg < 1) return
+    const corpo = JSON.stringify({ episodioId, posicaoSeg, duracaoSeg })
+    if (saindo && navigator.sendBeacon) {
+      navigator.sendBeacon('/api/universidade/posicao', new Blob([corpo], { type: 'application/json' }))
+      return
+    }
+    fetch('/api/universidade/posicao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: corpo,
+      keepalive: true,
+    }).catch(() => {})
+  }, [])
+
+  // Salva ao trocar de aba ou fechar a página.
+  useEffect(() => {
+    const aoEsconder = () => { if (document.visibilityState === 'hidden') salvarPosicao(true) }
+    const aoSair = () => salvarPosicao(true)
+    document.addEventListener('visibilitychange', aoEsconder)
+    window.addEventListener('pagehide', aoSair)
+    return () => {
+      document.removeEventListener('visibilitychange', aoEsconder)
+      window.removeEventListener('pagehide', aoSair)
+    }
+  }, [salvarPosicao])
 
   function startCounter() {
     if (!intervalRef.current) {
@@ -87,6 +147,13 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
     setWatchedSeconds(0)
     stopCounter()
 
+    // Retoma do ponto salvo, se a pessoa já tinha passado do começo.
+    const salva = posicaoSalvaRef.current
+    const inicio = salva >= RETOMAR_MIN_SEG ? salva : 0
+    setRetomadoDe(inicio > 0 ? inicio : null)
+    let salvarTimer: ReturnType<typeof setInterval> | null = null
+    const pararSalvamento = () => { if (salvarTimer) { clearInterval(salvarTimer); salvarTimer = null } }
+
     function initPlayer() {
       // Garante que o elemento ainda existe no DOM (pode ter desmontado)
       if (!document.getElementById('yt-player-container')) return
@@ -95,10 +162,26 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
         videoId: vid,
         width: '100%',
         height: '100%',
-        playerVars: { origin: window.location.origin, rel: 0, modestbranding: 1 },
+        playerVars: { origin: window.location.origin, rel: 0, modestbranding: 1, ...(inicio > 0 ? { start: inicio } : {}) },
         events: {
+          onReady: (e: any) => {
+            // Se a posição salva está no fim do vídeo, começa do início.
+            const duracao = e.target.getDuration?.() || 0
+            if (inicio > 0 && duracao > 0 && inicio >= duracao - RETOMAR_FIM_SEG) {
+              e.target.seekTo(0, true)
+              setRetomadoDe(null)
+            }
+          },
           onStateChange: (e: any) => {
-            e.data === 1 ? startCounter() : stopCounter()
+            if (e.data === 1) {
+              startCounter()
+              if (!salvarTimer) salvarTimer = setInterval(() => salvarPosicao(), SALVAR_A_CADA_MS)
+            } else {
+              stopCounter()
+              pararSalvamento()
+              // Pausou (2) ou terminou (0): salva na hora.
+              if (e.data === 2 || e.data === 0) salvarPosicao()
+            }
           },
         },
       })
@@ -123,12 +206,15 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
 
     return () => {
       stopCounter()
+      pararSalvamento()
+      // Trocou de episódio ou saiu da tela: guarda onde parou antes de destruir o player.
+      salvarPosicao()
       if (playerRef.current) {
         try { playerRef.current.destroy() } catch {}
         playerRef.current = null
       }
     }
-  }, [activeEpId, activeVideoUrl])
+  }, [activeEpId, activeVideoUrl, salvarPosicao])
 
   async function marcarAssistido() {
     if (!activeEp) return
@@ -333,6 +419,21 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Player — 2/3 */}
         <div className="lg:col-span-2 space-y-3">
+          {retomadoDe !== null && videoId && (
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brand-500/25 bg-brand-500/10 px-4 py-2.5 text-sm">
+              <PlayCircle className="w-4 h-4 text-brand-400 shrink-0" />
+              <span className="text-slate-200">
+                Retomando de <strong className="text-white">{formatarTempo(retomadoDe)}</strong>, onde você parou.
+              </span>
+              <button
+                type="button"
+                onClick={() => { playerRef.current?.seekTo?.(0, true); setRetomadoDe(null) }}
+                className="ml-auto inline-flex items-center gap-1.5 text-brand-300 hover:text-white text-xs font-medium"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Começar do início
+              </button>
+            </div>
+          )}
           <div className="rounded-2xl overflow-hidden bg-black aspect-video">
             {videoId ? (
               <div key={activeEp?.id} id="yt-player-container" className="w-full h-full" />

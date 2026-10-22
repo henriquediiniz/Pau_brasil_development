@@ -7,7 +7,8 @@
  *   npx tsx prisma/demo-apresentacao.ts --gravar   # cria (pula o que já existe)
  *   npx tsx prisma/demo-apresentacao.ts --remover  # apaga exatamente o que este script cria
  *
- * Cria: avisos e vagas (Notícias gerais), mural, calendário, números do mês e 3 cursos.
+ * Cria: avisos e vagas (Notícias gerais), mural, calendário, números do mês, 3 cursos de vitrine
+ * e o curso "Treinamento Roteirizador (teste de vídeo)" com dois vídeos reais do canal Pau Brasil Ambev.
  * As vagas ficam na empresa "Demonstração (remover)", que não aparece no site público.
  */
 
@@ -49,6 +50,16 @@ const VAGAS = [
   { cargo: 'Motorista Entregador', unidadeTexto: 'Sumé', quantidadeVagas: 1, dataAbertura: diasAtras(2) },
 ]
 
+/** Curso com vídeos reais do YouTube, para testar o player e o "voltar de onde parou". */
+const CURSO_VIDEO = {
+  titulo: 'Treinamento Roteirizador (teste de vídeo)',
+  descricao: 'Curso de teste do player da Universidade com vídeos do canal Pau Brasil Ambev.',
+  episodios: [
+    { titulo: 'Roteirizador: atividade em lote', videoUrl: 'https://www.youtube.com/watch?v=ym3h50QYeV0' },
+    { titulo: 'Roteirizador: horário de início e velocidade da rota', videoUrl: 'https://www.youtube.com/watch?v=wKeadsTNPAk' },
+  ],
+}
+
 const CURSOS: [string, string, string[]][] = [
   ['Integração Pau Brasil', 'Nossa história, cultura e jeito de trabalhar para quem está chegando.', ['Boas-vindas ao grupo', 'Nossa história', 'Cultura e valores', 'Segurança no trabalho']],
   ['Liderança na prática', 'Ferramentas de gestão de equipe compartilhadas pelos nossos líderes.', ['O papel do líder', 'Feedback que funciona', 'Rotina de gestão']],
@@ -63,8 +74,9 @@ async function remover() {
     prisma.endoNumero.deleteMany({ where: { label: { in: NUMEROS.map((n) => n.label) }, createdById: null } }),
     prisma.recVaga.deleteMany({ where: { empresa: { slug: EMPRESA_DEMO.slug } } }),
     prisma.empresa.deleteMany({ where: { slug: EMPRESA_DEMO.slug } }),
-    prisma.uPBEpisodio.deleteMany({ where: { temporada: { titulo: { in: CURSOS.map((c) => c[0]) } } } }),
-    prisma.uPBTemporada.deleteMany({ where: { titulo: { in: CURSOS.map((c) => c[0]) } } }),
+    prisma.uPBProgresso.deleteMany({ where: { episodio: { temporada: { titulo: { in: [...CURSOS.map((c) => c[0]), CURSO_VIDEO.titulo] } } } } }),
+    prisma.uPBEpisodio.deleteMany({ where: { temporada: { titulo: { in: [...CURSOS.map((c) => c[0]), CURSO_VIDEO.titulo] } } } }),
+    prisma.uPBTemporada.deleteMany({ where: { titulo: { in: [...CURSOS.map((c) => c[0]), CURSO_VIDEO.titulo] } } }),
   ])
   console.log('removidos:', r.map((x) => x.count).join(' / '))
 }
@@ -82,11 +94,13 @@ async function criar(gravar: boolean) {
   const camps = await novos(CAMPANHAS, (c) => prisma.endoCampanha.findFirst({ where: { title: c.title } }))
   const nums = await novos(NUMEROS, (n) => prisma.endoNumero.findFirst({ where: { label: n.label, mes } }))
   const cursos = await novos(CURSOS, (c) => prisma.uPBTemporada.findFirst({ where: { titulo: c[0] } }))
+  const cursoVideo = !(await prisma.uPBTemporada.findFirst({ where: { titulo: CURSO_VIDEO.titulo } }))
   const empresa = await prisma.empresa.findUnique({ where: { slug: EMPRESA_DEMO.slug } })
   const vagas = empresa ? [] : VAGAS
 
   log('avisos', avisos.length); log('reconhecimentos', recs.length); log('campanhas do calendário', camps.length)
   log('números do mês', nums.length); log('vagas', vagas.length); log('cursos', cursos.length)
+  log('curso de teste de vídeo', cursoVideo ? 1 : 0)
   if (!gravar) return console.log('\nNada gravado. Rode com --gravar para criar.')
 
   if (avisos.length) await prisma.endoAviso.createMany({ data: avisos.map((a) => ({ ...a, published: true })) })
@@ -102,6 +116,15 @@ async function criar(gravar: boolean) {
       data: {
         titulo, descricao, ativo: true,
         episodios: { create: eps.map((t, i) => ({ titulo: t, videoUrl: 'https://example.com/video', ordem: i + 1, duracaoMin: 8 + i * 3, publicado: true })) },
+      },
+    })
+  }
+  if (cursoVideo) {
+    await prisma.uPBTemporada.create({
+      data: {
+        titulo: CURSO_VIDEO.titulo, descricao: CURSO_VIDEO.descricao, ativo: true,
+        // duracaoMin baixo: só libera o "marcar como assistido" depois de 1 min assistido.
+        episodios: { create: CURSO_VIDEO.episodios.map((e, i) => ({ ...e, ordem: i + 1, duracaoMin: 1, publicado: true })) },
       },
     })
   }

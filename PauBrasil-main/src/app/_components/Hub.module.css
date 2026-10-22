@@ -3632,3 +3632,78 @@
 .nlBack svg {
   transition: transform 0.2s;
 }
+
+/* Newsletter: botões das campanhas sempre em uma linha, com rolagem lateral */
+.newsTabsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 26px;
+  min-width: 0;
+}
+.newsTabsRow .newsTabs {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+  padding: 2px 18px;
+}
+.newsTabsRow .newsTabs::-webkit-scrollbar {
+  display: none;
+}
+.newsTabsRow .newsTabs button {
+  flex-shrink: 0;
+  white-space: nowrap;
+  scroll-snap-align: center;
+}
+.hub .newsTabsScroll {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #cfc1b3;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+.hub .newsTabsScroll:hover {
+  border-color: var(--wine);
+  color: var(--wine);
+}
+.newsTabsRow .newsPause {
+  flex-shrink: 0;
+}
+/* Toque: arrastar a faixa basta; as setinhas ficam só para mouse */
+@media (hover: none) {
+  .hub .newsTabsScroll {
+    display: none;
+  }
+}
+/* A faixa em linha não pode alargar a coluna do grid (estourava o celular) */
+.newsGrid > * {
+  min-width: 0;
+}
+.newsTabsRow .newsPause {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #cfc1b3;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.newsTabsRow .newsPause:hover {
+  border-color: var(--wine);
+  color: var(--wine);
+}

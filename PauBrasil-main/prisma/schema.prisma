@@ -676,6 +676,12 @@ model UPBProgresso {
   userId      String
   episodioId  String
   concluidoEm DateTime?
+  /// Último ponto assistido (segundos), para retomar o vídeo de onde parou.
+  posicaoSeg  Int       @default(0)
+  /// Duração do vídeo informada pelo player, quando conhecida.
+  duracaoSeg  Int?
+  /// Quando a posição foi salva pela última vez (ordena o "continue de onde parou").
+  vistoEm     DateTime  @default(now())
   createdAt   DateTime  @default(now())
 
   user     User        @relation(fields: [userId], references: [id])
@@ -684,6 +690,7 @@ model UPBProgresso {
   @@unique([userId, episodioId])
   @@index([userId])
   @@index([episodioId])
+  @@index([userId, vistoEm])
 }
 
 model UPBCertificado {

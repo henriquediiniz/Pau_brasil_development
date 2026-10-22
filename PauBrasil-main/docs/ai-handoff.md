@@ -253,8 +253,8 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — campanhas do servidor de Patos/Sume + noticias gerais (2026-10-22)
-  - objetivo concluido; arquivos em posse: nenhum
+- Claude — newsletter (autoplay e botoes em linha) + Universidade (retomar video) (2026-10-22)
+  - objetivo concluido; arquivos em posse: nenhum (producao migrada com ok do usuario; curso de teste criado)
 
 - Codex — consolidação de contexto (2026-10-19)
   - objetivo concluído: documentação atual para transferência a um novo agente
@@ -413,6 +413,15 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-22 - Claude - Newsletter mais estavel, botoes em uma linha e "voltar de onde parou" na Universidade
+
+- Feedback (print do WhatsApp): "o play ta bugando as vezes", "botoes sempre na mesma linha", e testes de video no portal com "voltar de onde parou".
+- `HubNewsletter.tsx`: causas do bug — (1) timer com `if (document.hidden) return` nao reagendava e travava; (2) `onFocus` pausava ate o foco sair, entao qualquer clique de mouse parava o carrossel; (3) hover zerava o tempo. Agora: tempo decorrido em ref (pausa congela, retomar continua), `visibilitychange` pausa/retoma, foco so pausa se `:focus-visible` (teclado), clique segura 6 s (`CLICK_HOLD_MS`), barrinha sempre montada com `animation-play-state`. Botoes em uma linha com rolagem lateral, mascara nas pontas, setinhas (so mouse) e campanha ativa centralizada. Gotcha: `.newsGrid > * { min-width: 0 }` — sem isso a linha nao-quebrante alargava a coluna e estourava o celular.
+- Universidade: `UPBProgresso` ganhou `posicaoSeg`, `duracaoSeg`, `vistoEm` + indice (migration `20261022200000_upb_progresso_posicao`, aditiva, a mao). Nova rota `/api/universidade/posicao` (POST salva posicao com as mesmas regras de acesso do progresso; GET devolve o ultimo episodio em andamento). Player: abre em `?ep=` ou no episodio em andamento, `playerVars.start` com a posicao salva (>=10 s e longe do fim), aviso "Retomando de m:ss · Comecar do inicio", salva a cada 10 s tocando, ao pausar/terminar, ao trocar de episodio e ao esconder/fechar (sendBeacon). Card "Continue de onde parou" em `/universidade`.
+- Curso de teste "Treinamento Roteirizador (teste de video)" com 2 videos do canal Pau Brasil Ambev, no `prisma/demo-apresentacao.ts` (o `--remover` tambem o apaga, incluindo progressos).
+- Validacao: tsc 0; `npm test` 511/0; `next build` ok; E2E local da newsletter (aba escondida pausa e retoma, clique segura e volta, hover continua do restante, 1 linha desktop/mobile, sem transbordo) e da retomada (API 200/400/404, sem login 401, card, `start=95`, aviso, "Comecar do inicio"). Reproducao real do YouTube nao testavel no Chromium headless (sem codecs): confirmar no navegador.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-22 - Claude - Conteudo de DEMONSTRACAO em producao (apresentacao a diretoria)
 

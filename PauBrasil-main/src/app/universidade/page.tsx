@@ -35,6 +35,18 @@ function urgenciaCls(dias: number) {
   return { border: 'border-brand-500/30', badge: 'bg-brand-500/15 border-brand-500/30 text-brand-300', label: `${dias}d restantes` }
 }
 
+interface Continuar {
+  posicaoSeg: number
+  duracaoSeg: number
+  episodio: { id: string; titulo: string }
+  temporada: { id: string; titulo: string; capa: string | null }
+}
+
+function formatarTempo(seg: number) {
+  const m = Math.floor(seg / 60)
+  return `${m}:${String(Math.floor(seg % 60)).padStart(2, '0')}`
+}
+
 // Capas sem imagem: tons de vinho e grafite da identidade 2026
 const FALLBACK_COLORS = ['#2a1214', '#3b1a1d', '#1f1a17', '#4a1c22', '#2b2420', '#33161a']
 
@@ -43,6 +55,7 @@ export default function UniversidadePage() {
   const [loading, setLoading] = useState(true)
   const [erro, setErro] = useState(false)
   const [solicitando, setSolicitando] = useState<string | null>(null)
+  const [continuar, setContinuar] = useState<Continuar | null>(null)
 
   function load() {
     setErro(false)
@@ -52,7 +65,14 @@ export default function UniversidadePage() {
       .catch(() => { setErro(true); setLoading(false) })
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    // Último episódio em andamento; falhar aqui não atrapalha a lista de cursos.
+    fetch('/api/universidade/posicao')
+      .then(r => (r.ok ? r.json() : null))
+      .then(setContinuar)
+      .catch(() => {})
+  }, [])
 
   async function solicitarAcesso(e: React.MouseEvent, temporadaId: string) {
     e.preventDefault()
@@ -135,6 +155,43 @@ export default function UniversidadePage() {
           )}
         </div>
       </motion.div>
+
+      {continuar && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <Link
+            href={`/universidade/${continuar.temporada.id}?ep=${continuar.episodio.id}`}
+            className="group flex items-center gap-4 rounded-2xl border border-brand-500/25 bg-brand-500/10 p-3 pr-5 hover:border-brand-500/40 transition-colors"
+          >
+            <div className="relative w-28 sm:w-40 aspect-video shrink-0 overflow-hidden rounded-xl bg-[#2a1214]">
+              {continuar.temporada.capa ? (
+                <Image src={continuar.temporada.capa} alt="" fill unoptimized className="object-cover" />
+              ) : (
+                <GraduationCap className="absolute inset-0 m-auto w-7 h-7 text-white/30" />
+              )}
+              <span className="absolute inset-0 flex items-center justify-center bg-black/35 opacity-90 group-hover:opacity-100">
+                <PlayCircle className="w-9 h-9 text-white" />
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] uppercase tracking-wider text-brand-300 font-semibold">Continue de onde parou</p>
+              <p className="text-white font-medium truncate mt-0.5">{continuar.episodio.titulo}</p>
+              <p className="text-slate-400 text-xs truncate">{continuar.temporada.titulo}</p>
+              <div className="mt-2 flex items-center gap-2">
+                <div className="flex-1 max-w-xs h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full gradient-brand"
+                    style={{ width: `${Math.min(100, (continuar.posicaoSeg / Math.max(1, continuar.duracaoSeg)) * 100)}%` }}
+                  />
+                </div>
+                <span className="text-slate-400 text-xs tabular-nums">
+                  {formatarTempo(continuar.posicaoSeg)} de {formatarTempo(continuar.duracaoSeg)}
+                </span>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-brand-300 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </motion.div>
+      )}
 
       {/* Seção: treinamentos obrigatórios pendentes */}
       {(() => {
