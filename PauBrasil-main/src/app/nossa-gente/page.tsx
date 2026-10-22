@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Montserrat } from 'next/font/google'
-import { ArrowUpRight, Award, CalendarDays } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Award, CalendarDays } from 'lucide-react'
 import { HubFooter, HubNav } from '@/app/_components/HubShell'
 import { HubReveal } from '@/app/_components/HubReveal'
 import { HubCountUp } from '@/app/_components/HubEffects'
@@ -46,6 +46,11 @@ export default async function NossaGentePage() {
       <HubNav />
       <main id="conteudo">
         <section className={styles.ngHero}>
+          <div className={styles.container}>
+            <Link href="/" className={`${styles.backLink} ${styles.ngBack}`}>
+              <ArrowLeft size={17} /> Voltar para o início
+            </Link>
+          </div>
           <div className={styles.container} data-reveal>
             <span className={styles.eyebrow}>Nossa gente</span>
             <h1>

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
+import Link from 'next/link'
 import { Montserrat } from 'next/font/google'
+import { ArrowLeft } from 'lucide-react'
 import { HubFooter, HubNav } from '@/app/_components/HubShell'
 import { HubReveal } from '@/app/_components/HubReveal'
 import { NewsletterArquivo } from './_components/NewsletterArquivo'
@@ -40,6 +42,9 @@ export default async function NewsletterPage() {
         </section>
         <section className={styles.section}>
           <div className={styles.container}>
+            <Link href="/" className={`${styles.textLink} ${styles.nlBack}`}>
+              <ArrowLeft size={16} /> Voltar para o início
+            </Link>
             <NewsletterArquivo campanhas={campanhas} />
           </div>
         </section>

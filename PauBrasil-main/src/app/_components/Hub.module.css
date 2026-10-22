@@ -3599,3 +3599,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Voltar para o início nas páginas Newsletter e Nossa gente */
+.ngHero {
+  position: relative;
+  padding-top: 40px;
+}
+.ngBack {
+  margin-bottom: 70px;
+  transition: color 0.2s, gap 0.2s;
+}
+.ngBack:hover {
+  color: var(--sand);
+  gap: 14px;
+}
+@media (max-width: 800px) {
+  .ngHero {
+    padding-top: 28px;
+  }
+  .ngBack {
+    margin-bottom: 48px;
+  }
+}
+/* Página de campanhas: voltar em destaque, acima das fotos */
+.nlBack {
+  margin-bottom: 32px;
+  gap: 12px;
+}
+.nlBack:hover svg {
+  transform: translateX(-3px);
+}
+.nlBack svg {
+  transition: transform 0.2s;
+}

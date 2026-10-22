@@ -414,6 +414,12 @@ Use este formato:
 
 ## Registro de Rodadas
 
+### 2026-10-22 - Claude - Voltar para o inicio em /newsletter e /nossa-gente
+
+- `/newsletter`: link "Voltar para o inicio" (padrao `textLink` vinho, igual ao "Ver todas as campanhas") na area clara acima das fotos. `/nossa-gente`: link discreto no topo escuro (abaixo dele vem a faixa vinho dos numeros).
+- Pendencia registrada a pedido do usuario: melhorar depois o tratamento de fotos do servidor (tamanho e formato, ex.: HEIC com mapa de profundidade).
+- Parecer do outro agente: pendente.
+
 ### 2026-10-22 - Claude - Campanhas 2026 de Patos/Sume, arquivo /newsletter e noticias gerais
 
 - Fonte: servidor de arquivos da empresa (`smb://172.16.51.252/publico_patos/REVENDA/SDPO 2026/DPO/PILAR GENTE/ARQUIVOS DE GENTE/FOTOS/2026`), lido pelo usuario no COSMIC Files (gvfs). Ambiente: Pop!_OS COSMIC; o servidor `dc01n` nao resolve por nome fora do dominio, usar IP.
