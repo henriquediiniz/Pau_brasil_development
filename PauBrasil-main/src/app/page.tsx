@@ -20,7 +20,8 @@ import { HubReveal } from './_components/HubReveal'
 import { HubLearningPath } from './_components/HubLearningPath'
 import { HubNewsletter } from './_components/HubNewsletter'
 import { listarNewsletterPublicada } from '@/lib/newsletter'
-import { carregarNossaGente } from '@/lib/endomarketing'
+import { carregarNoticiasGerais, carregarNossaGente } from '@/lib/endomarketing'
+import { HubNoticias } from './_components/HubNoticias'
 import { HubCountUp, HubHeroGlow } from './_components/HubEffects'
 import {
   HUB_COMPANIES,
@@ -56,7 +57,11 @@ export const viewport: Viewport = { colorScheme: 'only light' }
 export const revalidate = 300
 
 export default async function HomePage() {
-  const [newsletter, nossaGente] = await Promise.all([listarNewsletterPublicada(), carregarNossaGente()])
+  const [newsletter, nossaGente, noticias] = await Promise.all([
+    listarNewsletterPublicada(),
+    carregarNossaGente(),
+    carregarNoticiasGerais(),
+  ])
   return (
     <div className={`${styles.hub} ${montserrat.variable}`} data-hub-root>
       <HubReveal />
@@ -154,6 +159,8 @@ export default async function HomePage() {
             </Link>
           </div>
         </nav>
+
+        <HubNoticias {...noticias} />
 
         <section className={styles.manifesto} aria-label="Nosso jeito">
           <div className={styles.container} data-reveal>

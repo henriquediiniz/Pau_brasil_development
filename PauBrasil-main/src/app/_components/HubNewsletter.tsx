@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 import { HUB_COMPANIES, type HubNews } from '@/lib/hub-content'
 import styles from './Hub.module.css'
 
@@ -123,6 +124,9 @@ export function HubNewsletter({ items }: { items: HubNews[] }) {
               </button>
             )}
           </div>
+          <Link href="/newsletter" className={`${styles.textLink} ${styles.newsAllLink}`}>
+            Ver todas as campanhas <ArrowRight size={16} />
+          </Link>
         </div>
         <div
           className={styles.newsStage}

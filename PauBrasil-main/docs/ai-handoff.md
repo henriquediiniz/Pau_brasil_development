@@ -253,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — logos uniformes (sem selo redondo) (2026-10-22)
+- Claude — campanhas do servidor de Patos/Sume + noticias gerais (2026-10-22)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +413,17 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-22 - Claude - Campanhas 2026 de Patos/Sume, arquivo /newsletter e noticias gerais
+
+- Fonte: servidor de arquivos da empresa (`smb://172.16.51.252/publico_patos/REVENDA/SDPO 2026/DPO/PILAR GENTE/ARQUIVOS DE GENTE/FOTOS/2026`), lido pelo usuario no COSMIC Files (gvfs). Ambiente: Pop!_OS COSMIC; o servidor `dc01n` nao resolve por nome fora do dominio, usar IP.
+- Curadoria (decisao do usuario: Claude escolhe ate 8 por campanha): 20 campanhas, 110 fotos, 1600 px sem EXIF; videos e o .zip fora; sem close de criancas; 7 HEIC do Dia do Trabalhador com mapa de profundidade nao convertem (libheif) e ficaram de fora; Dia do ADM ja existia. Pastas vazias (Promotor, Vigilante, Mindset) ignoradas.
+- Textos e datas em `prisma/seed-data/newsletter-2026-patos-sume.json` (datas pelo nome dos arquivos/EXIF; unidade "Patos e Sume (PB)"); fotos NAO vao para o Git. Importador `prisma/importar-newsletter.ts <manifesto> <pasta> [--gravar]` (dry-run por padrao, idempotente por titulo+empresa).
+- Pagina `/newsletter` (ISR): arquivo completo, filtro por empresa, galeria em tela cheia com setas/teclado. Link "Ver todas as campanhas" na newsletter da home; "Newsletter" do cabecalho aponta para `/newsletter`. `listarNewsletterPublicada(limite)` aceita `null`.
+- Noticias gerais (sugestao do Thiago): modelo `EndoAviso` + migration `20261022180000_add_endo_aviso` (aditiva, a mao); 4a aba "Noticias gerais" em `/gente/endomarketing` (link interno ou https validado; destaque). Secao na home `HubNoticias` = avisos + vagas ABERTAS de `RecVaga` agrupadas por cargo+unidade (somente cargo, unidade, quantidade, abertura; salario e solicitante nunca saem).
+- Validacao: tsc 0; `npm test` 511/0; E2E local (aviso pela tela, link `javascript:` recusado 400, vagas somadas e fechadas ocultas, sem salario, arquivo com 23 campanhas e galeria); `next build` ok; `hub.spec.ts` 2/3 (falha mobile preexistente). Vagas e empresa de teste so no banco local.
+- Producao (ok explicito do usuario, 2026-10-22): `migrate deploy` (EndoAviso) e importacao das 20 campanhas; producao com 23 campanhas e 121 fotos.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-22 - Claude - Logos uniformes (fim dos selos redondos)
 

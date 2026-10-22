@@ -4,16 +4,18 @@ import { useState } from 'react'
 import Link from 'next/link'
 import useSWR from 'swr'
 import {
-  Award, CalendarDays, ChevronLeft, ExternalLink, Hash, Loader2, Pencil, Plus, Save, Trash2, X,
+  Award, CalendarDays, ChevronLeft, ExternalLink, Hash, Loader2, Megaphone, Pencil, Plus, Save, Trash2, X,
 } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { HUB_COMPANIES } from '@/lib/hub-content'
 import { CATEGORIAS_RECONHECIMENTO, CORES_CAMPANHA } from '@/lib/endomarketing-opcoes'
 
-type Tipo = 'reconhecimentos' | 'campanhas' | 'numeros'
+type Tipo = 'avisos' | 'reconhecimentos' | 'campanhas' | 'numeros'
 type Registro = Record<string, string | number | boolean | null> & { id: string }
 
 const ABAS: { tipo: Tipo; label: string; icone: typeof Award; ajuda: string }[] = [
+  { tipo: 'avisos', label: 'Notícias gerais', icone: Megaphone,
+    ajuda: 'Avisos fixos da home. As vagas abertas do módulo Gente aparecem junto automaticamente, sem cadastrar aqui.' },
   { tipo: 'reconhecimentos', label: 'Mural de reconhecimento', icone: Award,
     ajuda: 'Destaques de colaboradores. Aparecem no mural da página Nossa Gente, os mais recentes primeiro.' },
   { tipo: 'campanhas', label: 'Calendário de campanhas', icone: CalendarDays,
@@ -28,6 +30,7 @@ const rotulo = 'block text-xs font-medium text-slate-400 mb-1'
 
 const hoje = new Date().toISOString().slice(0, 10)
 const VAZIOS: Record<Tipo, Record<string, string | boolean>> = {
+  avisos: { title: '', texto: '', link: '', linkLabel: '', destaque: false, ordem: '0', published: true },
   reconhecimentos: { nome: '', cargo: '', company: 'bebidas', unit: '', categoria: 'destaque', motivo: '', fotoUrl: '', mes: hoje.slice(0, 7), published: true },
   campanhas: { title: '', descricao: '', inicio: hoje, fim: '', cor: 'vinho', published: true },
   numeros: { label: '', valor: '', sufixo: '', mes: hoje.slice(0, 7), ordem: '0' },
@@ -63,7 +66,7 @@ function paraFormulario(tipo: Tipo, r: Registro): Record<string, string | boolea
 }
 
 export default function EndomarketingPage() {
-  const [tipo, setTipo] = useState<Tipo>('reconhecimentos')
+  const [tipo, setTipo] = useState<Tipo>('avisos')
   const aba = ABAS.find((a) => a.tipo === tipo)!
   const { data, error, isLoading, mutate } = useSWR<Registro[]>(`/api/gente/endomarketing/${tipo}`, fetcher)
   const [form, setForm] = useState<Record<string, string | boolean> | null>(null)
@@ -175,6 +178,18 @@ export default function EndomarketingPage() {
             <button onClick={fechar} aria-label="Cancelar" className="p-1.5 rounded-lg text-slate-400 hover:bg-white/5"><X className="w-4 h-4" /></button>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
+            {tipo === 'avisos' && (<>
+              <div className="md:col-span-2">{entrada('title', 'Título', { maxLength: 80, placeholder: 'Ex.: Vagas abertas em Patos' })}</div>
+              <div className="md:col-span-2">{texto('texto', 'Texto', 400)}</div>
+              {entrada('link', 'Link (opcional)', { maxLength: 300, placeholder: '/carreiras ou https://...' })}
+              {entrada('linkLabel', 'Texto do link (opcional)', { maxLength: 40, placeholder: 'Ex.: Ver vagas' })}
+              {entrada('ordem', 'Ordem de exibição', { type: 'number', min: 0, max: 99 })}
+              <label className="inline-flex items-center gap-2 text-sm text-slate-300 self-end pb-2">
+                <input type="checkbox" checked={Boolean(form?.destaque)} onChange={(e) => alterar('destaque', e.target.checked)} />
+                Destacar (aparece primeiro, em vinho)
+              </label>
+              {publicado}
+            </>)}
             {tipo === 'reconhecimentos' && (<>
               {entrada('nome', 'Nome do colaborador', { maxLength: 80 })}
               {entrada('cargo', 'Cargo', { maxLength: 80 })}
@@ -233,11 +248,13 @@ export default function EndomarketingPage() {
               ) : null}
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-medium truncate">
+                  {tipo === 'avisos' && `${r.destaque ? '★ ' : ''}${r.title}`}
                   {tipo === 'reconhecimentos' && `${r.nome} · ${r.cargo}`}
                   {tipo === 'campanhas' && String(r.title)}
                   {tipo === 'numeros' && `${Number(r.valor).toLocaleString('pt-BR')}${r.sufixo ?? ''} ${r.label}`}
                 </p>
                 <p className="text-slate-500 text-xs truncate">
+                  {tipo === 'avisos' && String(r.texto).slice(0, 90)}
                   {tipo === 'reconhecimentos' && `${CATEGORIAS_RECONHECIMENTO[String(r.categoria) as keyof typeof CATEGORIAS_RECONHECIMENTO] ?? r.categoria} · ${mesLabel(r.mes)} · ${r.unit}`}
                   {tipo === 'campanhas' && `${diaLabel(r.inicio)}${r.fim ? ` a ${diaLabel(r.fim)}` : ''}`}
                   {tipo === 'numeros' && mesLabel(r.mes)}

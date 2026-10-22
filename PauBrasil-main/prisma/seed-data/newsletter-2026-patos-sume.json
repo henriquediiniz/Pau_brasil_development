@@ -1,0 +1,27 @@
+{
+  "fonte": "Servidor publico_patos: REVENDA/SDPO 2026/DPO/PILAR GENTE/ARQUIVOS DE GENTE/FOTOS/2026 (fotos escolhidas por Claude, out/2026)",
+  "company": "bebidas",
+  "unit": "Patos e Sumé (PB)",
+  "campanhas": [
+    { "pasta": "carnaval", "title": "Carnaval", "dateLabel": "Fevereiro", "eventDate": "2026-02-13", "summary": "Confetes, colares e mesa farta: as equipes de Patos e Sumé celebraram o Carnaval juntas antes do feriado.", "tagline": "Alegria também faz parte da rotina." },
+    { "pasta": "kits-escolares", "title": "Kits Escolares", "dateLabel": "Fevereiro", "eventDate": "2026-02-14", "summary": "Entrega de mochilas e kits escolares para os filhos dos colaboradores, na volta às aulas." },
+    { "pasta": "dia-do-aux-serv-gerais", "title": "Dia do Auxiliar de Serviços Gerais", "dateLabel": "Fevereiro", "eventDate": "2026-02-26", "summary": "Homenagem a quem cuida de cada espaço da revenda todos os dias." },
+    { "pasta": "workshop", "title": "Workshop Ambev e Pau Brasil 2026", "dateLabel": "14 mar", "eventDate": "2026-03-14", "summary": "Um dia de alinhamento, reconhecimento e premiações com toda a operação, rumo a uma operação segura, eficiente e sustentável.", "tagline": "Gente comprometida, cliente no foco." },
+    { "pasta": "dia-da-mulher", "title": "Dia da Mulher", "dateLabel": "Março", "eventDate": "2026-03-08", "summary": "Café especial, roda de conversa e homenagens às mulheres que fazem a Pau Brasil acontecer." },
+    { "pasta": "cestas-de-pascoa", "title": "Cestas de Páscoa", "dateLabel": "Abril", "eventDate": "2026-04-03", "summary": "Momento de reflexão e entrega das cestas de Páscoa para todos os colaboradores." },
+    { "pasta": "dia-do-jovem-aprendiz", "title": "Dia do Jovem Aprendiz", "dateLabel": "Abril", "eventDate": "2026-04-24", "summary": "Café e conversa com os jovens aprendizes, que começam a construir a carreira com a gente." },
+    { "pasta": "dia-do-trabalhador", "title": "Dia do Trabalhador", "dateLabel": "01 mai", "eventDate": "2026-05-01", "summary": "Café da manhã e lembranças para as equipes no Dia do Trabalhador." },
+    { "pasta": "dia-das-maes", "title": "Dia das Mães", "dateLabel": "Maio", "eventDate": "2026-05-10", "summary": "Homenagem às mães que fazem parte do nosso time." },
+    { "pasta": "dia-do-rh", "title": "Dia do RH", "dateLabel": "Maio", "eventDate": "2026-05-20", "summary": "Celebração do time de Gente & Gestão, que cuida de quem cuida da operação." },
+    { "pasta": "dia-do-op-empilhadeira", "title": "Dia do Operador de Empilhadeira", "dateLabel": "Maio", "eventDate": "2026-05-28", "summary": "Reconhecimento aos operadores de empilhadeira, peças-chave para o armazém funcionar com segurança." },
+    { "pasta": "cafe-junino", "title": "Café Junino", "dateLabel": "Junho", "eventDate": "2026-06-18", "summary": "Chapéu de palha, mesa típica e muito arraiá no café junino das equipes.", "tagline": "Eita festa boa!" },
+    { "pasta": "dia-da-logistica", "title": "Dia da Logística", "dateLabel": "Julho", "eventDate": "2026-07-15", "summary": "Homenagem ao time de logística, que faz o produto chegar a cada ponto de venda." },
+    { "pasta": "dia-do-motorista", "title": "Dia do Motorista", "dateLabel": "25 jul", "eventDate": "2026-07-25", "summary": "Café, homenagem e kits para os motoristas, com reforço sobre segurança nas rotas." },
+    { "pasta": "feirinha-saude-e-bem-estar", "title": "Feirinha Saúde e Bem-estar", "dateLabel": "Julho", "eventDate": "2026-07-26", "summary": "Vacinação, atendimentos e cuidados com o corpo: um dia inteiro dedicado à saúde dos colaboradores.", "tagline": "Juntos pela saúde e pelo bem-estar." },
+    { "pasta": "dia-do-repositor", "title": "Dia do Repositor", "dateLabel": "Agosto", "eventDate": "2026-08-28", "summary": "Homenagem aos repositores, que deixam nossas marcas sempre à vista do cliente." },
+    { "pasta": "dia-do-vendedor", "title": "Dia do Vendedor", "dateLabel": "01 out", "eventDate": "2026-10-01", "summary": "Encontro com o time comercial, com reconhecimento e entrega de lembranças." },
+    { "pasta": "dia-das-criancas", "title": "Dia das Crianças", "dateLabel": "12 out", "eventDate": "2026-10-12", "summary": "Entrega de kits para os filhos dos colaboradores e festa com a comunidade." },
+    { "pasta": "crianca-solidaria", "title": "Criança Solidária", "dateLabel": "Outubro", "eventDate": "2026-10-11", "summary": "Ação solidária com brincadeiras, guloseimas e diversão para as crianças da comunidade." },
+    { "pasta": "outubro-rosa", "title": "Outubro Rosa", "dateLabel": "Outubro", "eventDate": "2026-10-19", "summary": "Roda de conversa sobre prevenção e cuidado com a saúde da mulher.", "tagline": "Cuidar de si é um ato de amor." }
+  ]
+}

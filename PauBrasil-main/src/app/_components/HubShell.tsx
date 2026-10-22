@@ -9,7 +9,7 @@ import styles from './Hub.module.css'
 const links = [
   { href: '/#historia', label: 'O grupo' },
   { href: '/#empresas', label: 'Nossas empresas' },
-  { href: '/#newsletter', label: 'Newsletter' },
+  { href: '/newsletter', label: 'Newsletter' },
   { href: '/nossa-gente', label: 'Nossa gente' },
   { href: '/#universidade', label: 'Universidade' },
   { href: '/#talentos', label: 'Trabalhe conosco' },

@@ -56,6 +56,23 @@ export const SCHEMAS = {
       published: z.boolean().optional(),
     })
     .refine((c) => !c.fim || c.fim >= c.inicio, { message: 'O fim deve ser depois do início', path: ['fim'] }),
+  avisos: z.object({
+    title: z.string().trim().min(3).max(80),
+    texto: z.string().trim().min(10).max(400),
+    // Interno (/carreiras) ou https externo; nada de javascript: ou outros esquemas.
+    link: z
+      .string()
+      .trim()
+      .max(300)
+      .regex(/^(\/[^\s]*|https:\/\/\S+)$/, 'Link inválido')
+      .optional()
+      .nullable()
+      .or(z.literal('').transform(() => null)),
+    linkLabel: textoOpcional(40),
+    destaque: z.boolean().optional(),
+    ordem: z.coerce.number().int().min(0).max(99).optional(),
+    published: z.boolean().optional(),
+  }),
   numeros: z.object({
     label: z.string().trim().min(3).max(60),
     valor: z.coerce.number().int().min(0).max(10_000_000),
@@ -78,6 +95,7 @@ export function tabelaEndo(tipo: TipoEndo) {
     reconhecimentos: prisma.endoReconhecimento,
     campanhas: prisma.endoCampanha,
     numeros: prisma.endoNumero,
+    avisos: prisma.endoAviso,
   } as const
   // Os três delegates têm a mesma forma de create/update/delete/findMany para o uso daqui.
   return tabelas[tipo] as unknown as {
@@ -92,6 +110,7 @@ export const ORDEM_GESTAO: Record<TipoEndo, object> = {
   reconhecimentos: [{ mes: 'desc' }, { createdAt: 'desc' }],
   campanhas: [{ inicio: 'asc' }],
   numeros: [{ mes: 'desc' }, { ordem: 'asc' }],
+  avisos: [{ ordem: 'asc' }, { createdAt: 'desc' }],
 }
 
 export type ConteudoNossaGente = Awaited<ReturnType<typeof carregarNossaGente>>
@@ -122,5 +141,53 @@ export async function carregarNossaGente() {
   } catch (error) {
     console.error('[endomarketing] falha ao carregar', error)
     return { reconhecimentos: [], campanhas: [], numeros: [], mesNumeros: null, ano: new Date().getFullYear() }
+  }
+}
+
+/**
+ * Notícias gerais da home: avisos fixos + vagas abertas do módulo Gente.
+ * Das vagas, só o que pode ser público (cargo, unidade, quantidade, abertura):
+ * salário, solicitante e histórico nunca saem daqui.
+ */
+export async function carregarNoticiasGerais() {
+  try {
+    const [avisos, vagas] = await Promise.all([
+      prisma.endoAviso.findMany({
+        where: { published: true },
+        orderBy: [{ destaque: 'desc' }, { ordem: 'asc' }, { createdAt: 'desc' }],
+        take: 6,
+      }),
+      prisma.recVaga.findMany({
+        where: { status: 'ABERTA' },
+        orderBy: { dataAbertura: 'desc' },
+        take: 200,
+        select: {
+          cargo: true,
+          quantidadeVagas: true,
+          dataAbertura: true,
+          unidadeTexto: true,
+          operacao: { select: { nome: true } },
+          cargoRef: { select: { cargo: true } },
+        },
+      }),
+    ])
+    // Agrupa vagas iguais (mesmo cargo na mesma unidade) somando as quantidades.
+    const grupos = new Map<string, { cargo: string; unidade: string | null; quantidade: number; desde: Date }>()
+    for (const v of vagas) {
+      const cargo = (v.cargoRef?.cargo ?? v.cargo).trim()
+      const unidade = v.operacao?.nome ?? v.unidadeTexto ?? null
+      const chave = `${cargo.toLowerCase()}|${unidade ?? ''}`
+      const atual = grupos.get(chave)
+      if (atual) {
+        atual.quantidade += v.quantidadeVagas
+        if (v.dataAbertura < atual.desde) atual.desde = v.dataAbertura
+      } else {
+        grupos.set(chave, { cargo, unidade, quantidade: v.quantidadeVagas, desde: v.dataAbertura })
+      }
+    }
+    return { avisos, vagas: Array.from(grupos.values()).slice(0, 8), totalVagas: grupos.size }
+  } catch (error) {
+    console.error('[noticias-gerais] falha ao carregar', error)
+    return { avisos: [], vagas: [], totalVagas: 0 }
   }
 }

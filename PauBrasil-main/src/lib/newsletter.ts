@@ -57,13 +57,13 @@ export function tipoDaImagem(bytes: Uint8Array): 'image/jpeg' | 'image/webp' | n
 
 const FOTO_SELECT = { id: true, alt: true, width: true, height: true, blur: true, position: true } as const
 
-/** Campanhas publicadas para a home, no formato do componente do site. Sem banco, devolve lista vazia. */
-export async function listarNewsletterPublicada(): Promise<HubNews[]> {
+/** Campanhas publicadas no formato do componente do site. Sem banco, devolve lista vazia. */
+export async function listarNewsletterPublicada(limite: number | null = NEWSLETTER_LIMITE_SITE): Promise<HubNews[]> {
   try {
     const posts = await prisma.newsletterPost.findMany({
       where: { published: true, photos: { some: {} } },
       orderBy: { eventDate: 'desc' },
-      take: NEWSLETTER_LIMITE_SITE,
+      ...(limite ? { take: limite } : {}),
       include: { photos: { select: FOTO_SELECT, orderBy: { position: 'asc' } } },
     })
     return posts.map((post) => ({
