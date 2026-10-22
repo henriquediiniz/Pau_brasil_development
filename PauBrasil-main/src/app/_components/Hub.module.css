@@ -3383,3 +3383,48 @@
     gap: 6px;
   }
 }
+
+/* Logos uniformes (out/2026): sem selo redondo; placas retangulares para caber a logo inteira */
+.plate_mini {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+}
+.plate_mini .plateLogo,
+.plate_mini[data-shape='wide'] .plateLogo {
+  padding: 4px 6px;
+}
+.brandStripStacked .plate_mini {
+  width: 84px;
+  height: 52px;
+  border-radius: 8px;
+}
+.brandStripStacked a {
+  width: 100px;
+}
+.talentResult .plate_mini,
+.eraBrands .plate_mini {
+  width: 52px;
+  height: 32px;
+  border-radius: 5px;
+}
+.plate_hero {
+  width: 200px;
+  height: 120px;
+  border-radius: 10px;
+}
+.plate_hero .plateLogo,
+.plate_hero[data-shape='wide'] .plateLogo {
+  padding: 10px 14px;
+}
+@media (max-width: 600px) {
+  .plate_hero {
+    width: 160px;
+    height: 96px;
+  }
+}
+.brandStrip:not(.brandStripStacked) .plate_mini {
+  width: 54px;
+  height: 34px;
+  border-radius: 999px;
+}

@@ -49,7 +49,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'motos',
-    logo: { src: '/logos/hub/motos.png', shape: 'circle' },
+    logo: { src: '/logos/hub/motos-2026.png', shape: 'wide' },
     plate: HUB_PLATE,
     monogram: 'PM',
     name: 'Pau Brasil Motos',
@@ -67,7 +67,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'unida',
-    logo: { src: '/logos/hub/unida.png', shape: 'circle' },
+    logo: { src: '/logos/hub/unida-2026.png', shape: 'wide' },
     plate: HUB_PLATE,
     monogram: 'UC',
     name: 'Unida Construtora',
@@ -79,7 +79,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'instituto-yso',
-    logo: { src: '/logos/hub/instituto-yso.png', shape: 'circle' },
+    logo: { src: '/logos/hub/instituto-yso-2026.png', shape: 'wide' },
     plate: HUB_PLATE,
     monogram: 'IY',
     name: 'Instituto YSO',
@@ -127,7 +127,7 @@ export const HUB_COMPANIES: HubCompany[] = [
   },
   {
     slug: 'fazenda-divina',
-    logo: { src: '/logos/hub/fazenda-divina.png', shape: 'circle' },
+    logo: { src: '/logos/hub/fazenda-divina-2026.png', shape: 'wide' },
     plate: HUB_PLATE,
     monogram: 'FD',
     name: 'Fazenda Divina',

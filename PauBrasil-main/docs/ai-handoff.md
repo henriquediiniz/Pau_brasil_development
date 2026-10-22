@@ -253,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — Universidade na identidade do site + endomarketing (2026-10-22)
+- Claude — logos uniformes (sem selo redondo) (2026-10-22)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +413,13 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-22 - Claude - Logos uniformes (fim dos selos redondos)
+
+- Pedido da diretoria: Motos, Fazenda Divina, Unida e Instituto YSO estavam em selos redondos. Novas versoes do Drive "Logos": Motos (PNG horizontal), Unida (JPG, fundo removido), Fazenda Divina (PDF "logo fazenda divina_pau brasil", fundo removido — versao com cacto, diferente do selo antigo), YSO (PDF vetorial; fundo preto e moldura removidos, texto branco -> grafite, renderizado no Chromium). Arquivos `*-2026.png` (nome novo evita cache); os antigos foram removidos. Todas `shape: 'wide'`.
+- Placas pequenas deixaram de ser circulos: faixa do topo 84x52, pilulas "outras empresas" 54x34, selos da linha do tempo/orientacao 52x32, placa da pagina da empresa 200x120.
+- Validacao: tsc 0; `next build` ok; prints desktop/mobile da home e da pagina de empresa.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-22 - Claude - Universidade na identidade 2026 e endomarketing (/nossa-gente)
 
