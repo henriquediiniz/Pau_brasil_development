@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
-import { destroyUploadedCv } from '@/lib/carreiras-cv'
+import { apagarPrivado } from '@/lib/armazenamento'
 import {
   DIAS_RETENCAO_CV, ETAPAS_DE_SAIDA, cvVencido, saidaDoFunil,
 } from '@/lib/carreiras-retencao'
@@ -56,8 +56,8 @@ export async function GET(req: NextRequest) {
   }
 
   /*
-    Zera a referencia no banco antes de apagar no Cloudinary, como o botao
-    "Limpar CVs": se o Cloudinary falhar, sobra um arquivo orfao, e nao um
+    Zera a referencia no banco antes de apagar no armazenamento, como o botao
+    "Limpar CVs": se o Blob falhar, sobra um arquivo orfao, e nao um
     cadastro apontando para um PDF que nao abre.
 
     O `etapa: { in }` de novo no update fecha a corrida com o RH: se alguem
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
   const apagar = new Set(aindaFora.map((c) => c.id))
   const publicIds = vencidas.filter((c) => apagar.has(c.id)).map((c) => c.cvPublicId as string)
 
-  const resultados = await Promise.allSettled(publicIds.map((id) => destroyUploadedCv(id)))
+  const resultados = await Promise.allSettled(publicIds.map((id) => apagarPrivado(id)))
   const falhas = resultados.filter((r) => r.status === 'rejected').length
 
   await audit({
@@ -84,8 +84,8 @@ export async function GET(req: NextRequest) {
     actorName:  'Limpeza automática de currículos',
     action:     'CANDIDATURA_CVS_LIMPOS',
     targetType: 'Candidatura',
-    meta:       { automatico: true, dias: DIAS_RETENCAO_CV, total: publicIds.length, falhasCloudinary: falhas, ids: Array.from(apagar) },
+    meta:       { automatico: true, dias: DIAS_RETENCAO_CV, total: publicIds.length, falhasArmazenamento: falhas, ids: Array.from(apagar) },
   }).catch(console.error)
 
-  return NextResponse.json({ deleted: publicIds.length, falhasCloudinary: falhas, analisadas: candidatas.length })
+  return NextResponse.json({ deleted: publicIds.length, falhasArmazenamento: falhas, analisadas: candidatas.length })
 }

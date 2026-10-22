@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
+import { armazenamentoConfigurado, novaChaveCv, salvarPrivado } from '@/lib/armazenamento'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Deduplicação Criptográfica (World-Class)
-  // Checa se os bytes do currículo já existem no banco antes mesmo de subir pro Cloudinary
+  // Checa se os bytes do currículo já existem no banco antes mesmo de subir o arquivo
   const cvHash = crypto.createHash('sha256').update(fileBuffer).digest('hex')
   const duplicado = await prisma.candidatura.findFirst({
     where: { cvHash },
@@ -76,40 +77,23 @@ export async function POST(req: NextRequest) {
     }, { status: 409 })
   }
 
-  // Upload para Cloudinary como raw (PDF)
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME
-  const uploadPreset = process.env.CLOUDINARY_CV_PRESET
-
-  if (!cloudName || !uploadPreset) {
-    console.error('Cloudinary CV preset não configurado')
+  // Upload para o Vercel Blob privado (o arquivo só é entregue pelas rotas do RH)
+  if (!armazenamentoConfigurado()) {
+    console.error('[upload-cv] BLOB_READ_WRITE_TOKEN não configurado')
     return NextResponse.json({ error: 'Configuração de upload indisponível' }, { status: 500 })
   }
 
-  const base64 = Buffer.from(buffer).toString('base64')
-  const dataUri = `data:application/pdf;base64,${base64}`
-
-  const uploadForm = new FormData()
-  uploadForm.append('file', dataUri)
-  uploadForm.append('upload_preset', uploadPreset)
-  uploadForm.append('folder', 'cvs')
-  uploadForm.append('resource_type', 'raw')
-
-  const cloudRes = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
-    { method: 'POST', body: uploadForm }
-  )
-
-  if (!cloudRes.ok) {
-    const err = await cloudRes.text()
-    console.error('Cloudinary upload error:', err)
+  let salvo: { chave: string; url: string }
+  try {
+    salvo = await salvarPrivado(novaChaveCv(), fileBuffer, 'application/pdf')
+  } catch (error) {
+    console.error('[upload-cv] falha ao salvar no Blob', error)
     return NextResponse.json({ error: 'Erro ao salvar arquivo. Tente novamente.' }, { status: 502 })
   }
 
-  const data = await cloudRes.json()
-
   return NextResponse.json({
-    url:              data.secure_url as string,
-    publicId:         data.public_id as string,
+    url:              salvo.url,
+    publicId:         salvo.chave,
     originalFilename: file.name,
     sizeBytes:        file.size,
     mimeType:         file.type,

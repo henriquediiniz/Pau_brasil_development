@@ -616,7 +616,7 @@ export default function RhPage() {
           <button
             onClick={cleanupCvs}
             disabled={cleaning}
-            title="Remove CVs de candidaturas Rejeitadas e Arquivadas do Cloudinary"
+            title="Remove CVs de candidaturas Rejeitadas e Arquivadas do armazenamento"
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-red-500/20 bg-red-500/8 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/15 transition-colors disabled:opacity-40">
             {cleaning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
             Limpar CVs

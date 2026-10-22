@@ -626,7 +626,7 @@ export default function CandidatarPage() {
     if (!validateStep(3)) return
     setGlobalError('')
 
-    // Upload CV verdadeiro para o Cloudinary (ou s3)
+    // Upload do CV para o armazenamento privado (Vercel Blob)
     if (!form.cvFile) {
       setGlobalError('Currículo não encontrado. Volte ao passo 1 e envie o PDF novamente.')
       return

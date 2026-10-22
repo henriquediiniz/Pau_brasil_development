@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import { chaveDeCvValida } from '@/lib/armazenamento'
 import { notify } from '@/lib/notify'
 import { montarCatalogo, gruposDosCargos, nomesDoCatalogo } from '@/lib/gente/cargo-publico'
 import { candidatarRatelimit } from '@/lib/rate-limit'
@@ -128,8 +129,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Validar publicId — deve vir da pasta cvs/ no Cloudinary
-  if (!data.cvPublicId.startsWith('cvs/')) {
+  // Validar a chave do arquivo — deve ser um CV enviado por /api/carreiras/upload-cv
+  if (!chaveDeCvValida(data.cvPublicId)) {
     return NextResponse.json({ error: 'Upload do currículo inválido. Envie o PDF novamente.' }, { status: 422 })
   }
 

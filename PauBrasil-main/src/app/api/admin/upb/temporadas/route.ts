@@ -7,12 +7,13 @@ import { isSysAdmin, isUpbAdmin } from '@/lib/auth-helpers'
 import { audit } from '@/lib/audit'
 import { getEffectiveSessionUser } from '@/lib/session-user'
 import { z } from 'zod'
+import { urlDeImagemSchema } from '@/lib/armazenamento'
 import { withHandler } from '@/lib/api-handler'
 
 const createSchema = z.object({
   titulo: z.string().min(1).max(200),
   descricao: z.string().max(1000).optional(),
-  capa: z.string().url().optional().or(z.literal('')),
+  capa: urlDeImagemSchema.optional().or(z.literal('')),
   restricaoAcesso: z.boolean().optional(),
   pontosNoCertificado: z.number().int().min(0).max(100000).optional(),
   empresas: z.array(z.string()).default([]),

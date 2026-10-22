@@ -4,6 +4,12 @@ import crypto from 'crypto'
 import { authOptions } from '@/lib/auth'
 import { isRhAdmin } from '@/lib/auth-helpers'
 import { extractCvData } from '@/lib/cv-parser'
+import {
+  MENSAGEM_SEM_ARMAZENAMENTO,
+  armazenamentoConfigurado,
+  novaChaveCv,
+  salvarPrivado,
+} from '@/lib/armazenamento'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,38 +52,21 @@ export async function POST(req: NextRequest) {
     // PDF parseável mas sem texto legível (provavelmente escaneado) — retorna campos vazios
   }
 
-  // ── Upload Cloudinary ─────────────────────────────────────────────────────────
-  const cloudName   = process.env.CLOUDINARY_CLOUD_NAME
-  const uploadPreset = process.env.CLOUDINARY_CV_PRESET
+  // ── Upload para o Vercel Blob privado ────────────────────────────────────────
+  if (!armazenamentoConfigurado())
+    return NextResponse.json({ error: MENSAGEM_SEM_ARMAZENAMENTO }, { status: 500 })
 
-  if (!cloudName || !uploadPreset)
-    return NextResponse.json({ error: 'Cloudinary não configurado.' }, { status: 500 })
-
-  const base64  = buffer.toString('base64')
-  const dataUri = `data:application/pdf;base64,${base64}`
-
-  const uploadForm = new FormData()
-  uploadForm.append('file', dataUri)
-  uploadForm.append('upload_preset', uploadPreset)
-  uploadForm.append('folder', 'cvs')
-  uploadForm.append('resource_type', 'raw')
-
-  const cloudRes = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
-    { method: 'POST', body: uploadForm }
-  )
-
-  if (!cloudRes.ok) {
-    const err = await cloudRes.text()
-    console.error('Cloudinary upload error:', err)
-    return NextResponse.json({ error: 'Erro ao salvar arquivo no Cloudinary.' }, { status: 502 })
+  let salvo: { chave: string; url: string }
+  try {
+    salvo = await salvarPrivado(novaChaveCv(), buffer, 'application/pdf')
+  } catch (error) {
+    console.error('[importar-cv] falha ao salvar no Blob', error)
+    return NextResponse.json({ error: 'Erro ao salvar o arquivo.' }, { status: 502 })
   }
 
-  const cloud = await cloudRes.json()
-
   return NextResponse.json({
-    cvUrl:             cloud.secure_url as string,
-    cvPublicId:        cloud.public_id as string,
+    cvUrl:             salvo.url,
+    cvPublicId:        salvo.chave,
     cvOriginalFilename: file.name,
     cvSizeBytes:       file.size,
     cvMimeType:        file.type,

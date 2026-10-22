@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { isRhAdmin } from '@/lib/auth-helpers'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
-import { destroyUploadedCv } from '@/lib/carreiras-cv'
+import { apagarPrivado } from '@/lib/armazenamento'
 import { log } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
  * Direito ao esquecimento (LGPD art. 18 §1 VI).
  * Remove permanentemente todos os dados pessoais do candidato:
  * - Registro de Candidatura e notas associadas
- * - CV armazenado no Cloudinary
+ * - CV armazenado no Vercel Blob
  * Gera audit log antes de deletar para rastreabilidade regulatória.
  */
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
@@ -50,13 +50,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     },
   })
 
-  // Deletar CV do Cloudinary (best-effort — não bloqueia a deleção local se Cloudinary falhar)
+  // Apagar o CV do armazenamento (best-effort — não bloqueia a deleção local se o Blob falhar)
   if (candidatura.cvPublicId) {
     try {
-      await destroyUploadedCv(candidatura.cvPublicId)
+      await apagarPrivado(candidatura.cvPublicId)
     } catch {
-      // Falha no Cloudinary não impede a erasure do banco — logar e continuar
-      log.error({ err: { publicId: candidatura.cvPublicId } }, '[erasure] falha ao deletar CV do Cloudinary')
+      // Falha no armazenamento não impede a erasure do banco — logar e continuar
+      log.error({ err: { publicId: candidatura.cvPublicId } }, '[erasure] falha ao apagar CV do armazenamento')
     }
   }
 

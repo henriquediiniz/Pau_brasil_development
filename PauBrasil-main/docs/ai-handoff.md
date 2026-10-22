@@ -253,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — remocao das tabelas legadas OBZ/Score e diagnostico de upload de CV (2026-10-21)
+- Claude — migracao de arquivos do Cloudinary para Vercel Blob privado (2026-10-22)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +413,16 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-22 - Claude - Migracao Cloudinary -> Vercel Blob privado
+
+- Decisao do usuario: Vercel Blob. Store criado por Claude a pedido do usuario: `paubrasil-arquivos` (privado, iad1), conectado ao projeto; `BLOB_READ_WRITE_TOKEN` em Production/Preview/Development. Local: token copiado para `.env.development.local` (mesmo store de producao; testes usam arquivos sem dado pessoal e sao apagados).
+- `src/lib/armazenamento.ts`: salvar/ler/apagar privado, chaves `cvs/<uuid>.pdf` e `imagens/<uuid>.<ext>`, `urlDeImagemSchema` (aceita https externo ou `/api/arquivos/imagem/...`).
+- CV: upload do candidato, importacao do RH, leitura no Banco de Talentos e no Gente (auditoria mantida, `no-store`), remocao (cron, limpar CVs, erasure LGPD). Campos do banco iguais (`cvPublicId` guarda a chave do Blob). `carreiras-cv.ts` e `cv-signed-url.ts` removidos.
+- Imagens: `/api/upload` grava no Blob e devolve endereco interno; nova rota publica `/api/arquivos/imagem/[arquivo]` (nome UUID, cache imutavel). Validadores de `photoUrl` e capa de temporada aceitam o endereco interno. Sem recorte por rosto (era transformacao do Cloudinary).
+- `.env.example`: Cloudinary trocado por `BLOB_READ_WRITE_TOKEN`. `remotePatterns` de res.cloudinary.com mantido para URLs antigas.
+- Validacao: tsc 0; `npm test` 511/0; `next build` ok; E2E com Blob real: upload-cv 200, RH abre CV identico (sem login 401), upload de imagem + entrega publica + salvar foto de perfil, erasure apaga o CV do Blob; Blob terminou vazio. Laudo PCD e backup nao exercitados (codigo inalterado, ja usava Blob).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-21 - Claude - Atalho da newsletter na barra lateral do portal
 

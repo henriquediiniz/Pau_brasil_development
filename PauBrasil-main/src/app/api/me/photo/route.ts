@@ -4,11 +4,12 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { z } from 'zod'
+import { urlDeImagemSchema } from '@/lib/armazenamento'
 
 export const dynamic = 'force-dynamic'
 
 const schema = z.object({
-  photoUrl: z.string().url(),
+  photoUrl: urlDeImagemSchema,
 })
 
 export async function PATCH(req: NextRequest) {

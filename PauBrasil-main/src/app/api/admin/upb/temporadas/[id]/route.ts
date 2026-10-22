@@ -7,12 +7,13 @@ import { canAccessCompanyScope, isUpbAdmin, type SessionUser } from '@/lib/auth-
 import { audit } from '@/lib/audit'
 import { getEffectiveSessionUser } from '@/lib/session-user'
 import { z } from 'zod'
+import { urlDeImagemSchema } from '@/lib/armazenamento'
 import { withHandler } from '@/lib/api-handler'
 
 const updateSchema = z.object({
   titulo: z.string().min(1).max(200).optional(),
   descricao: z.string().max(1000).nullable().optional(),
-  capa: z.string().url().nullable().optional(),
+  capa: urlDeImagemSchema.nullable().optional(),
   ordem: z.number().int().min(0).optional(),
   ativo: z.boolean().optional(),
   restricaoAcesso: z.boolean().optional(),
