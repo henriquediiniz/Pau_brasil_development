@@ -414,6 +414,12 @@ Use este formato:
 
 ## Registro de Rodadas
 
+### 2026-10-22 - Claude - Conteudo de DEMONSTRACAO em producao (apresentacao a diretoria)
+
+- A pedido explicito do usuario, para a apresentacao: `prisma/demo-apresentacao.ts --gravar` em producao criou 2 avisos, 3 reconhecimentos (nomes ficticios: Maria Teste, Joao Exemplo, Ana Silva), 3 campanhas no calendario, 3 numeros do mes, 2 vagas abertas (empresa "Demonstracao (remover)", slug `demo-apresentacao`, invisivel no site publico) e 3 cursos da Universidade (episodios com video de exemplo, nao tocam).
+- **REMOVER antes de usar com dados reais:** `npx tsx prisma/demo-apresentacao.ts --remover` (apaga exatamente esses itens; testado em banco descartavel).
+- Parecer do outro agente: pendente.
+
 ### 2026-10-22 - Claude - Voltar para o inicio em /newsletter e /nossa-gente
 
 - `/newsletter`: link "Voltar para o inicio" (padrao `textLink` vinho, igual ao "Ver todas as campanhas") na area clara acima das fotos. `/nossa-gente`: link discreto no topo escuro (abaixo dele vem a faixa vinho dos numeros).
