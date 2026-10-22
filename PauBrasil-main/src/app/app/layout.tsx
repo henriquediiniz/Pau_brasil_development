@@ -10,7 +10,7 @@ import {
   ChevronLeft, ChevronRight, Menu, Bell, X, Key, ClipboardList,
   GraduationCap,
   Search, Home, Building2, Briefcase, HardDrive, HelpCircle,
-  UsersRound, ArrowLeft, type LucideIcon,
+  UsersRound, ArrowLeft, Newspaper, type LucideIcon,
 } from 'lucide-react'
 import { CommandMenu } from '@/components/ui/command-menu'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -132,6 +132,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       label: 'Gente & Cultura',
       items: [
         { href: '/gente',          label: 'Gente',             icon: UsersRound },
+        { href: '/gente/newsletter', label: 'Newsletter do site', icon: Newspaper },
         { href: '/talentos',       label: 'Banco de Talentos', icon: Users },
         { href: '/admin/usuarios', label: 'Usuários',          icon: Users },
       ],
@@ -149,6 +150,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         { href: '/admin/empresas',     label: 'Empresas',       icon: Building2 },
         { href: '/admin/funcoes',      label: 'Funções',        icon: Settings },
         { href: '/admin/upb',          label: 'Universidade',   icon: GraduationCap },
+        // Admin não vê a zona Gente & Cultura, então o cadastro da newsletter precisa de atalho aqui também.
+        { href: '/gente/newsletter',   label: 'Newsletter do site', icon: Newspaper },
         { href: '/admin/auditoria',    label: 'Auditoria',      icon: ClipboardList },
         { href: '/admin/backup',       label: 'Backup',         icon: HardDrive },
       ],

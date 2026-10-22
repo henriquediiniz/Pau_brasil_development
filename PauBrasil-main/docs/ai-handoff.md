@@ -414,6 +414,12 @@ Use este formato:
 
 ## Registro de Rodadas
 
+### 2026-10-21 - Claude - Atalho da newsletter na barra lateral do portal
+
+- Usuario (SYS_ADMIN) nao encontrava o cadastro: a zona "Gente & Cultura" da sidebar so aparece para RH_ADMIN (`isRhAdminUser && !isAdmin`) e a zona Admin nao tinha link para o modulo Gente. Acesso a rota sempre existiu (`canAccessGente` inclui SYS_ADMIN).
+- `src/app/app/layout.tsx`: item "Newsletter do site" (`/gente/newsletter`) nas zonas Admin e Gente & Cultura; entra tambem na busca do portal (derivada das secoes).
+- Parecer do outro agente: pendente.
+
 ### 2026-10-21 - Claude - Tabelas legadas removidas e upload de CV quebrado em producao
 
 - Remocao autorizada pelo usuario. Antes: as 15 tabelas OBZ*/Score* estavam VAZIAS em producao e no local, e nenhum usuario tinha `isObzAdmin`/`isScoreAdmin`. Migration `20261021220000_drop_legacy_obz_score` (escrita a mao: DROP das 15 tabelas, das 2 colunas em User e dos enums OBZJustStatus/OBZJustTipo). Aplicada local e em producao; producao ficou com 0 tabelas legadas, usuarios e newsletter intactos.
