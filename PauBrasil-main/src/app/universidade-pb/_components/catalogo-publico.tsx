@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
-import { GraduationCap, Lock, X, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowUpRight, Clock, GraduationCap, Lock, X } from 'lucide-react'
+import styles from '@/app/_components/Hub.module.css'
 
 // videoUrl é intencionalmente excluído deste tipo — jamais chega ao componente
 interface Episodio {
@@ -23,138 +23,113 @@ interface Temporada {
   episodios: Episodio[]
 }
 
-interface Props {
-  temporadas: Temporada[]
+const minutos = (t: Temporada) => t.episodios.reduce((acc, e) => acc + e.duracaoMin, 0)
+
+/** Capa do curso; sem imagem cadastrada, um fundo vinho com o ícone da Universidade. */
+function Capa({ temporada, sizes }: { temporada: Temporada; sizes: string }) {
+  if (temporada.capa) {
+    return <Image src={temporada.capa} alt="" fill unoptimized sizes={sizes} className={styles.upbCoverImg} />
+  }
+  return (
+    <span className={styles.upbCoverFallback} aria-hidden="true">
+      <GraduationCap size={34} strokeWidth={1.4} />
+    </span>
+  )
 }
 
-const FALLBACK_COLORS = ['#1a1a2e', '#0f3460', '#16213e', '#1b1b2e', '#0d1b2a', '#1a0a2e']
+export function CatalogoPublico({ temporadas }: { temporadas: Temporada[] }) {
+  const [selecionada, setSelecionada] = useState<Temporada | null>(null)
 
-export function CatalogoPublico({ temporadas }: Props) {
-  const [selected, setSelected] = useState<Temporada | null>(null)
-  const selectedIndex = selected ? temporadas.findIndex(t => t.id === selected.id) : 0
+  useEffect(() => {
+    if (!selecionada) return
+    const fechar = (e: KeyboardEvent) => e.key === 'Escape' && setSelecionada(null)
+    window.addEventListener('keydown', fechar)
+    return () => window.removeEventListener('keydown', fechar)
+  }, [selecionada])
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {temporadas.map((t, i) => {
-          const totalMin = t.episodios.reduce((acc, e) => acc + e.duracaoMin, 0)
-          return (
-            <motion.button key={t.id} onClick={() => setSelected(t)}
-              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="text-left rounded-2xl bg-white/3 border border-white/8 overflow-hidden hover:border-brand-500/30 hover:bg-white/5 transition-all group w-full">
-              {/* Capa */}
-              <div className="h-[240px] relative overflow-hidden rounded-t-2xl">
-                {t.capa ? (
-                  <Image
-                    src={t.capa}
-                    alt={t.titulo}
-                    fill
-                    unoptimized
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center"
-                    style={{ backgroundColor: FALLBACK_COLORS[i % FALLBACK_COLORS.length] }}>
-                    <GraduationCap className="w-10 h-10 text-white/20" />
-                  </div>
-                )}
-                {/* Badge episódios */}
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-xs text-white font-medium">
-                  {t.episodios.length} ep.
-                </div>
-                {/* Cadeado central */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                    <Lock className="w-4 h-4 text-white/80" />
-                  </div>
-                </div>
-              </div>
-              {/* Body */}
-              <div className="p-4">
-                <h3 className="text-white font-display font-bold text-sm mb-1 group-hover:text-brand-400 transition-colors">{t.titulo}</h3>
-                {t.descricao && (
-                  <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2">{t.descricao}</p>
-                )}
-                {totalMin > 0 && (
-                  <p className="text-slate-600 text-xs">{totalMin} min de conteúdo</p>
-                )}
-              </div>
-            </motion.button>
-          )
-        })}
-      </div>
-
-      {/* Modal de preview */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-            onClick={() => setSelected(null)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={e => e.stopPropagation()}
-              className="bg-[#111118] rounded-2xl border border-white/10 max-w-lg w-full overflow-hidden shadow-2xl">
-
-              {/* Capa do modal */}
-              <div className="h-[200px] relative">
-                {selected.capa ? (
-                  <Image
-                    src={selected.capa}
-                    alt={selected.titulo}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center"
-                    style={{ backgroundColor: FALLBACK_COLORS[selectedIndex % FALLBACK_COLORS.length] }}>
-                    <GraduationCap className="w-16 h-16 text-white/20" />
-                  </div>
-                )}
-                {/* Gradiente com título */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-5">
-                  <h2 className="text-white font-display font-bold text-lg leading-tight">{selected.titulo}</h2>
-                  {selected.descricao && (
-                    <p className="text-slate-300 text-xs mt-1 line-clamp-2">{selected.descricao}</p>
+      <ul className={styles.upbGrid}>
+        {temporadas.map((t) => (
+          <li key={t.id} data-reveal>
+            <button type="button" className={styles.upbCard} onClick={() => setSelecionada(t)}>
+              <span className={styles.upbCover}>
+                <Capa temporada={t} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 400px" />
+                <span className={styles.upbBadge}>
+                  {t.episodios.length} {t.episodios.length === 1 ? 'episódio' : 'episódios'}
+                </span>
+                <span className={styles.upbLock} aria-hidden="true">
+                  <Lock size={15} />
+                </span>
+              </span>
+              <span className={styles.upbBody}>
+                <strong>{t.titulo}</strong>
+                {t.descricao && <span className={styles.upbDesc}>{t.descricao}</span>}
+                <span className={styles.upbMeta}>
+                  {minutos(t) > 0 && (
+                    <>
+                      <Clock size={13} /> {minutos(t)} min de conteúdo
+                    </>
                   )}
-                </div>
-                {/* Botão fechar */}
-                <button onClick={() => setSelected(null)}
-                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/80 hover:text-white transition-colors">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+                  <span className={styles.companyArrow} aria-hidden="true">
+                    <ArrowUpRight size={16} />
+                  </span>
+                </span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
 
-              {/* Lista de episódios */}
-              <div className="divide-y divide-white/5">
-                {selected.episodios.slice(0, 5).map((ep, idx) => (
-                  <div key={ep.id} className="flex items-center gap-3 px-5 py-3">
-                    <span className="text-slate-600 text-xs w-5 text-right shrink-0">{idx + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-slate-300 text-sm truncate">{ep.titulo}</p>
-                    </div>
-                    <span className="text-slate-600 text-xs shrink-0">{ep.duracaoMin}min</span>
-                    <Lock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                  </div>
-                ))}
-                {selected.episodios.length > 5 && (
-                  <p className="px-5 py-3 text-xs text-slate-600">
-                    +{selected.episodios.length - 5} episódio{selected.episodios.length - 5 !== 1 ? 's' : ''}
-                  </p>
-                )}
+      {selecionada && (
+        <div className={styles.upbOverlay} onClick={() => setSelecionada(null)}>
+          <div
+            className={styles.upbModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upb-modal-titulo"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.upbModalCover}>
+              <Capa temporada={selecionada} sizes="520px" />
+              <div className={styles.upbModalShade}>
+                <h3 id="upb-modal-titulo">{selecionada.titulo}</h3>
+                {selecionada.descricao && <p>{selecionada.descricao}</p>}
               </div>
-
-              {/* CTA */}
-              <div className="p-5">
-                <Link href="/login"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl gradient-brand text-white font-semibold shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 transition-all">
-                  Fazer login para assistir <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <button
+                type="button"
+                className={styles.upbClose}
+                onClick={() => setSelecionada(null)}
+                aria-label="Fechar"
+                autoFocus
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <ol className={styles.upbEpisodes}>
+              {selecionada.episodios.slice(0, 6).map((ep, i) => (
+                <li key={ep.id}>
+                  <span>{String(i + 1).padStart(2, '0')}</span>
+                  <strong>{ep.titulo}</strong>
+                  <small>{ep.duracaoMin} min</small>
+                  <Lock size={13} aria-label="Exclusivo para colaboradores" />
+                </li>
+              ))}
+            </ol>
+            {selecionada.episodios.length > 6 && (
+              <p className={styles.upbMore}>
+                +{selecionada.episodios.length - 6}{' '}
+                {selecionada.episodios.length - 6 === 1 ? 'episódio' : 'episódios'}
+              </p>
+            )}
+            <div className={styles.upbModalCta}>
+              <Link href="/login?callbackUrl=%2Funiversidade" className={styles.button}>
+                Entrar para assistir <ArrowUpRight size={18} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

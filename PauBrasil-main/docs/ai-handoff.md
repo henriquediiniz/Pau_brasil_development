@@ -253,7 +253,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — migracao de arquivos do Cloudinary para Vercel Blob privado (2026-10-22)
+- Claude — Universidade na identidade do site + endomarketing (2026-10-22)
   - objetivo concluido; arquivos em posse: nenhum
 
 - Codex — consolidação de contexto (2026-10-19)
@@ -413,6 +413,29 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-22 - Claude - Universidade na identidade 2026 e endomarketing (/nossa-gente)
+
+- Pedidos do usuario: Universidade sem a paleta verde (vitrine e area logada) e endomarketing com mural de reconhecimento, calendario de campanhas e numeros do mes, em pagina propria + resumo na home. Envio mensal da newsletter: depois.
+- Universidade: `/universidade-pb` reescrita no padrao do hub (HubNav/HubFooter, hero vinho, catalogo em cards claros, modal proprio sem framer-motion, CTA); layout deixou de forcar texto branco. `HubLearningPath` extraido da home e reutilizado. Area logada: `emerald/green` trocados por ouro da paleta (#b88c0b/#d4a72c) e capas sem imagem em vinho/grafite.
+- Endomarketing: modelos `EndoReconhecimento`, `EndoCampanha`, `EndoNumero`; migration `20261022140000_add_endomarketing` escrita a mao (aditiva; o diff gerado tambem mexia em indices antigos). `src/lib/endomarketing.ts` (schemas zod, `carregarNossaGente`), `src/lib/endomarketing-opcoes.ts` (categorias/cores, sem dependencia de servidor). API generica `/api/gente/endomarketing/[tipo]` e `/[tipo]/[id]` via `autenticarGente`, auditoria `GENTE_ENDOMARKETING_*`, `revalidatePath` de `/` e `/nossa-gente`. Tela `/gente/endomarketing` (abas, criar/editar/excluir, foto via `/api/upload` no Blob). Links no dock do Gente, sidebar (Admin e Gente & Cultura) e cabecalho do site ("Nossa gente").
+- Pagina `/nossa-gente` (ISR 300 s): hero, numeros do mes (contador), mural, calendario do ano (destaca "acontecendo agora", esmaece passadas). Home: faixa "Acreditamos em nossa gente" mostra ate 4 numeros + link.
+- Gotchas: depois de `prisma generate` o `next dev` precisa reiniciar (delegates novos vinham undefined). `urlDeImagemSchema` passou a aceitar so imagem interna ou res.cloudinary.com: link externo qualquer quebrava o `next/image` de quem exibe a foto.
+- Validacao: tsc 0; `npm test` 511/0; E2E local (criar/editar pela tela, API 201/400, sem login 401, pagina publica com os 3 blocos, home com numeros, cabecalho em 1 linha 860-1440, sem transbordo em 320-768); `next build` ok; `hub.spec.ts` 2/3 (falha mobile preexistente). Dados de exemplo (cursos e endomarketing) so no banco local.
+- Producao (ok explicito do usuario, 2026-10-22): `migrate deploy` aplicou so `add_endomarketing`; schema em dia.
+- Parecer do outro agente: pendente.
+
+### 2026-10-22 - Claude - Hero com a logo branca vetorial (sem a caixa bege)
+
+- Pedido do usuario: o cartao bege com logo, "2026" e frase destoava do topo escuro. Fonte: pasta `arquivos-paubrasil` (manual da marca e `LOGO PAU BRASIL 2026.pdf`). O manual usa a logo branca direto no fundo escuro (capa e pag. 9).
+- `public/brand/logo-branca-animada.svg`: extraido da pag. 2 do PDF (versao branca), sem o fundo e sem os contornos finos do Corel; 30 formas com `pathLength=1`; animacao de traco + preenchimento embutida no proprio SVG, desligada com movimento reduzido.
+- Hero: figura `heroMark` (logo + brilho vinho suave + legenda "Nova identidade — 2026") no lugar de `heroVisual`/`brandPlate`.
+- Parecer do outro agente: pendente.
+
+### 2026-10-22 - Claude - Frase "Acreditamos em nossa gente" mais acima
+
+- Pedido do usuario (nao encontrava a frase, que ficava a ~80% da pagina): a faixa saiu de entre Universidade e Trabalhe conosco e foi para logo depois do topo/atalhos, antes de "Nossas empresas".
+- Parecer do outro agente: pendente.
 
 ### 2026-10-22 - Claude - Migracao Cloudinary -> Vercel Blob privado
 

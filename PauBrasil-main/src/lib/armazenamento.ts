@@ -63,13 +63,17 @@ export function urlDaImagem(chave: string) {
   return PREFIXO_URL_IMAGEM + chave.replace(/^imagens\//, '')
 }
 
-/** Aceita imagem enviada pelo portal (endereço interno) ou um link https externo. */
+/**
+ * Aceita imagem enviada pelo portal (endereço interno) ou, por compatibilidade, um link antigo
+ * do Cloudinary. Link externo qualquer é recusado: o `next/image` só carrega hosts autorizados
+ * no next.config.js, e uma foto de perfil de outro domínio derrubaria as telas que a exibem.
+ */
 export const urlDeImagemSchema = z
   .string()
   .max(500)
   .refine(
     (valor) =>
-      /^https:\/\/\S+$/.test(valor) ||
+      /^https:\/\/res\.cloudinary\.com\/\S+$/.test(valor) ||
       new RegExp(`^${PREFIXO_URL_IMAGEM}[A-Za-z0-9-]+\\.(jpg|png|webp|gif)$`).test(valor),
     'Imagem inválida',
   )

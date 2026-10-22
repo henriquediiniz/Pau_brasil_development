@@ -35,7 +35,8 @@ function urgenciaCls(dias: number) {
   return { border: 'border-brand-500/30', badge: 'bg-brand-500/15 border-brand-500/30 text-brand-300', label: `${dias}d restantes` }
 }
 
-const FALLBACK_COLORS = ['#1a1a2e', '#0f3460', '#16213e', '#1b1b2e', '#0d1b2a', '#1a0a2e']
+// Capas sem imagem: tons de vinho e grafite da identidade 2026
+const FALLBACK_COLORS = ['#2a1214', '#3b1a1d', '#1f1a17', '#4a1c22', '#2b2420', '#33161a']
 
 export default function UniversidadePage() {
   const [temporadas, setTemporadas] = useState<Temporada[]>([])
@@ -127,7 +128,7 @@ export default function UniversidadePage() {
           </div>
           {temporadas.some(t => t.certificado !== null) && (
             <Link href="/universidade/certificados"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium hover:bg-emerald-500/20 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#b88c0b]/10 border border-[#b88c0b]/30 text-[#d4a72c] text-sm font-medium hover:bg-[#b88c0b]/20 transition-colors">
               <Award className="w-4 h-4" />
               Meus Certificados
             </Link>
@@ -206,9 +207,9 @@ export default function UniversidadePage() {
                     )}
                     {/* Badges */}
                     {concluida && (
-                      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 backdrop-blur-sm">
-                        <Award className="w-3 h-3 text-emerald-400" />
-                        <span className="text-emerald-400 text-xs font-medium">Certificado</span>
+                      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full bg-[#b88c0b]/20 border border-[#b88c0b]/40 backdrop-blur-sm">
+                        <Award className="w-3 h-3 text-[#d4a72c]" />
+                        <span className="text-[#d4a72c] text-xs font-medium">Certificado</span>
                       </div>
                     )}
                     {bloqueado && (
@@ -297,12 +298,12 @@ export default function UniversidadePage() {
                             {t.concluidos}/{t.totalEpisodios} aulas
                           </span>
                           {concluida
-                            ? <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Concluída</span>
+                            ? <span className="text-[#d4a72c] flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Concluída</span>
                             : <span className="text-slate-500 flex items-center gap-1">{pct.toFixed(0)}% <ChevronRight className="w-3 h-3 group-hover:text-brand-400 group-hover:translate-x-0.5 transition-all" /></span>
                           }
                         </div>
                         <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
-                          <div className={`h-full rounded-full origin-left transition-transform duration-300 ${concluida ? 'bg-emerald-400' : 'gradient-brand'}`}
+                          <div className={`h-full rounded-full origin-left transition-transform duration-300 ${concluida ? 'bg-[#d4a72c]' : 'gradient-brand'}`}
                             style={{ transform: `scaleX(${Math.min(pct, 100) / 100})` }} />
                         </div>
                       </div>

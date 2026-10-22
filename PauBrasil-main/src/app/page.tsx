@@ -6,10 +6,8 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
   GraduationCap,
   Sprout,
-  Users,
 } from 'lucide-react'
 import { HubFooter, HubNav } from './_components/HubShell'
 import {
@@ -19,8 +17,10 @@ import {
   HubTalentGuide,
 } from './_components/HubInteractive'
 import { HubReveal } from './_components/HubReveal'
+import { HubLearningPath } from './_components/HubLearningPath'
 import { HubNewsletter } from './_components/HubNewsletter'
 import { listarNewsletterPublicada } from '@/lib/newsletter'
+import { carregarNossaGente } from '@/lib/endomarketing'
 import { HubCountUp, HubHeroGlow } from './_components/HubEffects'
 import {
   HUB_COMPANIES,
@@ -56,7 +56,7 @@ export const viewport: Viewport = { colorScheme: 'only light' }
 export const revalidate = 300
 
 export default async function HomePage() {
-  const newsletter = await listarNewsletterPublicada()
+  const [newsletter, nossaGente] = await Promise.all([listarNewsletterPublicada(), carregarNossaGente()])
   return (
     <div className={`${styles.hub} ${montserrat.variable}`} data-hub-root>
       <HubReveal />
@@ -95,25 +95,20 @@ export default async function HomePage() {
                   <span>Origem, crescimento e pertencimento.</span>
                 </div>
               </div>
-              <figure className={styles.heroVisual}>
-                <div className={styles.brandPlate}>
-                  <Image
-                    src="/brand/logo-principal.png"
-                    alt="Nova identidade do Grupo Pau Brasil"
-                    width={340}
-                    height={275}
-                    priority
-                    sizes="(max-width: 700px) 230px, 340px"
-                  />
-                </div>
-                <div className={styles.visualFooter}>
-                  <span>
-                    Uma nova identidade.
-                    <br />
-                    <strong>O mesmo propósito de crescer.</strong>
-                  </span>
-                  <span className={styles.brandYear}>2026</span>
-                </div>
+              <figure className={styles.heroMark}>
+                {/* SVG com animação própria (traço que se desenha); next/image não anima SVG. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/brand/logo-branca-animada.svg"
+                  alt="Pau Brasil, nova identidade visual"
+                  width={2065}
+                  height={1676}
+                />
+                <figcaption>
+                  <span>Nova identidade</span>
+                  <i aria-hidden="true" />
+                  <span>2026</span>
+                </figcaption>
               </figure>
             </div>
             <div className={styles.heroBottom}>
@@ -159,6 +154,34 @@ export default async function HomePage() {
             </Link>
           </div>
         </nav>
+
+        <section className={styles.manifesto} aria-label="Nosso jeito">
+          <div className={styles.container} data-reveal>
+            <p>
+              Acreditamos em <em>nossa gente.</em>
+            </p>
+            <span>
+              Cada conquista do Grupo Pau Brasil começa nas pessoas que fazem
+              parte dele.
+            </span>
+            {nossaGente.numeros.length > 0 && (
+              <ul className={styles.manifestoNumbers}>
+                {nossaGente.numeros.slice(0, 4).map((n) => (
+                  <li key={n.id}>
+                    <strong>
+                      <HubCountUp value={n.valor} />
+                      {n.sufixo}
+                    </strong>
+                    <span>{n.label}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link href="/nossa-gente" className={styles.textLink}>
+              Conheça nossa gente <ArrowRight size={16} />
+            </Link>
+          </div>
+        </section>
 
         <section
           id="empresas"
@@ -283,75 +306,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className={styles.learningPath} data-reveal>
-              <span className={styles.learningEyebrow}>
-                Aprendizagem em cada etapa
-              </span>
-              <div>
-                <span>
-                  <Users size={22} />
-                </span>
-                <div>
-                  <h3>Chegar e pertencer</h3>
-                  <p>Integração e conexão com a cultura do grupo.</p>
-                </div>
-                <small>01</small>
-              </div>
-              <div>
-                <span>
-                  <BookOpen size={22} />
-                </span>
-                <div>
-                  <h3>Aprender na prática</h3>
-                  <p>Conteúdos compartilhados pelos nossos líderes.</p>
-                </div>
-                <small>02</small>
-              </div>
-              <div>
-                <span>
-                  <GraduationCap size={22} />
-                </span>
-                <div>
-                  <h3>Continuar evoluindo</h3>
-                  <p>Aprendizado, avaliações e certificados.</p>
-                </div>
-                <small>03</small>
-              </div>
-              <ul className={styles.programs} aria-label="Programas do grupo">
-                <li>
-                  <Image
-                    src="/brand/programa-capacitar.png"
-                    alt="Capacitar · Grupo Pau Brasil"
-                    width={640}
-                    height={302}
-                    sizes="180px"
-                  />
-                  <span>Capacitação das equipes</span>
-                </li>
-                <li>
-                  <Image
-                    src="/brand/programa-td-lideres.jpg"
-                    alt="T&D Líderes · Grupo Pau Brasil"
-                    width={640}
-                    height={393}
-                    sizes="180px"
-                  />
-                  <span>Treinamento e desenvolvimento de líderes</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.manifesto} aria-label="Nosso jeito">
-          <div className={styles.container} data-reveal>
-            <p>
-              Acreditamos em <em>nossa gente.</em>
-            </p>
-            <span>
-              Cada conquista do Grupo Pau Brasil começa nas pessoas que fazem
-              parte dele.
-            </span>
+            <HubLearningPath />
           </div>
         </section>
 

@@ -1439,3 +1439,62 @@ model NewsletterPhoto {
 
   @@index([postId, position])
 }
+
+// ─── Endomarketing (página /nossa-gente) ─────────────────────────────────────
+// Cadastrado pelo módulo Gente. Fotos ficam no Vercel Blob privado e são
+// servidas por /api/arquivos/imagem (campo fotoUrl).
+
+/// Mural de reconhecimento: destaque de um colaborador.
+model EndoReconhecimento {
+  id          String   @id @default(cuid())
+  nome        String
+  cargo       String
+  /// Slug da empresa no hub (src/lib/hub-content.ts).
+  company     String
+  unit        String
+  /// tempo-de-casa | meta | elogio | destaque
+  categoria   String
+  motivo      String
+  fotoUrl     String?
+  /// Mês de referência (dia 1), usado para ordenar e agrupar.
+  mes         DateTime
+  published   Boolean  @default(true)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, mes])
+}
+
+/// Calendário de campanhas internas do ano.
+model EndoCampanha {
+  id          String    @id @default(cuid())
+  title       String
+  descricao   String
+  inicio      DateTime
+  fim         DateTime?
+  /// Cor de destaque da campanha (ex.: amarelo, rosa, azul, vinho).
+  cor         String    @default("vinho")
+  published   Boolean   @default(true)
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([published, inicio])
+}
+
+/// Números do mês: indicadores da cultura exibidos com contador.
+model EndoNumero {
+  id          String   @id @default(cuid())
+  label       String
+  valor       Int
+  sufixo      String?
+  /// Mês de referência (dia 1); o site mostra o mês mais recente cadastrado.
+  mes         DateTime
+  ordem       Int      @default(0)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([mes, ordem])
+}

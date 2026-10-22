@@ -175,7 +175,7 @@ export default function CertificadosPage() {
                       </motion.div>
                     ) : downloadSuccess === cert.id ? (
                       <motion.div key="success" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="flex items-center gap-1.5 absolute">
-                        <Check className="w-3.5 h-3.5 text-green-200" />
+                        <Check className="w-3.5 h-3.5 text-[#f0dfb0]" />
                         <span>Pronto!</span>
                       </motion.div>
                     ) : (

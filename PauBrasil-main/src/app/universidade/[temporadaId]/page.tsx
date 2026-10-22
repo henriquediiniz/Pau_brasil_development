@@ -263,12 +263,12 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
           </div>
         )}
         {temporada.certificado && !temporada.certExpirado && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-            <Award className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#b88c0b]/10 border border-[#b88c0b]/30">
+            <Award className="w-4 h-4 text-[#d4a72c]" />
             <div>
-              <span className="text-emerald-400 text-xs font-medium">Certificado emitido</span>
+              <span className="text-[#d4a72c] text-xs font-medium">Certificado emitido</span>
               {temporada.certificado.validoAte && (
-                <p className="text-emerald-600 text-[10px] leading-none mt-0.5">
+                <p className="text-[#9a7509] text-[10px] leading-none mt-0.5">
                   Válido até {new Date(temporada.certificado.validoAte).toLocaleDateString('pt-BR')}
                 </p>
               )}
@@ -294,7 +294,7 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
                   p.expirado
                     ? 'bg-orange-500/10 border-orange-500/30 text-orange-300 hover:bg-orange-500/20'
                     : p.concluido
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    ? 'bg-[#b88c0b]/10 border-[#b88c0b]/30 text-[#e0c27a]'
                     : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
                 }`}
               >
@@ -357,7 +357,7 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
               </div>
 
               {activeIsConcluido ? (
-                <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                <div className="flex items-center gap-2 text-[#d4a72c] text-sm font-medium">
                   <CheckCircle2 className="w-4 h-4" /> Assistido
                 </div>
               ) : canMark ? (
@@ -409,7 +409,7 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
                   className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors
                     ${isActive ? 'bg-brand-500/10 border-l-2 border-l-brand-500' : 'hover:bg-white/3'}`}>
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold
-                    ${concluido ? 'bg-emerald-500/20 text-emerald-400' : isActive ? 'bg-brand-500/20 text-brand-400' : 'bg-white/5 text-slate-500'}`}>
+                    ${concluido ? 'bg-[#b88c0b]/20 text-[#d4a72c]' : isActive ? 'bg-brand-500/20 text-brand-400' : 'bg-white/5 text-slate-500'}`}>
                     {concluido ? <CheckCircle2 className="w-3.5 h-3.5" /> : i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -439,8 +439,8 @@ export default function TemporadaPage({ params }: { params: { temporadaId: strin
               <button onClick={() => setShowCertModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
-              <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-5">
-                <Award className="w-10 h-10 text-emerald-400" />
+              <div className="w-20 h-20 rounded-full bg-[#b88c0b]/10 border-2 border-[#b88c0b]/40 flex items-center justify-center mx-auto mb-5">
+                <Award className="w-10 h-10 text-[#d4a72c]" />
               </div>
               <h2 className="text-2xl font-display font-bold text-white mb-2">Parabéns!</h2>
               <p className="text-slate-400 text-sm mb-4">

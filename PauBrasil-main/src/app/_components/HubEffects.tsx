@@ -40,9 +40,9 @@ export function HubCountUp({ value }: { value: number }) {
   return (
     <>
       <span ref={ref} className={styles.countUp} aria-hidden="true">
-        {shown}
+        {shown.toLocaleString('pt-BR')}
       </span>
-      <span className={styles.srOnly}>{value}</span>
+      <span className={styles.srOnly}>{value.toLocaleString('pt-BR')}</span>
     </>
   )
 }

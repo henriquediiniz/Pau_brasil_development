@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  Accessibility, Briefcase, ClipboardList, FileText, GaugeCircle, GraduationCap, LayoutDashboard,
+  Accessibility, Award, Briefcase, ClipboardList, FileText, GaugeCircle, GraduationCap, LayoutDashboard,
   LogOut, Network, Newspaper, UserPlus, UsersRound,
 } from 'lucide-react'
 import { Dock, DockItem } from '@/components/ui/dock'
@@ -29,6 +29,7 @@ const ITENS = [
   { href: '/gente/cargos', label: 'Descritivos de cargo', icone: FileText },
   { href: '/gente/sucessao', label: 'Pipeline de sucessão', icone: Network },
   { href: '/gente/newsletter', label: 'Newsletter do site', icone: Newspaper },
+  { href: '/gente/endomarketing', label: 'Endomarketing', icone: Award },
 ] as const
 
 /**
