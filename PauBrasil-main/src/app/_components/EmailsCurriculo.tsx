@@ -18,10 +18,10 @@ export function EmailsCurriculo({ className = '' }: { className?: string }) {
     <span className={`inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 ${className}`}>
       {EMAILS_CURRICULO.map(({ unidade, email }) => (
         <span key={email} className="whitespace-nowrap">
-          <span className="text-slate-500">Vagas em {unidade}:</span>{' '}
+          <span className="text-[#6f5c4e]">Vagas em {unidade}:</span>{' '}
           <a
             href={`mailto:${email}?subject=${encodeURIComponent(`Currículo - ${unidade}`)}`}
-            className="text-brand-400 hover:text-brand-300 transition-colors"
+            className="text-[#7a1520] hover:text-[#941d2b] transition-colors"
           >
             {email}
           </a>

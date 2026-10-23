@@ -4,10 +4,13 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Eye, EyeOff, Loader2, ShieldCheck, AlertCircle, ArrowLeft, CheckCircle2, Circle,
-  ChevronRight, ChevronLeft,
+  Eye, EyeOff, Loader2, ShieldCheck, AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Circle,
+  BookOpen, User, Users,
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
+import styles from '../login/Login.module.css'
+import r from './Registro.module.css'
 
 const ALLOWED_DOMAIN = 'grupopaubrasil.com.br'
 
@@ -130,175 +133,133 @@ export default function RegistroPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0d0d14] p-6">
+      <main className={r.done}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center space-y-6"
+          className={r.doneCard}
         >
-          <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 className="w-8 h-8 text-green-400" />
-            </div>
-          </div>
-          <div>
-            <h2 className="text-2xl font-display font-bold text-white">Solicitação enviada!</h2>
-            <p className="text-slate-400 mt-2 leading-relaxed">
-              Seu cadastro foi enviado para aprovação.<br />
-              Quando liberado, você poderá acessar o portal.
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/login')}
-            className="w-full py-3 px-6 rounded-xl gradient-brand text-white font-semibold text-sm transition-all hover:-translate-y-0.5"
-          >
-            Voltar ao login
+          <span className={r.doneIcon}><CheckCircle2 size={30} /></span>
+          <h2>Solicitação enviada!</h2>
+          <p>
+            Seu cadastro foi enviado para aprovação.<br />
+            Quando liberado, você poderá acessar o portal.
+          </p>
+          <button onClick={() => router.push('/login')} className={styles.submit}>
+            Voltar ao login <ArrowRight size={18} />
           </button>
         </motion.div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen flex bg-[#0d0d14]">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a0a00] via-[#0d0d14] to-[#0d0d14]" />
-        <div className="absolute top-0 left-0 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center">
-            <span className="text-white font-bold text-lg font-display">P</span>
-          </div>
-          <div>
-            <div className="text-white font-display font-bold text-lg leading-none">Grupo Pau Brasil</div>
-            <div className="text-brand-400 text-xs">Portal Corporativo</div>
-          </div>
-        </div>
-        <div className="relative z-10 space-y-4">
-          <h1 className="text-4xl font-display font-bold text-white leading-tight">
-            Solicite seu acesso<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">
-              ao portal.
-            </span>
+    <main className={styles.login}>
+      <section className={styles.story} aria-label="Portal do colaborador Pau Brasil">
+        <Link href="/" className={styles.brand}>
+          <Image src="/brand/logo-branca.png" alt="Grupo Pau Brasil" width={170} height={138} priority />
+        </Link>
+        <div className={styles.storyContent}>
+          <span className={styles.eyebrow}>Portal do colaborador</span>
+          <h1>
+            Solicite seu acesso
+            <br />
+            ao <span>portal.</span>
           </h1>
-          <p className="text-slate-400 text-lg leading-relaxed max-w-sm">
-            Preencha o formulário e aguarde aprovação do RH ou TI da sua empresa.
-          </p>
+          <p>Preencha o formulário e aguarde a aprovação do RH ou da TI da sua empresa.</p>
+          <div className={styles.features}>
+            <span><User size={19} /> Perfil e serviços do colaborador</span>
+            <span><BookOpen size={19} /> Universidade Pau Brasil</span>
+            <span><Users size={19} /> Conexão com sua equipe</span>
+          </div>
         </div>
-        <div className="relative z-10 text-xs text-slate-600">
-          © {new Date().getFullYear()} Grupo Pau Brasil. Todos os direitos reservados.
-        </div>
-      </div>
+        <small>Grupo Pau Brasil · Raízes fortes. Novos caminhos.</small>
+      </section>
 
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+      <section className={styles.formPanel}>
+        <Link href="/login" className={styles.back}>
+          <ArrowLeft size={16} /> Voltar ao login
+        </Link>
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-md"
+          className={styles.formWrap}
         >
-          <div className="mb-6">
-            <Link href="/login" className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white text-sm transition-colors group">
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              Voltar ao login
-            </Link>
-          </div>
+          <Image className={styles.mobileLogo} src="/brand/logo-compacta.png" alt="Pau Brasil" width={150} height={71} priority />
+          <span className={styles.formEyebrow}>Solicitar acesso</span>
+          <h2>Crie sua conta.</h2>
+          <p>Use seu e-mail corporativo. O acesso é liberado depois da aprovação.</p>
 
-          <div className="mb-8">
-            <h2 className="text-2xl font-display font-bold text-white">Solicitar acesso</h2>
-            <p className="text-slate-400 mt-1">Use seu e-mail corporativo</p>
-          </div>
-
-          {/* Step indicator */}
-          <div className="flex items-center gap-2 mb-8">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center gap-2">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all
-                  ${s === step ? 'gradient-brand text-white' : s < step ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-slate-500'}`}>
-                  {s < step ? <CheckCircle2 className="w-4 h-4" /> : s}
-                </div>
-                {s < 3 && <div className={`h-px flex-1 transition-all ${s < step ? 'bg-green-500/40' : 'bg-white/10'}`} style={{ width: 40 }} />}
-              </div>
+          <div className={r.steps} aria-label={`Etapa ${step} de 3`}>
+            {[1, 2, 3].map((n) => (
+              <span key={n} style={{ display: 'contents' }}>
+                <span className={r.step} data-state={n === step ? 'active' : n < step ? 'done' : 'next'}>
+                  {n < step ? <CheckCircle2 size={16} /> : n}
+                </span>
+                {n < 3 && <span className={r.stepLine} data-done={n < step} />}
+              </span>
             ))}
           </div>
 
-          <div className="flex items-center gap-2 mb-6 px-3 py-2 rounded-lg bg-brand-500/10 border border-brand-500/20">
-            <ShieldCheck className="w-4 h-4 text-brand-400 shrink-0" />
-            <span className="text-xs text-brand-400">Restrito a <strong>@{ALLOWED_DOMAIN}</strong></span>
+          <div className={styles.accessNote}>
+            <ShieldCheck size={18} />
+            <span>Restrito a <strong>@{ALLOWED_DOMAIN}</strong></span>
           </div>
 
           <AnimatePresence mode="wait">
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-300">Nome completo</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Seu nome completo"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-white placeholder-slate-600 text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500"
-                  />
+              <motion.div key="step1" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
+                <div className={styles.field}>
+                  <label htmlFor="registro-nome">Nome completo</label>
+                  <input id="registro-nome" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" autoComplete="name" />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-300">E-mail corporativo</label>
+                <div className={styles.field}>
+                  <label htmlFor="registro-email">E-mail corporativo</label>
                   <input
+                    id="registro-email"
                     type="email"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
                     onBlur={() => { if (email) validateEmailField() }}
                     placeholder={`seunome@${ALLOWED_DOMAIN}`}
-                    className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-slate-600 text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all
-                      ${emailError ? 'border-red-500/60' : 'border-white/10 hover:border-white/20'}`}
+                    autoComplete="email"
+                    aria-invalid={!!emailError}
                   />
-                  {emailError && (
-                    <p className="flex items-center gap-1.5 text-xs text-red-400">
-                      <AlertCircle className="w-3 h-3" />{emailError}
-                    </p>
-                  )}
+                  {emailError && <p className={styles.fieldError} role="alert">{emailError}</p>}
                 </div>
                 {error && <ErrorBanner>{error}</ErrorBanner>}
-                <button onClick={goStep2} className="w-full py-3 px-6 rounded-xl gradient-brand text-white font-semibold text-sm flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all mt-2">
-                  Próximo <ChevronRight className="w-4 h-4" />
+                <button onClick={goStep2} className={styles.submit}>
+                  Próximo <ArrowRight size={18} />
                 </button>
               </motion.div>
             )}
 
             {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-300">Empresa</label>
-                  <select
-                    value={empresaId}
-                    onChange={(e) => setEmpresaId(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-white text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 appearance-none"
-                  >
-                    <option value="" className="bg-[#1a1a2e]">Selecione...</option>
-                    {empresas.map((e) => <option key={e.id} value={e.id} className="bg-[#1a1a2e]">{e.nome}</option>)}
+              <motion.div key="step2" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
+                <div className={`${styles.field} ${r.field}`}>
+                  <label htmlFor="registro-empresa">Empresa</label>
+                  <select id="registro-empresa" value={empresaId} onChange={(e) => setEmpresaId(e.target.value)}>
+                    <option value="">Selecione...</option>
+                    {empresas.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
                   </select>
                 </div>
                 {empresaId && (
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-300">Função <span className="text-slate-500">(opcional)</span></label>
-                    <select
-                      value={functionId}
-                      onChange={(e) => setFunctionId(e.target.value)}
-                      disabled={loadingFuncoes}
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-white text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 appearance-none disabled:opacity-50"
-                    >
-                      <option value="" className="bg-[#1a1a2e]">{loadingFuncoes ? 'Carregando...' : 'Selecione...'}</option>
-                      {funcoes.map((f) => <option key={f.id} value={f.id} className="bg-[#1a1a2e]">{f.name}</option>)}
+                  <div className={`${styles.field} ${r.field}`}>
+                    <label htmlFor="registro-funcao">Função <span className={r.optional}>(opcional)</span></label>
+                    <select id="registro-funcao" value={functionId} onChange={(e) => setFunctionId(e.target.value)} disabled={loadingFuncoes}>
+                      <option value="">{loadingFuncoes ? 'Carregando...' : 'Selecione...'}</option>
+                      {funcoes.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
                     </select>
                   </div>
                 )}
                 {error && <ErrorBanner>{error}</ErrorBanner>}
-                <div className="flex gap-3 mt-2">
-                  <button onClick={() => { setError(''); setStep(1) }} className="flex-1 py-3 px-6 rounded-xl bg-white/5 border border-white/10 text-white text-sm flex items-center justify-center gap-2 hover:bg-white/10 transition-all">
-                    <ChevronLeft className="w-4 h-4" /> Voltar
+                <div className={r.actions}>
+                  <button onClick={() => { setError(''); setStep(1) }} className={r.secondary}>
+                    <ArrowLeft size={16} /> Voltar
                   </button>
-                  <button onClick={goStep3} className="flex-1 py-3 px-6 rounded-xl gradient-brand text-white font-semibold text-sm flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all">
-                    Próximo <ChevronRight className="w-4 h-4" />
+                  <button onClick={goStep3} className={styles.submit}>
+                    Próximo <ArrowRight size={18} />
                   </button>
                 </div>
               </motion.div>
@@ -306,100 +267,94 @@ export default function RegistroPage() {
 
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-300">Senha</label>
-                    <div className="relative">
-                      <input
-                        type={showPw ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••••"
-                        autoComplete="new-password"
-                        className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-white placeholder-slate-600 text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500"
-                      />
-                      <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1">
-                        {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <form onSubmit={handleSubmit}>
+                  <div className={styles.field}>
+                    <label htmlFor="registro-senha">Senha</label>
+                    <div className={styles.password}>
+                      <input id="registro-senha" type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Crie uma senha" autoComplete="new-password" />
+                      <button type="button" onClick={() => setShowPw(!showPw)} aria-label={showPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                        {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                   </div>
 
-                  {/* Policy checklist */}
                   {password && (
-                    <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg bg-white/3 border border-white/10">
+                    <div className={r.policy}>
                       {Object.entries(policy).map(([key, ok]) => (
-                        <div key={key} className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? 'text-green-400' : 'text-slate-500'}`}>
-                          {ok ? <CheckCircle2 className="w-3 h-3 shrink-0" /> : <Circle className="w-3 h-3 shrink-0" />}
+                        <span key={key} data-ok={ok}>
+                          {ok ? <CheckCircle2 size={13} /> : <Circle size={13} />}
                           {POLICY_LABELS[key]}
-                        </div>
+                        </span>
                       ))}
                     </div>
                   )}
 
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-300">Confirmar senha</label>
-                    <div className="relative">
+                  <div className={styles.field}>
+                    <label htmlFor="registro-confirmar">Confirmar senha</label>
+                    <div className={styles.password}>
                       <input
+                        id="registro-confirmar"
                         type={showConfirm ? 'text' : 'password'}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="••••••••••"
+                        placeholder="Repita a senha"
                         autoComplete="new-password"
-                        className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-white placeholder-slate-600 text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500"
+                        aria-invalid={!!confirmPassword && password !== confirmPassword}
                       />
-                      <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1">
-                        {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      <button type="button" onClick={() => setShowConfirm(!showConfirm)} aria-label={showConfirm ? 'Ocultar senha' : 'Mostrar senha'}>
+                        {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                     {confirmPassword && password !== confirmPassword && (
-                      <p className="flex items-center gap-1.5 text-xs text-red-400">
-                        <AlertCircle className="w-3 h-3" />As senhas não coincidem
-                      </p>
+                      <p className={styles.fieldError} role="alert">As senhas não coincidem</p>
                     )}
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-300">Mensagem <span className="text-slate-500">(opcional)</span></label>
+                  <div className={`${styles.field} ${r.field}`}>
+                    <label htmlFor="registro-mensagem">Mensagem <span className={r.optional}>(opcional)</span></label>
                     <textarea
+                      id="registro-mensagem"
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                       placeholder="Conte um pouco sobre você ou por que precisa de acesso..."
                       rows={3}
                       maxLength={500}
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-white placeholder-slate-600 text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 resize-none"
                     />
-                    <p className="text-xs text-slate-600 text-right">{note.length}/500</p>
+                    <p className={r.counter}>{note.length}/500</p>
                   </div>
 
                   {error && <ErrorBanner>{error}</ErrorBanner>}
 
-                  <div className="flex gap-3 mt-2">
-                    <button type="button" onClick={() => { setError(''); setStep(2) }} className="flex-1 py-3 px-6 rounded-xl bg-white/5 border border-white/10 text-white text-sm flex items-center justify-center gap-2 hover:bg-white/10 transition-all">
-                      <ChevronLeft className="w-4 h-4" /> Voltar
+                  <div className={r.actions}>
+                    <button type="button" onClick={() => { setError(''); setStep(2) }} className={r.secondary}>
+                      <ArrowLeft size={16} /> Voltar
                     </button>
-                    <button
-                      type="submit"
-                      disabled={loading || !policyOk || !password || !confirmPassword}
-                      className="flex-1 py-3 px-6 rounded-xl gradient-brand text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none hover:-translate-y-0.5 transition-all"
-                    >
-                      {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Enviando...</> : 'Enviar solicitação'}
+                    <button type="submit" disabled={loading || !policyOk || !password || !confirmPassword} className={styles.submit}>
+                      {loading ? <><Loader2 size={18} className="animate-spin" />Enviando...</> : 'Enviar solicitação'}
                     </button>
                   </div>
                 </form>
               </motion.div>
             )}
           </AnimatePresence>
+
+          <div className={styles.help}>
+            <p>
+              Já tem uma conta? <Link href="/login">Entrar no portal <ArrowRight size={12} /></Link>
+            </p>
+          </div>
         </motion.div>
-      </div>
-    </div>
+        <span className={styles.copyright}>© {new Date().getFullYear()} Grupo Pau Brasil</span>
+      </section>
+    </main>
   )
 }
 
 function ErrorBanner({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-      <AlertCircle className="w-4 h-4 shrink-0" />
-      {children}
+    <div className={styles.error} role="alert">
+      <AlertCircle size={18} />
+      <span>{children}</span>
     </div>
   )
 }

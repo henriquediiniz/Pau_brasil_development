@@ -14,21 +14,22 @@ export default function GlobalError({
     Sentry.captureException(error)
   }, [error])
 
+  // Estilos inline: este componente substitui o layout raiz, então não conta com o CSS global.
   return (
-    <html>
-      <body className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
-        <div className="text-center space-y-4 p-8 max-w-md">
-          <div className="text-4xl">⚠️</div>
-          <h2 className="text-white font-bold text-lg">Algo deu errado</h2>
-          <p className="text-slate-400 text-sm">
+    <html lang="pt-BR">
+      <body style={{ margin: 0, minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#faf9f6', color: '#1a1a1a', fontFamily: 'Montserrat, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center', padding: 32, maxWidth: 420 }}>
+          <p style={{ margin: 0, fontSize: 12, fontWeight: 600, letterSpacing: '0.17em', textTransform: 'uppercase', color: '#7a1520' }}>Grupo Pau Brasil</p>
+          <h2 style={{ margin: '16px 0 10px', fontSize: 28, fontWeight: 600, letterSpacing: '-0.04em' }}>Algo deu errado.</h2>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: '#6f5c4e' }}>
             O erro foi registrado automaticamente. Tente novamente ou entre em contato com o suporte.
           </p>
           {error.digest && (
-            <p className="text-slate-600 text-xs font-mono">ID: {error.digest}</p>
+            <p style={{ margin: '12px 0 0', fontSize: 12, color: '#6f5c4e', fontFamily: 'monospace' }}>ID: {error.digest}</p>
           )}
           <button
             onClick={reset}
-            className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-white text-sm font-medium transition-colors"
+            style={{ marginTop: 26, padding: '14px 22px', border: 0, borderRadius: 3, background: '#7a1520', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
           >
             Tentar novamente
           </button>

@@ -161,6 +161,15 @@
 .dark select option:hover {
   background-color: rgb(30 41 59);
 }
+/* Páginas públicas com a identidade clara do hub (ex.: envio de currículo) ficam claras mesmo com .dark */
+.tema-claro { color-scheme: light; }
+.tema-claro :is(h1, h2, h3, h4) { font-family: inherit; }
+.dark .tema-claro select,
+.dark .tema-claro select option {
+  background-color: #fff;
+  color: #1a1a1a;
+  color-scheme: light;
+}
 
 /* ── Light mode: remapeia classes hardcoded — só dentro do app shell ────────── */
 /* Escopo .app-shell: público (landing, login, etc.) não é afetado */

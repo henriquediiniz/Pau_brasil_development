@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Paginas publicas no visual do hub (candidatar, carreiras, contato, registro, erro/offline) | Claude | concluido | 2026-10-23: tema verde antigo removido; deploy | Parecer do Codex |
 | Hub: critica de design (contraste, mobile, cabecalho) | Claude | concluido | 2026-10-23: contraste, fonte minima 12px, cabecalho areia + newsletter branca, logos 4x2, cards compactos, pausa/play da newsletter corrigido; deploy | Parecer do Codex |
 | Hub: linha do tempo e feedbacks | Claude | concluido | 2026-10-21: linha do tempo 1994-2026 em eras; YSO e Hora 10 corrigidos; rolagem suave; color-scheme claro; filtros e selos mais fortes | Confirmar assinatura no Samsung Internet e cidades-sede adicionadas |
 | Hub: logos do Drive do grupo | Claude | concluido | 2026-10-20: logos Original Start e Locadora, assinatura Zenildo Oliveira, programas Capacitar e T&D Lideres, faixa de parceiros; Original Start corrigida para Moto Pecas | Confirmar descricao da Original Start e uso das marcas Ambev/Honda |
@@ -254,7 +255,7 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
-- Claude — ajustes da critica de design + separacao do cabecalho (2026-10-23)
+- Claude — ajustes da critica de design + paginas publicas no visual do hub (2026-10-23)
   - objetivo concluido e publicado; arquivos em posse: nenhum
 
 - Claude — newsletter (autoplay e botoes em linha) + Universidade (retomar video) (2026-10-22)
@@ -417,6 +418,29 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-23 - Claude - Paginas publicas restantes na identidade do hub
+
+- Pedido: "passe tudo pro visual novo". Escopo: paginas publicas que ainda tinham o tema escuro verde. Portal interno (`/app`, `/gente`, `/admin`) fora: tem o proprio remapeamento claro (`.app-shell`/`portal-brand`).
+- `/carreiras`: HubNav/HubFooter, hero "Gente que cresce.", CTA do banco de talentos em bloco vinho, lideranca geral e cidades em cartoes brancos com avatar em placa areia; painel da cidade (CityView) claro com cabecalho areia; lightbox claro. `AREA_CONFIG` virou so rotulo (as cores neon por area sairam; `filial.color` do banco nao e mais usado na pagina). Logica (API de lideres, foco, Esc, analytics) intacta.
+- `/contato`: HubNav/HubFooter, formulario em cartao branco com labels ligados aos campos (`htmlFor`).
+- `/registro`: mesma moldura do login (`layout.tsx` com `portal-brand portal-login`, reaproveita `Login.module.css`) + `Registro.module.css` (etapas, selects, checklist da senha, botao secundario, tela de concluido).
+- `global-error.tsx` (estilos inline: substitui o layout raiz) e `/offline` claros.
+- `Login.module.css`: textos de 9-11px para 12px e cinzas `#72675e/#85796d/#8b7e72` para `#6f5c4e` (contraste; o rodape "© Grupo Pau Brasil" dava 4.0:1).
+- Removido `src/app/_components/PublicBackground.tsx` (sem uso).
+- Validacao: auditoria Playwright em 1280 (tema escuro) e 390 (claro): nenhum elemento verde, 0 textos abaixo de 4.5:1, sem transbordo; painel da cidade com lideres simulados abre, sem transbordo, fecha com Esc. tsc 0; `npm test` 511/0; E2E 4 passaram, 3 pulados, 1 falha anterior a rodada (`login-flow` usa conta `gestor@` inexistente no banco local; falha igual com as mudancas guardadas no stash).
+- Removido `/carreiras/preview` (prototipo antigo no tema verde, sem link no site) com ok do usuario. Publicado com deploy.
+- Parecer do outro agente: pendente.
+
+### 2026-10-23 - Claude - Envio de curriculo (/carreiras/candidatar) na identidade do hub
+
+- Pedido: "a area de anexar curriculo ainda esta com aquela area verde". A pagina inteira (e os modais LGPD e descritivo do cargo, e `EmailsCurriculo`) ainda usava o tema escuro verde antigo (`brand-*`/emerald, logo "P", `PublicBackground`).
+- Agora: cabecalho e rodape do hub (`HubNav`/`HubFooter` dentro de wrapper `.hub`, sticky), Montserrat, fundo papel, cartao branco, vinho nos estados ativos/selecionados, areia nas sugestoes, botoes vinho no padrao do hub, foco dourado, fonte minima 12px, confete nas cores da marca.
+- `globals.css`: classe `.tema-claro` — o `<html>` tem `.dark` e a regra global `.dark select` deixava os selects azul-escuros; dentro de `.tema-claro` ficam brancos, e os titulos herdam a fonte (a regra global de h1-h6 punha Plus Jakarta).
+- Bug pego no teste: com 12px os selos "Vaga aberta"/"detalhes" saiam do card e cobriam o vizinho; o conteudo do card agora quebra linha.
+- Validacao: fluxo completo com APIs simuladas no Playwright (sem upload real; o Blob e o mesmo da producao) em 1280 e 390: nenhum elemento verde, sem transbordo, modais e tela de concluido ok; tsc 0; `npm test` 511/0; E2E hub 3/3.
+- `/carreiras` e `/contato` convertidos na rodada seguinte (abaixo).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-23 - Claude - Ajustes da critica de design e separacao do cabecalho
 

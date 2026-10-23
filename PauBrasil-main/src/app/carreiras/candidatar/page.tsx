@@ -10,12 +10,16 @@ import { DescritivoCargo, type DescritivoPublico } from './_components/Descritiv
 import type { CargoNaPagina, GrupoNaPagina } from '@/lib/gente/cargo-publico'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { saveDraft, loadDraft, clearDraft, migrateDraft } from '@/lib/draft-candidatura'
-import { PublicBackground } from '@/app/_components/PublicBackground'
+import { Montserrat } from 'next/font/google'
+import { HubFooter, HubNav } from '@/app/_components/HubShell'
+import hubStyles from '@/app/_components/Hub.module.css'
 import { EmailsCurriculo } from '@/app/_components/EmailsCurriculo'
 import { AvisoLgpd } from './_components/AvisoLgpd'
 import {
   ESCOLARIDADES, GENEROS, IDADE_MAXIMA, IDADE_MINIMA, idadeAceita, lerDataNascimento,
 } from '@/lib/carreiras-perfil'
+
+const montserrat = Montserrat({ subsets: ['latin'], display: 'swap', variable: '--font-hub' })
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ESTADOS_BR = [
@@ -60,17 +64,17 @@ function ProgressBar({ step }: { step: number }) {
         return (
           <div key={i} className="flex items-center gap-2 flex-1 min-w-0">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300
-              ${done   ? 'bg-emerald-500 text-white' :
-                active ? 'bg-brand-500 text-white ring-2 ring-brand-400/40' :
-                         'bg-white/8 text-slate-500'}`}>
+              ${done   ? 'bg-[#7a1520] text-white' :
+                active ? 'bg-[#7a1520] text-white ring-4 ring-[#7a1520]/15' :
+                         'bg-[#f1ebe3] text-[#6f5c4e]'}`}>
               {done ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-3.5 h-3.5" />}
             </div>
-            <span className={`text-[11px] font-medium truncate transition-colors hidden sm:block
-              ${active ? 'text-white' : done ? 'text-emerald-400' : 'text-slate-600'}`}>
+            <span className={`text-xs font-medium truncate transition-colors hidden sm:block
+              ${active ? 'text-[#1a1a1a]' : done ? 'text-[#7a1520]' : 'text-[#6f5c4e]'}`}>
               {s.label}
             </span>
             {i < steps.length - 1 && (
-              <div className={`flex-1 h-px mx-1 transition-colors ${done ? 'bg-emerald-500/50' : 'bg-white/10'}`} />
+              <div className={`flex-1 h-px mx-1 transition-colors ${done ? 'bg-[#7a1520]/40' : 'bg-[#f1ebe3]'}`} />
             )}
           </div>
         )
@@ -169,17 +173,17 @@ function CargoSelector({ selected, recommended = [], onChange }: {
     <div className="space-y-3">
       {/* Chips selecionados */}
       {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+        <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-[#7a1520]/[0.05] border border-[#7a1520]/20">
           {selected.map(c => (
             <span key={c}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#7a1520]/10 border border-[#7a1520]/30 text-[#7a1520] text-xs font-medium">
               {c}
-              <button onClick={() => toggleCargo(c)} className="hover:text-white transition-colors">
+              <button onClick={() => toggleCargo(c)} className="hover:text-[#7a1520] transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </span>
           ))}
-          <span className="text-xs text-emerald-500/70 self-center ml-auto">
+          <span className="text-xs text-[#6f5c4e] self-center ml-auto">
             {selected.length}/{MAX_CARGOS} selecionados
           </span>
         </div>
@@ -188,12 +192,12 @@ function CargoSelector({ selected, recommended = [], onChange }: {
       {/* Barra de Busca (Nova IA Focus) */}
       <div className="relative pt-1 pb-1">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-           <Search className="h-4 w-4 text-slate-500" />
+           <Search className="h-4 w-4 text-[#6f5c4e]" />
         </div>
         <input 
           type="text" 
           placeholder="Buscar áreas ou vagas..." 
-          className="w-full bg-[#12121a] border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500/50 focus:bg-white/5 transition-all"
+          className="w-full bg-white border border-[#d9cdbf] rounded-[6px] pl-9 pr-4 py-2.5 text-sm text-[#1a1a1a] placeholder-[#9a8c80] focus:outline-none focus:border-[#7a1520] focus:bg-white transition-all"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -215,9 +219,9 @@ function CargoSelector({ selected, recommended = [], onChange }: {
           if (falhouCatalogo) {
             return (
               <div className="flex flex-col items-center justify-center p-8 text-center border border-amber-500/20 rounded-xl bg-amber-500/5">
-                <X className="w-8 h-8 text-amber-400 mb-3" />
-                <p className="text-sm font-medium text-slate-200">Não conseguimos carregar as vagas.</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <X className="w-8 h-8 text-amber-700 mb-3" />
+                <p className="text-sm font-medium text-[#3f3732]">Não conseguimos carregar as vagas.</p>
+                <p className="text-xs text-[#6f5c4e] mt-1">
                   Atualize a página e tente de novo. Se continuar, escreva para a gente.
                 </p>
               </div>
@@ -228,7 +232,7 @@ function CargoSelector({ selected, recommended = [], onChange }: {
             return (
               <div className="space-y-2">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-12 rounded-xl bg-white/5 animate-pulse" />
+                  <div key={i} className="h-12 rounded-xl bg-[#f4efe8] animate-pulse" />
                 ))}
               </div>
             )
@@ -236,10 +240,10 @@ function CargoSelector({ selected, recommended = [], onChange }: {
 
           if (filteredGroups.length === 0) {
             return (
-              <div className="flex flex-col items-center justify-center p-8 text-center border border-white/5 rounded-xl bg-[#12121a]/50">
-                <Search className="w-8 h-8 text-slate-600 mb-3" />
-                <p className="text-sm font-medium text-slate-300">Nenhum cargo encontrado.</p>
-                <p className="text-xs text-slate-500 mt-1">Tente pesquisar usando outros termos ou jargões.</p>
+              <div className="flex flex-col items-center justify-center p-8 text-center border border-[#e7e1da] rounded-xl bg-[#faf9f6]">
+                <Search className="w-8 h-8 text-[#6f5c4e] mb-3" />
+                <p className="text-sm font-medium text-[#3f3732]">Nenhum cargo encontrado.</p>
+                <p className="text-xs text-[#6f5c4e] mt-1">Tente pesquisar usando outros termos ou jargões.</p>
               </div>
             )
           }
@@ -254,25 +258,25 @@ function CargoSelector({ selected, recommended = [], onChange }: {
             : grupo.cargos
 
           return (
-            <div key={grupo.slug} className="rounded-xl border border-white/8 overflow-hidden">
+            <div key={grupo.slug} className="rounded-xl border border-[#e7e1da] overflow-hidden">
               <button
                 id={`accordion-btn-${grupo.slug}`}
                 aria-expanded={isExpanded}
                 aria-controls={`accordion-panel-${grupo.slug}`}
                 onClick={() => !forceExpand && toggleGrupo(grupo.slug)}
-                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 transition-colors">
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#f4efe8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bb8c08] transition-colors">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-white">{grupo.grupo}</span>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-sm font-semibold text-[#1a1a1a]">{grupo.grupo}</span>
+                  <span className="text-xs text-[#6f5c4e]">
                     {grupo.cargos.length} {grupo.cargos.length === 1 ? 'cargo' : 'cargos'}
                   </span>
                   {selectedInGroup > 0 && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                    <span className="px-1.5 py-0.5 rounded-full bg-[#7a1520]/10 text-[#7a1520] text-xs font-bold">
                       {selectedInGroup}
                     </span>
                   )}
                 </div>
-                {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+                {isExpanded ? <ChevronUp className="w-4 h-4 text-[#6f5c4e]" /> : <ChevronDown className="w-4 h-4 text-[#6f5c4e]" />}
               </button>
 
               <AnimatePresence>
@@ -285,7 +289,7 @@ function CargoSelector({ selected, recommended = [], onChange }: {
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}>
-                    <div className="px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 border-t border-white/5 pt-2">
+                    <div className="px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 border-t border-[#e7e1da] pt-2">
                       {filteredCargos.map(item => {
                         const cargo = item.cargo
                         const isSelected = selected.includes(cargo)
@@ -297,29 +301,29 @@ function CargoSelector({ selected, recommended = [], onChange }: {
                               onClick={() => !isDisabled && toggleCargo(cargo)}
                               disabled={isDisabled}
                               aria-pressed={isSelected}
-                              className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70
+                              className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bb8c08]
                                 ${isSelected
-                                  ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300'
+                                  ? 'bg-[#7a1520]/10 border border-[#7a1520]/40 text-[#7a1520]'
                                   : isDisabled
-                                    ? 'opacity-30 cursor-not-allowed text-slate-500 border border-transparent'
+                                    ? 'opacity-30 cursor-not-allowed text-[#6f5c4e] border border-transparent'
                                     : isRecommended
-                                      ? 'border border-brand-500/40 bg-brand-500/10 text-brand-300 hover:border-brand-500/80 hover:bg-brand-500/20'
-                                      : 'border border-white/8 text-slate-300 hover:border-white/20 hover:bg-white/5 hover:text-white'
+                                      ? 'border border-[#dcc8b1] bg-[#f1ebe3] text-[#7a1520] hover:border-[#c9ab94] hover:bg-[#ebe2d7]'
+                                      : 'border border-[#e7e1da] text-[#3f3732] hover:border-[#c9ab94] hover:bg-[#f4efe8] hover:text-[#7a1520]'
                                 }`}>
-                            <div className="flex items-center justify-between gap-2">
-                              <span>{cargo}</span>
-                              <span className="flex items-center gap-1.5 shrink-0">
+                            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
+                              <span className="min-w-0">{cargo}</span>
+                              <span className="flex flex-wrap items-center gap-1.5">
                                 {/*
                                   Vaga aberta agora, vinda do Controle de Vagas.
                                   E a informacao mais acionavel da lista: diz
                                   onde a candidatura tem chance hoje.
                                 */}
                                 {item.vagaAberta && (
-                                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold uppercase tracking-wide">
-                                    vaga aberta
+                                  <span className="px-1.5 py-0.5 rounded bg-[#7a1520]/10 text-[#7a1520] text-xs font-semibold">
+                                    Vaga aberta
                                   </span>
                                 )}
-                                {isRecommended && !isSelected && <Sparkles className="w-3.5 h-3.5 text-brand-400 opacity-80" />}
+                                {isRecommended && !isSelected && <Sparkles className="w-3.5 h-3.5 text-[#7a1520] opacity-80" />}
                                 {/*
                                   Span com role de botao, e nao <button>: este
                                   cartao inteiro ja e um <button>, e botao
@@ -338,7 +342,7 @@ function CargoSelector({ selected, recommended = [], onChange }: {
                                       e.preventDefault(); e.stopPropagation()
                                       setVendoDescritivo(item.descritivo!)
                                     }}
-                                    className="px-1.5 py-0.5 rounded text-[10px] font-medium text-slate-400 border border-white/10 hover:text-white hover:border-white/30 hover:bg-white/5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70"
+                                    className="px-1.5 py-0.5 rounded text-xs font-medium text-[#6f5c4e] border border-[#e2d6cb] hover:text-[#7a1520] hover:border-[#c9ab94] hover:bg-[#f4efe8] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bb8c08]"
                                   >
                                     detalhes
                                   </span>
@@ -401,17 +405,17 @@ function FileDropZone({ file, onFile }: {
     <div>
       <input ref={inputRef} type="file" accept="application/pdf" className="hidden" onChange={handleChange} />
       {file ? (
-        <div className="flex items-center gap-3 p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/8">
-          <FileText className="w-8 h-8 text-emerald-400 shrink-0" />
+        <div className="flex items-center gap-3 p-4 rounded-xl border border-[#7a1520]/30 bg-[#7a1520]/[0.05]">
+          <FileText className="w-8 h-8 text-[#7a1520] shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-white truncate">{file.name}</div>
-            <div className="text-xs text-slate-500 mt-0.5">{formatSize(file.size)} · PDF</div>
+            <div className="text-sm font-medium text-[#1a1a1a] truncate">{file.name}</div>
+            <div className="text-xs text-[#6f5c4e] mt-0.5">{formatSize(file.size)} · PDF</div>
           </div>
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label="Trocar arquivo de currículo"
-            className="text-xs text-brand-400 hover:text-brand-300 transition-colors focus-visible:outline-none focus-visible:underline">
+            className="text-xs text-[#7a1520] hover:text-[#941d2b] transition-colors focus-visible:outline-none focus-visible:underline">
             Trocar arquivo
           </button>
         </div>
@@ -424,11 +428,11 @@ function FileDropZone({ file, onFile }: {
           onDrop={handleDrop}
           aria-label="Selecionar arquivo PDF do currículo. Arraste ou clique para escolher."
           className={`w-full rounded-xl border-2 border-dashed p-8 text-center transition-all duration-200
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50
-            ${dragging ? 'border-brand-400 bg-brand-500/10 scale-[1.02]' : 'border-white/15 hover:border-white/30 hover:bg-white/3'}`}>
-          <Upload className={`w-8 h-8 mx-auto mb-3 transition-colors ${dragging ? 'text-brand-400 animate-bounce' : 'text-slate-500'}`} />
-          <div className="text-sm font-medium text-white mb-1">Arraste o PDF do currículo aqui</div>
-          <div className="text-xs text-slate-500">ou clique para selecionar · máx. 5 MB</div>
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bb8c08]
+            ${dragging ? 'border-[#7a1520] bg-[#f1ebe3] scale-[1.02]' : 'border-[#d9cdbf] hover:border-[#c9ab94] hover:bg-[#faf9f6]'}`}>
+          <Upload className={`w-8 h-8 mx-auto mb-3 transition-colors ${dragging ? 'text-[#7a1520] animate-bounce' : 'text-[#6f5c4e]'}`} />
+          <div className="text-sm font-medium text-[#1a1a1a] mb-1">Arraste o PDF do currículo aqui</div>
+          <div className="text-xs text-[#6f5c4e]">ou clique para selecionar · máx. 5 MB</div>
         </button>
       )}
     </div>
@@ -444,16 +448,16 @@ function Field({ label, id, children, error }: {
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-medium text-slate-400 mb-1.5">{label}</label>
+      <label htmlFor={id} className="block text-xs font-medium text-[#6f5c4e] mb-1.5">{label}</label>
       {children}
       {error && (
-        <p role="alert" aria-live="polite" className="mt-1 text-[11px] text-red-400">{error}</p>
+        <p role="alert" aria-live="polite" className="mt-1 text-xs text-[#b42318]">{error}</p>
       )}
     </div>
   )
 }
 
-const inputCls = "w-full bg-white/5 border border-white/12 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500/60 focus:bg-white/8 transition-all"
+const inputCls = "w-full bg-white border border-[#d9cdbf] rounded-[6px] px-3 py-2.5 text-sm text-[#1a1a1a] placeholder-[#9a8c80] focus:outline-none focus:border-[#7a1520] focus:ring-2 focus:ring-[#7a1520]/10 transition-all"
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function CandidatarPage() {
@@ -694,26 +698,16 @@ export default function CandidatarPage() {
   }
 
   return (
-    <div className="min-h-screen text-white">
-      <PublicBackground />
+    <div
+      className={`tema-claro min-h-screen flex flex-col bg-[#faf9f6] text-[#1a1a1a] ${montserrat.variable}`}
+      style={{ fontFamily: 'var(--font-hub), Arial, sans-serif' }}
+    >
+      {/* Mesmo cabeçalho e rodapé do hub; o wrapper .hub traz as cores e o sticky. */}
+      <div className={hubStyles.hub} style={{ position: 'sticky', top: 0, zIndex: 40 }}>
+        <HubNav />
+      </div>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-30 bg-[#0d0d14]/80 backdrop-blur-xl border-b border-white/8">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/carreiras" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm">
-            <ArrowLeft className="w-4 h-4" /> Carreiras
-          </Link>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg gradient-brand flex items-center justify-center">
-              <span className="font-bold text-xs text-white">P</span>
-            </div>
-            <span className="font-display font-bold text-white text-sm hidden sm:block">Grupo Pau Brasil</span>
-          </div>
-          <div className="w-20" />
-        </div>
-      </header>
-
-      <main className="relative z-10 pt-14">
+      <main id="conteudo" className="relative flex-1">
         <div className="max-w-xl mx-auto px-4 py-10">
 
           {/* Step 4 — Sucesso */}
@@ -732,14 +726,14 @@ export default function CandidatarPage() {
                     angle: 60,
                     spread: 55,
                     origin: { x: 0 },
-                    colors: ['#10b981', '#22c55e', '#3b82f6', '#8b5cf6']
+                    colors: ['#7a1520', '#dcc8b1', '#bb8c08', '#c98d90']
                   });
                   confetti({
                     particleCount: 3,
                     angle: 120,
                     spread: 55,
                     origin: { x: 1 },
-                    colors: ['#10b981', '#22c55e', '#3b82f6', '#8b5cf6']
+                    colors: ['#7a1520', '#dcc8b1', '#bb8c08', '#c98d90']
                   });
               
                   if (Date.now() < end) {
@@ -750,27 +744,27 @@ export default function CandidatarPage() {
               className="text-center py-16">
               {/* Glow extra atrás do ícone de sucesso */}
               <div className="relative inline-flex mb-6">
-                <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-2xl scale-150" />
+                <div className="absolute inset-0 rounded-full bg-[#7a1520]/10 blur-2xl scale-150" />
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
-                  className="relative w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center backdrop-blur-sm">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                  className="relative w-20 h-20 rounded-full bg-[#7a1520]/[0.06] border-2 border-[#7a1520]/40 flex items-center justify-center backdrop-blur-sm">
+                  <CheckCircle2 className="w-10 h-10 text-[#7a1520]" />
                 </motion.div>
               </div>
-              <h2 className="text-2xl font-display font-black text-white mb-3">Candidatura Concluída!</h2>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-sm mx-auto mb-8">
+              <h2 className="text-[28px] font-semibold tracking-[-0.04em] text-[#1a1a1a] mb-3">Candidatura Concluída!</h2>
+              <p className="text-[#6f5c4e] text-sm leading-relaxed max-w-sm mx-auto mb-8">
                 Parabéns! Sucesso no seu primeiro passo no Banco de Talentos do Grupo Pau Brasil.
                 Nossa equipe de Gente & Gestão analisará seu perfil.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/carreiras"
-                  className="px-5 py-2.5 rounded-xl bg-white/6 backdrop-blur-sm border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors">
+                  className="px-5 py-3 rounded-[3px] bg-white border border-[#dcc8b1] text-[#7a1520] text-sm font-semibold hover:bg-[#f4efe8] transition-colors">
                   ← Voltar para Carreiras
                 </Link>
                 <Link href="/"
-                  className="px-5 py-2.5 rounded-xl gradient-brand text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                  className="px-5 py-3 rounded-[3px] bg-[#7a1520] text-white hover:bg-[#941d2b] text-sm font-semibold transition-colors">
                   Ir para a Página Inicial
                 </Link>
               </div>
@@ -779,14 +773,14 @@ export default function CandidatarPage() {
             <>
               {/* Header form */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-                <h1 className="text-2xl font-display font-black text-white">
+                <h1 className="text-[28px] font-semibold tracking-[-0.04em] text-[#1a1a1a]">
                   {step === 1 && 'Envie seu currículo'}
                   {step === 2 && 'Confirme seus dados'}
                   {step === 3 && 'Onde quer atuar?'}
                 </h1>
-                <p className="text-slate-500 text-sm mt-1.5 flex items-center justify-center gap-1.5">
+                <p className="text-[#6f5c4e] text-sm mt-1.5 flex items-center justify-center gap-1.5">
                   {step === 1 && 'Vamos começar pelo seu CV em PDF (máx. 5 MB)'}
-                  {step === 2 && <><Sparkles className="w-3.5 h-3.5 text-brand-400" /> Auto-preenchidos pela IA. Revise os campos abaixos.</>}
+                  {step === 2 && <><Sparkles className="w-3.5 h-3.5 text-[#7a1520]" /> Auto-preenchidos pela IA. Revise os campos abaixo.</>}
                   {step === 3 && `Escolha até ${MAX_CARGOS} cargos de interesse`}
                 </p>
               </motion.div>
@@ -794,14 +788,13 @@ export default function CandidatarPage() {
               <ProgressBar step={step} />
 
               {/* Card de vidro envolvendo o conteúdo do passo */}
-              <div className="rounded-2xl backdrop-blur-md p-6 relative overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 40px rgba(0,0,0,0.3), 0 0 60px rgba(16,185,129,0.04) inset' }}>
+              <div className="rounded-[10px] bg-white border border-[#e7e1da] p-6 relative overflow-hidden shadow-[0_18px_40px_-28px_rgba(74,29,20,0.35)]">
 
               {parsing && (
-                <div className="absolute inset-x-0 top-0 h-1 bg-brand-500/20 overflow-hidden z-20">
+                <div className="absolute inset-x-0 top-0 h-1 bg-[#7a1520]/10 overflow-hidden z-20">
                     <motion.div 
                         initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                        className="w-1/3 h-full bg-brand-400" />
+                        className="w-1/3 h-full bg-[#7a1520]" />
                 </div>
               )}
 
@@ -818,10 +811,10 @@ export default function CandidatarPage() {
                     <div className="space-y-5">
                       <Field id="campo-cv" label="Currículo (PDF) *" error={errors.cvFile}>
                         {parsing ? (
-                          <div className="rounded-xl border-2 border-brand-500/40 border-dashed p-8 text-center bg-brand-500/5 flex flex-col items-center justify-center h-[200px] transition-all">
-                            <Loader2 className="w-8 h-8 text-brand-400 animate-spin mb-4" />
-                            <div className="text-sm font-semibold text-brand-300">Lendo as entrelinhas do seu currículo...</div>
-                            <div className="text-[11px] text-slate-400 mt-1.5 animate-pulse">Extraindo dados para preencher o formulário pra você</div>
+                          <div className="rounded-xl border-2 border-[#dcc8b1] border-dashed p-8 text-center bg-[#faf9f6] flex flex-col items-center justify-center h-[200px] transition-all">
+                            <Loader2 className="w-8 h-8 text-[#7a1520] animate-spin mb-4" />
+                            <div className="text-sm font-semibold text-[#7a1520]">Lendo as entrelinhas do seu currículo...</div>
+                            <div className="text-xs text-[#6f5c4e] mt-1.5 animate-pulse">Extraindo dados para preencher o formulário pra você</div>
                           </div>
                         ) : (
                           <FileDropZone
@@ -831,7 +824,7 @@ export default function CandidatarPage() {
                         )}
                       </Field>
 
-                      <div className="rounded-xl border border-white/8 bg-white/3 p-4">
+                      <div className="rounded-xl border border-[#e7e1da] bg-[#faf9f6] p-4">
                         <label className="flex items-start gap-3 cursor-pointer">
                           <div className="relative shrink-0 mt-0.5">
                             <input
@@ -841,11 +834,11 @@ export default function CandidatarPage() {
                               onChange={e => set('consentimentoLgpd', e.target.checked)}
                             />
                             <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors
-                              ${form.consentimentoLgpd ? 'bg-emerald-500 border-emerald-500' : 'border-white/30'}`}>
+                              ${form.consentimentoLgpd ? 'bg-[#7a1520] border-[#7a1520]' : 'border-[#b9a593] bg-white'}`}>
                               {form.consentimentoLgpd && <CheckCircle2 className="w-3 h-3 text-white" />}
                             </div>
                           </div>
-                          <span className="text-xs text-slate-400 leading-relaxed">
+                          <span className="text-xs text-[#6f5c4e] leading-relaxed">
                             Concordo que o Grupo Pau Brasil armazene e utilize meus dados para fins de recrutamento e seleção, 
                             conforme a LGPD.
                           </span>
@@ -857,12 +850,12 @@ export default function CandidatarPage() {
                         <button
                           type="button"
                           onClick={() => setLgpdAberto(true)}
-                          className="mt-2 ml-7 text-[11px] text-brand-400 hover:text-brand-300 underline underline-offset-2 transition-colors"
+                          className="mt-2 ml-7 text-xs text-[#7a1520] hover:text-[#941d2b] underline underline-offset-2 transition-colors"
                         >
                           Consulte a LGPD
                         </button>
                         {errors.consentimentoLgpd && (
-                          <p className="mt-2 text-[11px] text-red-400 pl-7">{errors.consentimentoLgpd}</p>
+                          <p className="mt-2 text-xs text-[#b42318] pl-7">{errors.consentimentoLgpd}</p>
                         )}
                       </div>
                     </div>
@@ -874,35 +867,35 @@ export default function CandidatarPage() {
                       {/* Inline Validation Visuals */}
                       <Field id="campo-nome" label="Nome completo *" error={errors.nome}>
                         <div className="relative">
-                            <input id="campo-nome" className={inputCls + (form.nome.length >= 2 ? ' border-emerald-500/50 focus:border-brand-500 pr-10' : '')} placeholder="Seu nome" value={form.nome}
+                            <input id="campo-nome" className={inputCls + (form.nome.length >= 2 ? ' border-[#7a1520]/40 focus:border-[#7a1520] pr-10' : '')} placeholder="Seu nome" value={form.nome}
                                 onChange={e => set('nome', e.target.value)} />
-                            {form.nome.length >= 2 && <CheckCircle2 className="w-4 h-4 text-emerald-400 absolute right-3 top-3.5" />}
+                            {form.nome.length >= 2 && <CheckCircle2 className="w-4 h-4 text-[#7a1520] absolute right-3 top-3.5" />}
                         </div>
                       </Field>
                       <Field id="campo-email" label="E-mail *" error={errors.email}>
                         <div className="relative">
-                            <input id="campo-email" className={inputCls + (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ? ' border-emerald-500/50 focus:border-brand-500 pr-10' : '')} type="email" placeholder="seu@email.com" value={form.email}
+                            <input id="campo-email" className={inputCls + (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ? ' border-[#7a1520]/40 focus:border-[#7a1520] pr-10' : '')} type="email" placeholder="seu@email.com" value={form.email}
                                 onChange={e => set('email', e.target.value)} />
-                            {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) && <CheckCircle2 className="w-4 h-4 text-emerald-400 absolute right-3 top-3.5" />}
+                            {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) && <CheckCircle2 className="w-4 h-4 text-[#7a1520] absolute right-3 top-3.5" />}
                         </div>
                       </Field>
                       <Field id="campo-telefone" label="Telefone / WhatsApp">
                         <div className="relative">
-                            <input id="campo-telefone" className={inputCls + (form.telefone.length >= 14 ? ' border-emerald-500/50 focus:border-brand-500 pr-10' : '')} placeholder="(83) 99999-9999" value={form.telefone}
+                            <input id="campo-telefone" className={inputCls + (form.telefone.length >= 14 ? ' border-[#7a1520]/40 focus:border-[#7a1520] pr-10' : '')} placeholder="(83) 99999-9999" value={form.telefone}
                                 onChange={e => handlePhoneChange(e.target.value)} />
-                            {form.telefone.length >= 14 && <CheckCircle2 className="w-4 h-4 text-emerald-400 absolute right-3 top-3.5" />}
+                            {form.telefone.length >= 14 && <CheckCircle2 className="w-4 h-4 text-[#7a1520] absolute right-3 top-3.5" />}
                         </div>
                       </Field>
                       <div className="grid grid-cols-2 gap-3">
                         <Field id="campo-cidade" label="Cidade *" error={errors.cidade}>
                           <div className="relative">
-                              <input id="campo-cidade" className={inputCls + (form.cidade.length > 2 ? ' border-emerald-500/50 focus:border-brand-500 pr-10' : '')} placeholder="Ex: Patos" value={form.cidade}
+                              <input id="campo-cidade" className={inputCls + (form.cidade.length > 2 ? ' border-[#7a1520]/40 focus:border-[#7a1520] pr-10' : '')} placeholder="Ex: Patos" value={form.cidade}
                                 onChange={e => set('cidade', e.target.value)} />
-                              {form.cidade.length > 2 && <CheckCircle2 className="w-4 h-4 text-emerald-400 absolute right-3 top-3.5" />}
+                              {form.cidade.length > 2 && <CheckCircle2 className="w-4 h-4 text-[#7a1520] absolute right-3 top-3.5" />}
                           </div>
                         </Field>
                         <Field id="campo-estado" label="Estado *" error={errors.estado}>
-                          <select id="campo-estado" className={inputCls + (form.estado ? ' border-emerald-500/50 focus:border-brand-500' : '')} value={form.estado}
+                          <select id="campo-estado" className={inputCls + (form.estado ? ' border-[#7a1520]/40 focus:border-[#7a1520]' : '')} value={form.estado}
                             onChange={e => set('estado', e.target.value)}>
                             <option value="">UF</option>
                             {ESTADOS_BR.map(uf => <option key={uf} value={uf}>{uf}</option>)}
@@ -915,8 +908,8 @@ export default function CandidatarPage() {
                         curriculo raramente traz genero ou nascimento, e um
                         palpite errado aqui seria pior que perguntar.
                       */}
-                      <div className="pt-4 border-t border-white/8 space-y-4">
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
+                      <div className="pt-4 border-t border-[#e7e1da] space-y-4">
+                        <p className="text-xs text-[#6f5c4e] leading-relaxed">
                           Estes dados ajudam a equipe de Gente &amp; Gestão na triagem. Só o RH tem acesso a eles.
                         </p>
                         <div className="grid grid-cols-2 gap-3">
@@ -927,13 +920,13 @@ export default function CandidatarPage() {
                               // Sem `max`, o seletor do iPhone abre no ano atual
                               // e a pessoa rola decadas; com ele, abre perto.
                               max={new Date().toISOString().slice(0, 10)}
-                              className={inputCls + ' min-h-[42px] appearance-none' + (form.dataNascimento ? ' border-emerald-500/50' : '')}
+                              className={inputCls + ' min-h-[42px] appearance-none' + (form.dataNascimento ? ' border-[#7a1520]/40' : '')}
                               value={form.dataNascimento}
                               onChange={e => set('dataNascimento', e.target.value)}
                             />
                           </Field>
                           <Field id="campo-genero" label="Gênero *" error={errors.genero}>
-                            <select id="campo-genero" className={inputCls + (form.genero ? ' border-emerald-500/50' : '')} value={form.genero}
+                            <select id="campo-genero" className={inputCls + (form.genero ? ' border-[#7a1520]/40' : '')} value={form.genero}
                               onChange={e => set('genero', e.target.value)}>
                               <option value="">Selecione</option>
                               {GENEROS.map(g => <option key={g.valor} value={g.valor}>{g.rotulo}</option>)}
@@ -941,7 +934,7 @@ export default function CandidatarPage() {
                           </Field>
                         </div>
                         <Field id="campo-escolaridade" label="Escolaridade *" error={errors.escolaridade}>
-                          <select id="campo-escolaridade" className={inputCls + (form.escolaridade ? ' border-emerald-500/50' : '')} value={form.escolaridade}
+                          <select id="campo-escolaridade" className={inputCls + (form.escolaridade ? ' border-[#7a1520]/40' : '')} value={form.escolaridade}
                             onChange={e => set('escolaridade', e.target.value)}>
                             <option value="">Selecione</option>
                             {ESCOLARIDADES.map(e => <option key={e.valor} value={e.valor}>{e.rotulo}</option>)}
@@ -956,16 +949,16 @@ export default function CandidatarPage() {
                     <div className="space-y-6">
 
                       {/* Vagas exclusivas PCD / Mulheres */}
-                      <div className="rounded-xl border border-white/8 bg-white/3 p-4 space-y-2.5">
-                        <p className="text-xs font-medium text-slate-400">Candidatura para vaga exclusiva <span className="text-slate-600">(opcional)</span></p>
+                      <div className="rounded-xl border border-[#e7e1da] bg-[#faf9f6] p-4 space-y-2.5">
+                        <p className="text-xs font-medium text-[#6f5c4e]">Candidatura para vaga exclusiva <span className="text-[#6f5c4e]">(opcional)</span></p>
                         <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
                             onClick={() => toggleTipoVaga('pcd')}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
                               form.tiposVaga.includes('pcd')
-                                ? 'bg-brand-500/20 border-brand-500/40 text-brand-300'
-                                : 'border-white/10 text-slate-400 hover:border-brand-500/30 hover:text-slate-300'
+                                ? 'bg-[#7a1520]/10 border-[#dcc8b1] text-[#7a1520]'
+                                : 'border-[#e2d6cb] text-[#6f5c4e] hover:border-[#c9ab94] hover:text-[#3f3732]'
                             }`}>
                             {form.tiposVaga.includes('pcd') && <Check className="w-3 h-3" />}
                             Vaga exclusiva PCD
@@ -975,8 +968,8 @@ export default function CandidatarPage() {
                             onClick={() => toggleTipoVaga('mulheres')}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
                               form.tiposVaga.includes('mulheres')
-                                ? 'bg-purple-500/20 border-purple-500/40 text-purple-300'
-                                : 'border-white/10 text-slate-400 hover:border-purple-500/30 hover:text-slate-300'
+                                ? 'bg-[#7a1520]/10 border-[#7a1520]/40 text-[#7a1520]'
+                                : 'border-[#e2d6cb] text-[#6f5c4e] hover:border-[#c9ab94] hover:text-[#3f3732]'
                             }`}>
                             {form.tiposVaga.includes('mulheres') && <Check className="w-3 h-3" />}
                             Vaga exclusiva Mulheres
@@ -986,18 +979,18 @@ export default function CandidatarPage() {
 
                       {recommended.length > 0 && (
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                            className="bg-brand-500/10 border border-brand-500/30 rounded-xl p-3.5 flex items-start gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                            <Sparkles className="w-5 h-5 text-brand-400 shrink-0 mt-0.5" />
+                            className="bg-[#f1ebe3] border border-[#dcc8b1] rounded-xl p-3.5 flex items-start gap-3">
+                            <Sparkles className="w-5 h-5 text-[#7a1520] shrink-0 mt-0.5" />
                             <div>
-                                <div className="text-[13px] font-semibold text-brand-300">Sugestões VIPS para você</div>
-                                <div className="text-xs text-brand-400/80 mt-1 leading-relaxed">A Inteligência Artificial mapeou {recommended.length} área(s) que dão o *match* perfeito com suas competências no currículo.</div>
+                                <div className="text-[13px] font-semibold text-[#7a1520]">Sugestões para você</div>
+                                <div className="text-xs text-[#6f5c4e] mt-1 leading-relaxed">A Inteligência Artificial mapeou {recommended.length} área(s) que dão o *match* perfeito com suas competências no currículo.</div>
                             </div>
                         </motion.div>
                       )}
 
                       <div>
                           {errors.cargosInteresse && (
-                            <p className="mb-3 text-xs text-red-400">{errors.cargosInteresse}</p>
+                            <p className="mb-3 text-xs text-[#b42318]">{errors.cargosInteresse}</p>
                           )}
                           <CargoSelector
                             selected={form.cargosInteresse}
@@ -1016,14 +1009,14 @@ export default function CandidatarPage() {
                             maxLength={1000}
                             value={form.mensagem}
                             onChange={e => set('mensagem', e.target.value)} />
-                          <span className="absolute bottom-2 right-3 text-[10px] text-slate-600">
+                          <span className="absolute bottom-2 right-3 text-xs text-[#6f5c4e]">
                             {form.mensagem.length}/1000
                           </span>
                         </div>
                       </Field>
 
                       {globalError && (
-                        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-300">
+                        <div className="rounded-lg border border-red-500/30 bg-red-50 px-4 py-3 text-xs text-[#b42318]">
                           {globalError}
                         </div>
                       )}
@@ -1034,29 +1027,29 @@ export default function CandidatarPage() {
               </AnimatePresence>
 
               {/* Navigation */}
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/8 relative z-10">
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#e7e1da] relative z-10">
 
                 {step > 1 ? (
                   <button onClick={() => setStep(s => s - 1)} disabled={parsing}
-                    className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors disabled:opacity-50">
+                    className="flex items-center gap-2 text-sm text-[#6f5c4e] hover:text-[#7a1520] transition-colors disabled:opacity-50">
                     <ArrowLeft className="w-4 h-4" /> Voltar
                   </button>
                 ) : (
-                  <Link href="/carreiras" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+                  <Link href="/carreiras" className="flex items-center gap-2 text-sm text-[#6f5c4e] hover:text-[#7a1520] transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Carreiras
                   </Link>
                 )}
 
                 {step < 3 ? (
                   <button onClick={nextStep} disabled={parsing}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-[#0d0d14] text-sm font-bold hover:bg-slate-200 transition-colors disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                    className="flex items-center gap-2 px-6 py-3 rounded-[3px] bg-[#7a1520] text-white text-sm font-semibold hover:bg-[#941d2b] transition-colors disabled:opacity-50">
                     Continuar <ArrowRight className="w-4 h-4" />
                   </button>
                 ) : (
                   <button
                     onClick={handleSubmit}
                     disabled={uploading || submitting}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl gradient-brand text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                    className="flex items-center gap-2 px-6 py-3 rounded-[3px] bg-[#7a1520] text-white hover:bg-[#941d2b] text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {uploading ? 'Finalizando...' : submitting ? 'Registrando...' : 'Finalizar Submissão'}
                     {!uploading && !submitting && <CheckCircle2 className="w-4 h-4" />}
                   </button>
@@ -1067,11 +1060,14 @@ export default function CandidatarPage() {
           )}
           {/* E-mail alternativo */}
           <div className="text-center mt-5">
-            <p className="text-xs text-slate-600 mb-1">Prefere enviar por e-mail?</p>
+            <p className="text-xs text-[#6f5c4e] mb-1">Prefere enviar por e-mail?</p>
             <EmailsCurriculo className="text-xs" />
           </div>
         </div>
       </main>
+      <div className={hubStyles.hub}>
+        <HubFooter />
+      </div>
       {lgpdAberto && <AvisoLgpd aoFechar={() => setLgpdAberto(false)} />}
     </div>
   )

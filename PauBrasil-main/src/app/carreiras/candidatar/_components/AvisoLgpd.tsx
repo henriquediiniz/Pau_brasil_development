@@ -28,31 +28,31 @@ export function AvisoLgpd({ aoFechar }: { aoFechar: () => void }) {
     }
   }, [aoFechar])
 
-  const titulo = 'text-sm font-semibold text-white mb-1.5'
-  const texto = 'text-xs text-slate-300 leading-relaxed'
+  const titulo = 'text-sm font-semibold text-[#1a1a1a] mb-1.5'
+  const texto = 'text-xs text-[#3f3732] leading-relaxed'
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
       {/* Sem backdrop-blur de proposito: borrao em tela cheia pesa no iPhone. */}
-      <div className="absolute inset-0 bg-black/75" onClick={aoFechar} />
+      <div className="absolute inset-0 bg-[#1a1a1a]/60" onClick={aoFechar} />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="lgpd-titulo"
-        className="relative w-full sm:max-w-lg max-h-[88vh] flex flex-col rounded-t-2xl sm:rounded-2xl bg-[#111118] border border-white/10"
+        className="relative w-full sm:max-w-lg max-h-[88vh] flex flex-col rounded-t-2xl sm:rounded-2xl bg-white border border-[#e2d6cb]"
       >
-        <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-white/8">
+        <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-[#e7e1da]">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-            <h2 id="lgpd-titulo" className="text-base font-display font-bold text-white">
+            <ShieldCheck className="w-5 h-5 text-[#7a1520] shrink-0" />
+            <h2 id="lgpd-titulo" className="text-base font-semibold text-[#1a1a1a]">
               Seus dados e a LGPD
             </h2>
           </div>
           <button
             onClick={aoFechar}
             aria-label="Fechar"
-            className="p-1.5 -mr-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-colors"
+            className="p-1.5 -mr-1.5 rounded-lg text-[#6f5c4e] hover:text-[#7a1520] hover:bg-[#f4efe8] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -111,16 +111,16 @@ export function AvisoLgpd({ aoFechar }: { aoFechar: () => void }) {
             </div>
           </section>
 
-          <p className="text-[11px] text-slate-500 leading-relaxed">
+          <p className="text-xs text-[#6f5c4e] leading-relaxed">
             Ao marcar &quot;Concordo&quot;, você autoriza o uso dos seus dados para essas finalidades
             (art. 7º, I, da LGPD).
           </p>
         </div>
 
-        <div className="px-5 py-3 border-t border-white/8">
+        <div className="px-5 py-3 border-t border-[#e7e1da]">
           <button
             onClick={aoFechar}
-            className="w-full px-4 py-2.5 rounded-xl bg-white text-[#0d0d14] text-sm font-bold hover:bg-slate-200 transition-colors"
+            className="w-full px-4 py-3 rounded-[3px] bg-[#7a1520] text-white text-sm font-semibold hover:bg-[#941d2b] transition-colors"
           >
             Entendi
           </button>

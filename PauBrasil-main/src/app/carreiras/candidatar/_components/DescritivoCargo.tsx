@@ -61,7 +61,7 @@ export function DescritivoCargo({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 overflow-y-auto">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={aoFechar} />
+      <div className="absolute inset-0 bg-[#1a1a1a]/60 backdrop-blur-sm" onClick={aoFechar} />
 
       <div
         ref={painel}
@@ -69,16 +69,16 @@ export function DescritivoCargo({
         aria-modal="true"
         aria-labelledby="descritivo-titulo"
         tabIndex={-1}
-        className="relative w-full max-w-lg my-8 rounded-2xl bg-[#12121a] border border-white/10 focus:outline-none"
+        className="relative w-full max-w-lg my-8 rounded-2xl bg-white border border-[#e2d6cb] focus:outline-none"
       >
-        <div className="flex items-start justify-between gap-3 p-5 border-b border-white/8">
+        <div className="flex items-start justify-between gap-3 p-5 border-b border-[#e7e1da]">
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-wide text-brand-400">{descritivo.grupo}</p>
-            <h2 id="descritivo-titulo" className="text-lg font-bold text-white mt-1 break-words">
+            <p className="text-xs uppercase tracking-wide text-[#7a1520]">{descritivo.grupo}</p>
+            <h2 id="descritivo-titulo" className="text-lg font-bold text-[#1a1a1a] mt-1 break-words">
               {descritivo.cargo}
             </h2>
             {descritivo.tipoVaga && (
-              <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400 text-[11px]">
+              <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#f4efe8] border border-[#e2d6cb] text-[#6f5c4e] text-xs">
                 {descritivo.tipoVaga}
               </span>
             )}
@@ -87,7 +87,7 @@ export function DescritivoCargo({
           <button
             onClick={aoFechar}
             aria-label="Fechar"
-            className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-colors shrink-0"
+            className="p-1.5 rounded-lg text-[#6f5c4e] hover:text-[#7a1520] hover:bg-[#f4efe8] transition-colors shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -95,7 +95,7 @@ export function DescritivoCargo({
 
         <div className="p-5 space-y-4">
           {!temConteudo && (
-            <p className="text-slate-400 text-sm">
+            <p className="text-[#6f5c4e] text-sm">
               O descritivo deste cargo ainda está sendo detalhado. Você pode se candidatar
               normalmente — a equipe de Gente entra em contato com os detalhes.
             </p>
@@ -107,8 +107,8 @@ export function DescritivoCargo({
           <Bloco icone={ListChecks} titulo="Experiência" texto={descritivo.experiencia} />
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-white/8">
-          <p className="text-slate-500 text-[11px]">
+        <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-[#e7e1da]">
+          <p className="text-[#6f5c4e] text-xs">
             {selecionado
               ? 'Este cargo já está na sua seleção.'
               : podeSelecionar
@@ -121,8 +121,8 @@ export function DescritivoCargo({
             disabled={!selecionado && !podeSelecionar}
             className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors shrink-0 ${
               selecionado
-                ? 'bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10'
-                : 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-40'
+                ? 'bg-[#f4efe8] border border-[#e2d6cb] text-[#3f3732] hover:bg-[#f1ebe3]'
+                : 'bg-[#7a1520]/10 border border-[#7a1520]/40 text-[#7a1520] hover:bg-[#7a1520]/15 disabled:opacity-40'
             }`}
           >
             {selecionado ? 'Remover' : 'Selecionar'}
@@ -150,12 +150,12 @@ function Bloco({
 
   return (
     <section>
-      <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-1.5">
+      <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[#6f5c4e] mb-1.5">
         <Icone className="w-3.5 h-3.5" />
         {titulo}
       </h3>
       {/* O RH escreve uma atividade por linha; sem pre-wrap vira parágrafo. */}
-      <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap break-words">{texto}</p>
+      <p className="text-[#3f3732] text-sm leading-relaxed whitespace-pre-wrap break-words">{texto}</p>
     </section>
   )
 }

@@ -3,13 +3,20 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Montserrat } from 'next/font/google'
 import { ArrowLeft, ArrowRight, Send, CheckCircle2, Loader2 } from 'lucide-react'
-import { PublicBackground } from '@/app/_components/PublicBackground'
+import { HubFooter, HubNav } from '@/app/_components/HubShell'
+import hubStyles from '@/app/_components/Hub.module.css'
+
+const montserrat = Montserrat({ subsets: ['latin'], display: 'swap', variable: '--font-hub' })
 
 type Assunto = 'Candidatura' | 'Parceria' | 'Imprensa' | 'Outro'
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
 const ASSUNTOS: Assunto[] = ['Candidatura', 'Parceria', 'Imprensa', 'Outro']
+
+const campo = 'w-full px-3 py-2.5 rounded-[6px] bg-white border border-[#d9cdbf] text-[#1a1a1a] text-sm placeholder-[#9a8c80] outline-none focus:border-[#7a1520] focus:ring-2 focus:ring-[#7a1520]/10 transition-all'
+const rotulo = 'text-xs text-[#6f5c4e] font-semibold block'
 
 export default function ContatoPage() {
   const [nome, setNome]       = useState('')
@@ -44,36 +51,24 @@ export default function ContatoPage() {
   }
 
   return (
-    <div className="min-h-screen text-white">
-      <PublicBackground />
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#111118] border-b border-white/8 flex items-center px-6">
-        <div className="max-w-2xl mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-sm">
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Link>
-            <div className="w-px h-4 bg-white/10" />
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg gradient-brand flex items-center justify-center shrink-0">
-                <span className="text-white font-bold text-xs">P</span>
-              </div>
-              <span className="font-display font-bold text-white text-sm">Grupo Pau Brasil</span>
-            </div>
-          </div>
-          <Link href="/login" className="px-4 py-1.5 rounded-xl border border-white/10 text-white text-sm font-medium hover:bg-white/5 transition-colors">
-            Entrar
-          </Link>
-        </div>
-      </header>
+    <div
+      className={`tema-claro min-h-screen flex flex-col bg-[#faf9f6] text-[#1a1a1a] ${montserrat.variable}`}
+      style={{ fontFamily: 'var(--font-hub), Arial, sans-serif' }}
+    >
+      {/* Mesmo cabeçalho e rodapé do hub; o wrapper .hub traz as cores e o sticky. */}
+      <div className={hubStyles.hub} style={{ position: 'sticky', top: 0, zIndex: 40 }}>
+        <HubNav />
+      </div>
 
-      <main className="max-w-2xl mx-auto px-6 pt-24 pb-16">
-        {/* Hero */}
-        <section className="py-12 text-center">
-          <h1 className="text-4xl font-display font-black leading-tight mb-3">Fale com a gente</h1>
-          <p className="text-slate-400 text-base max-w-md mx-auto leading-relaxed">
-            Candidaturas, parcerias, imprensa ou qualquer outra dúvida — estamos por aqui.
+      <main id="conteudo" className="flex-1 w-full max-w-2xl mx-auto px-6 pt-14 pb-20">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#7a1520]">
+          <ArrowLeft className="w-4 h-4" /> Voltar para o início
+        </Link>
+        <section className="pt-10 pb-8">
+          <span className="block text-xs uppercase tracking-[0.17em] font-semibold text-[#7a1520] mb-4">Contato</span>
+          <h1 className="text-[36px] md:text-[44px] font-semibold leading-[1.1] tracking-[-0.045em] mb-3">Fale com a gente.</h1>
+          <p className="text-[#6f5c4e] text-base max-w-md leading-relaxed">
+            Candidaturas, parcerias, imprensa ou qualquer outra dúvida: estamos por aqui.
           </p>
         </section>
 
@@ -82,22 +77,24 @@ export default function ContatoPage() {
           {status === 'success' ? (
             <motion.div
               key="success"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-10 text-center space-y-4"
+              className="rounded-[10px] bg-white border border-[#e7e1da] p-10 text-center space-y-4"
             >
-              <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-              <h2 className="text-xl font-display font-bold text-white">Mensagem enviada!</h2>
-              <p className="text-slate-400 text-sm leading-relaxed">
+              <span className="mx-auto w-16 h-16 rounded-full bg-[#7a1520]/[0.07] border border-[#7a1520]/25 flex items-center justify-center">
+                <CheckCircle2 className="w-8 h-8 text-[#7a1520]" />
+              </span>
+              <h2 className="text-xl font-semibold tracking-[-0.03em]">Mensagem enviada!</h2>
+              <p className="text-[#6f5c4e] text-sm leading-relaxed">
                 Recebemos sua mensagem e entraremos em contato em breve.
               </p>
-              <div className="flex gap-3 justify-center pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                 <Link href="/"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm hover:bg-white/10 transition-colors">
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[3px] bg-white border border-[#dcc8b1] text-[#7a1520] text-sm font-semibold hover:bg-[#f4efe8] transition-colors">
                   <ArrowLeft className="w-4 h-4" /> Página inicial
                 </Link>
                 <Link href="/carreiras"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl gradient-brand text-white text-sm font-medium shadow-lg shadow-brand-500/20">
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[3px] bg-[#7a1520] text-white text-sm font-semibold hover:bg-[#941d2b] transition-colors">
                   Ver vagas <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -108,42 +105,25 @@ export default function ContatoPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               onSubmit={enviar}
-              className="space-y-5"
+              className="rounded-[10px] bg-white border border-[#e7e1da] p-6 md:p-8 space-y-5 shadow-[0_18px_40px_-28px_rgba(74,29,20,0.35)]"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="text-xs text-slate-400 font-medium block">Nome *</label>
-                  <input
-                    type="text"
-                    value={nome}
-                    onChange={e => setNome(e.target.value)}
-                    required
-                    placeholder="Seu nome completo"
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all"
-                  />
+                  <label htmlFor="contato-nome" className={rotulo}>Nome *</label>
+                  <input id="contato-nome" type="text" value={nome} onChange={e => setNome(e.target.value)} required
+                    placeholder="Seu nome completo" className={campo} />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs text-slate-400 font-medium block">E-mail *</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    placeholder="seu@email.com"
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all"
-                  />
+                  <label htmlFor="contato-email" className={rotulo}>E-mail *</label>
+                  <input id="contato-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                    placeholder="seu@email.com" className={campo} />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-400 font-medium block">Assunto *</label>
-                <select
-                  value={assunto}
-                  onChange={e => setAssunto(e.target.value as Assunto)}
-                  required
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#111118] border border-white/10 text-white text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all appearance-none"
-                >
+                <label htmlFor="contato-assunto" className={rotulo}>Assunto *</label>
+                <select id="contato-assunto" value={assunto} onChange={e => setAssunto(e.target.value as Assunto)} required className={campo}>
                   {ASSUNTOS.map(a => (
                     <option key={a} value={a}>{a}</option>
                   ))}
@@ -151,19 +131,13 @@ export default function ContatoPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-400 font-medium block">Mensagem *</label>
-                <textarea
-                  value={mensagem}
-                  onChange={e => setMensagem(e.target.value)}
-                  required
-                  rows={5}
-                  placeholder="Descreva como podemos ajudar..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all resize-none"
-                />
+                <label htmlFor="contato-mensagem" className={rotulo}>Mensagem *</label>
+                <textarea id="contato-mensagem" value={mensagem} onChange={e => setMensagem(e.target.value)} required rows={5}
+                  placeholder="Descreva como podemos ajudar..." className={campo + ' resize-none'} />
               </div>
 
               {erro && (
-                <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
+                <p role="alert" className="text-[#b42318] text-sm bg-red-50 border border-red-200 rounded-[6px] px-4 py-2.5">
                   {erro}
                 </p>
               )}
@@ -171,7 +145,7 @@ export default function ContatoPage() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+                className="w-full py-3.5 rounded-[3px] bg-[#7a1520] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#941d2b] transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bb8c08] focus-visible:ring-offset-2"
               >
                 {status === 'sending'
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
@@ -181,6 +155,10 @@ export default function ContatoPage() {
           )}
         </AnimatePresence>
       </main>
+
+      <div className={hubStyles.hub}>
+        <HubFooter />
+      </div>
     </div>
   )
 }
