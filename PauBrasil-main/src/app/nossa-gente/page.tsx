@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Montserrat } from 'next/font/google'
-import { ArrowLeft, ArrowUpRight, Award, CalendarDays } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Award } from 'lucide-react'
 import { HubFooter, HubNav } from '@/app/_components/HubShell'
 import { HubReveal } from '@/app/_components/HubReveal'
 import { HubCountUp } from '@/app/_components/HubEffects'
@@ -95,9 +95,7 @@ export default async function NossaGentePage() {
             <div className={styles.container}>
               <div className={styles.sectionHeading} data-reveal>
                 <div>
-                  <span className={styles.eyebrow}>
-                    <Award size={16} /> Mural de reconhecimento
-                  </span>
+                  <span className={styles.eyebrow}>Mural de reconhecimento</span>
                   <h2 id="mural-titulo">
                     Gente que faz
                     <br />a diferença.
@@ -140,9 +138,7 @@ export default async function NossaGentePage() {
             <div className={styles.container}>
               <div className={styles.sectionHeading} data-reveal>
                 <div>
-                  <span className={styles.eyebrow}>
-                    <CalendarDays size={16} /> Calendário de campanhas
-                  </span>
+                  <span className={styles.eyebrow}>Calendário de campanhas</span>
                   <h2 id="calendario-titulo">
                     Um ano inteiro
                     <br />

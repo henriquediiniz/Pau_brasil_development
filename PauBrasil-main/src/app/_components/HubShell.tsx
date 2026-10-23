@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight, Menu, X } from 'lucide-react'
@@ -17,8 +17,16 @@ const links = [
 
 export function HubNav() {
   const [open, setOpen] = useState(false)
+  // Depois de rolar um pouco, a sombra do cabeçalho fica mais marcada sobre o conteúdo.
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   return (
-    <header className={styles.header}>
+    <header className={styles.header} data-scrolled={scrolled || undefined}>
       <span className={styles.scrollProgress} aria-hidden="true" />
       <a href="#conteudo" className={styles.skip}>
         Pular para o conteúdo

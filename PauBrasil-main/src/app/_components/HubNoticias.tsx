@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Briefcase, MapPin, Megaphone } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Briefcase, MapPin } from 'lucide-react'
 import type { carregarNoticiasGerais } from '@/lib/endomarketing'
 import styles from './Hub.module.css'
 
@@ -16,9 +16,7 @@ export function HubNoticias({ avisos, vagas, totalVagas }: Noticias) {
       <div className={styles.container}>
         <div className={styles.sectionHeading} data-reveal>
           <div>
-            <span className={styles.eyebrow}>
-              <Megaphone size={16} /> Notícias gerais
-            </span>
+            <span className={styles.eyebrow}>Notícias gerais</span>
             <h2 id="noticias-titulo">
               Fique por dentro
               <br />

@@ -3,6 +3,8 @@
   --ink: #1a1a1a;
   --sand: #dcc8b1;
   --paper: #faf9f6;
+  /* Texto secundário: >= 4.5:1 sobre papel, branco e areia (#eee8e0) */
+  --muted: #6f5c4e;
   font-family: var(--font-hub), Arial, sans-serif;
   background: var(--paper);
   color: var(--ink);
@@ -113,9 +115,15 @@
 .header {
   position: sticky;
   top: 0;
-  background: #faf9f6;
+  /* Cabeçalho areia sobre a newsletter branca; linha e sombra separam também nas seções areia */
+  background: #f4efe8;
   z-index: 40;
-  border-bottom: 1px solid #e7e1da;
+  border-bottom: 1px solid #dcc8b1;
+  box-shadow: 0 6px 18px -14px #4a1d1440;
+  transition: box-shadow 0.25s ease;
+}
+.header[data-scrolled] {
+  box-shadow: 0 10px 28px -16px #4a1d1466;
 }
 .navInner {
   width: min(1340px, calc(100% - 80px));
@@ -225,14 +233,6 @@
   font-size: 13px;
   font-weight: 500;
 }
-.heroSignature {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 44px;
-  color: #a09b93;
-  font-size: 12px;
-}
 .heroBottom {
   display: flex;
   justify-content: space-between;
@@ -250,7 +250,7 @@
   flex-shrink: 0;
 }
 .heroBottomLabel span {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -262,52 +262,6 @@
 .heroBottom nav {
   min-width: 0;
 }
-.quickLinks {
-  background: #eee8e0;
-  border-bottom: 1px solid #ddd5ca;
-}
-.quickLinks > .container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-.quickLinks a {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 27px 24px;
-  border-right: 1px solid #d9d0c5;
-  color: var(--ink);
-}
-.quickLinks a:first-child {
-  padding-left: 0;
-}
-.quickLinks a:last-child {
-  border: 0;
-  padding-right: 0;
-}
-.quickLinks a > span {
-  font-size: 12px;
-  color: #967b66;
-}
-.quickLinks strong {
-  font-size: 13px;
-  font-weight: 600;
-  display: block;
-}
-.quickLinks small {
-  display: block;
-  font-size: 12px;
-  color: #72675e;
-  margin-top: 3px;
-}
-.quickLinks svg {
-  margin-left: auto;
-  flex-shrink: 0;
-  color: var(--wine);
-}
-.quickLinks a:hover strong {
-  color: var(--wine);
-}
 .sectionHeading {
   display: flex;
   justify-content: space-between;
@@ -317,7 +271,7 @@
 }
 .sectionHeading > p {
   max-width: 330px;
-  color: #79716b;
+  color: var(--muted);
   font-size: 14px;
 }
 .filters {
@@ -356,7 +310,7 @@
   border-radius: 10px;
   background: #ece5dc;
   color: #6d5f53;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .filters button[aria-pressed="true"] .filterCount {
@@ -502,11 +456,11 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px 10px;
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 600;
-  color: #8a7565;
+  color: var(--muted);
 }
 .partnerTag {
   text-transform: none;
@@ -529,7 +483,7 @@
 }
 .companyCard .companyBody > p {
   font-size: 13px;
-  color: #74685f;
+  color: var(--muted);
   margin: 10px 0 22px;
   line-height: 1.7;
 }
@@ -621,7 +575,7 @@
   border-radius: 8px;
   text-align: center;
   white-space: normal;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.3;
   color: #a9a29a;
 }
@@ -705,7 +659,7 @@
   align-items: center;
 }
 .historyIntro > div > p {
-  color: #756b63;
+  color: var(--muted);
   margin-top: 24px;
   max-width: 440px;
   font-size: 14px;
@@ -713,7 +667,7 @@
 .editorialTag {
   display: inline-block;
   font-size: 12px;
-  color: #7b6b5d;
+  color: var(--muted);
   border-left: 2px solid var(--wine);
   padding-left: 10px;
   margin-top: 25px;
@@ -732,12 +686,12 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #877568;
+  color: var(--muted);
   padding: 25px 12px 12px 0;
   font-size: 13px;
 }
 .timelineSteps button small {
-  font-size: 11px;
+  font-size: 12px;
   display: block;
   margin-bottom: 5px;
 }
@@ -847,7 +801,7 @@
 }
 .talentGrid > div > p {
   font-size: 14px;
-  color: #7a7068;
+  color: var(--muted);
   max-width: 470px;
   margin-top: 25px;
 }
@@ -893,7 +847,7 @@
 .talentGuide > p {
   font-size: 13px;
   margin-top: 10px;
-  color: #78695c;
+  color: var(--muted);
 }
 .talentGuide form {
   margin-top: 23px;
@@ -942,12 +896,12 @@
 .talentResult small {
   display: block;
   font-size: 12px;
-  color: #78695c;
+  color: var(--muted);
   margin-top: 15px;
 }
 .hub .contentNote {
   font-size: 12px;
-  color: #847365;
+  color: var(--muted);
   line-height: 1.8;
   margin-top: 24px;
 }
@@ -994,7 +948,7 @@
   display: flex;
   justify-content: space-between;
   padding: 22px 0;
-  font-size: 11px;
+  font-size: 12px;
   color: #a2978a;
 }
 .srOnly {
@@ -1084,7 +1038,7 @@
   background: #fff;
   border-radius: 3px;
   padding: 12px 16px;
-  color: #9a7b63;
+  color: var(--muted);
 }
 .search input {
   border: 0;
@@ -1095,7 +1049,7 @@
   width: 270px;
 }
 .unitCount {
-  color: #8e7b6b;
+  color: var(--muted);
   font-size: 12px !important;
   margin: 25px 0 15px !important;
 }
@@ -1122,12 +1076,12 @@
 }
 .unitGrid p {
   font-size: 12px;
-  color: #8c7764;
+  color: var(--muted);
 }
 .unitGrid article > span {
   margin-left: auto;
   font-size: 12px;
-  color: #8c7764;
+  color: var(--muted);
 }
 .emptyState {
   display: flex;
@@ -1149,7 +1103,7 @@
 .emptyState p {
   font-size: 14px;
   max-width: 460px;
-  color: #78695c;
+  color: var(--muted);
 }
 .emptyState button {
   background: none;
@@ -1174,7 +1128,7 @@
   font-size: 14px;
   max-width: 520px;
   margin-top: 15px;
-  color: #78695c;
+  color: var(--muted);
 }
 .companyCta .eyebrow {
   margin-bottom: 15px;
@@ -1221,19 +1175,6 @@
     font-size: 12px;
     gap: 10px;
     padding: 14px;
-  }
-  .quickLinks a {
-    padding-inline: 18px;
-    gap: 12px;
-  }
-  .quickLinks strong {
-    font-size: 12px;
-  }
-  .quickLinks small {
-    font-size: 11px;
-  }
-  .quickLinks a > span {
-    display: none;
   }
   .historyIntro,
   .universityGrid,
@@ -1314,9 +1255,6 @@
   .heroCopy > p {
     font-size: 14px;
   }
-  .heroSignature {
-    font-size: 11px;
-  }
   .heroActions {
     gap: 15px;
   }
@@ -1393,7 +1331,7 @@
     width: 120px;
   }
   .portalLink {
-    font-size: 11px;
+    font-size: 12px;
     padding: 10px;
     gap: 5px;
   }
@@ -1419,7 +1357,7 @@
     font-size: clamp(40px, 10vw, 58px);
   }
   .heroCopy .eyebrow {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 22px;
   }
   .heroCopy > p {
@@ -1434,35 +1372,9 @@
     font-size: 12px;
     padding: 15px 17px;
   }
-  .heroSignature {
-    margin-top: 25px;
-    font-size: 12px;
-  }
   .heroBottom {
     margin-top: 33px;
     padding: 22px 0 26px;
-  }
-  .quickLinks > .container {
-    grid-template-columns: 1fr;
-  }
-  .quickLinks a,
-  .quickLinks a:first-child,
-  .quickLinks a:last-child {
-    padding: 20px 0;
-    border: 0;
-    border-bottom: 1px solid #d9d0c5;
-  }
-  .quickLinks a:last-child {
-    border: 0;
-  }
-  .quickLinks a > span {
-    display: block;
-  }
-  .quickLinks strong {
-    font-size: 13px;
-  }
-  .quickLinks small {
-    font-size: 12px;
   }
   .sectionHeading {
     flex-direction: column;
@@ -1475,7 +1387,7 @@
     font-size: 13px;
   }
   .eyebrow {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 18px;
   }
   .hub h2 {
@@ -1497,13 +1409,13 @@
     margin-top: 40px;
   }
   .timelineSteps button {
-    font-size: 11px;
+    font-size: 12px;
     padding-top: 20px;
     padding-right: 8px;
     line-height: 1.5;
   }
   .timelineSteps button small {
-    font-size: 11px;
+    font-size: 12px;
   }
   .universityGrid,
   .talentGrid {
@@ -1522,7 +1434,7 @@
     gap: 12px;
   }
   .learningEyebrow {
-    font-size: 11px;
+    font-size: 12px;
   }
   .talentGuide {
     padding: 25px;
@@ -1551,7 +1463,7 @@
     font-size: 12px;
   }
   .footerBottom {
-    font-size: 11px;
+    font-size: 12px;
     gap: 25px;
     align-items: start;
   }
@@ -1586,7 +1498,7 @@
     font-size: 12px;
   }
   .unitGrid article > span {
-    font-size: 11px;
+    font-size: 12px;
   }
   .unitGrid svg {
     width: 17px;
@@ -1714,7 +1626,7 @@
   gap: 3px;
 }
 .founderPhoto figcaption span {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--sand);
@@ -1756,9 +1668,6 @@
 }
 .heroCopy > :nth-child(4) {
   animation-delay: 0.36s;
-}
-.heroCopy > :nth-child(5) {
-  animation-delay: 0.48s;
 }
 
 /* Barra de progresso de leitura (só onde o navegador suporta animação por rolagem) */
@@ -1887,10 +1796,10 @@
   align-items: center;
   gap: 12px;
   margin-top: 16px;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #8a7767;
+  color: var(--muted);
 }
 .founderQuote footer::before {
   content: '';
@@ -2008,8 +1917,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  border-radius: 4px;
-  background: #fff;
+  border-radius: 10px;
+  background: #f1ebe3;
   transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .programs li:hover {
@@ -2037,10 +1946,10 @@
   border-top: 1px solid #e7e1da;
 }
 .partnersStrip > span {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #8a7767;
+  color: var(--muted);
 }
 .partnersStrip ul {
   list-style: none;
@@ -2062,7 +1971,7 @@
 }
 .partnersStrip small {
   font-size: 12px;
-  color: #8a7767;
+  color: var(--muted);
 }
 
 @media (max-width: 800px) {
@@ -2151,7 +2060,7 @@
   gap: 14px;
   margin-top: 28px;
   font-size: 12px;
-  color: #806b5b;
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 .eraNav button {
@@ -2411,7 +2320,7 @@
 
 /* Newsletter: primeira coisa da página */
 .newsletter {
-  background: var(--paper);
+  background: #fff;
   padding: 44px 0 52px;
   border-bottom: 1px solid #e7e1da;
 }
@@ -2450,7 +2359,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8a7565;
+  color: var(--muted);
 }
 .hub .newsText h3 {
   margin-top: 10px;
@@ -2498,11 +2407,11 @@
     color 0.2s;
 }
 .newsTabs button small {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #8a7565;
+  color: var(--muted);
 }
 .newsTabs button:hover {
   border-color: var(--wine);
@@ -2719,7 +2628,9 @@
 }
 .newsBars button {
   flex: 1;
-  padding: 6px 0;
+  /* traço de 3px, área de toque de 24px (WCAG 2.5.8) */
+  min-height: 24px;
+  padding: 10px 0;
   border: 0;
   background: none;
   cursor: pointer;
@@ -2790,7 +2701,7 @@
   border-radius: 999px;
   background: #1a1a1a73;
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
@@ -2836,7 +2747,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -2943,7 +2854,7 @@
   border-radius: 999px;
   background: #1a1a1acc;
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .upbLock {
@@ -2987,7 +2898,7 @@
   margin-top: auto;
   padding-top: 12px;
   font-size: 12px;
-  color: #8a7565;
+  color: var(--muted);
 }
 .upbMeta .companyArrow {
   margin-left: auto;
@@ -3063,7 +2974,7 @@
   gap: 14px;
   padding: 12px 0;
   border-bottom: 1px solid #e7e1da;
-  color: #8a7565;
+  color: var(--muted);
 }
 .upbEpisodes li > span {
   font-size: 12px;
@@ -3087,7 +2998,7 @@
 .hub .upbMore {
   padding: 8px 24px 0;
   font-size: 12px;
-  color: #8a7565;
+  color: var(--muted);
 }
 .upbModalCta {
   padding: 18px 24px 24px;
@@ -3257,7 +3168,7 @@
 .hub .ngPerson p {
   font-size: 13px;
   line-height: 1.4;
-  color: #8a7565;
+  color: var(--muted);
 }
 .ngTag {
   align-self: flex-start;
@@ -3265,7 +3176,7 @@
   border-radius: 999px;
   background: #7a152014;
   color: var(--wine);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -3277,10 +3188,10 @@
   color: #3f3732;
 }
 .ngCard footer {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8a7565;
+  color: var(--muted);
 }
 .ngCalendarSection {
   background: #eee8e0;
@@ -3318,9 +3229,9 @@
 .ngDate small {
   display: block;
   margin-top: 2px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  color: #8a7565;
+  color: var(--muted);
   text-transform: none;
 }
 .hub .ngCalendar h3 {
@@ -3335,7 +3246,7 @@
   border-radius: 999px;
   background: var(--campanha);
   color: #fff;
-  font-size: 10px;
+  font-size: 12px;
   font-style: normal;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3431,11 +3342,11 @@
 
 /* ── Arquivo da newsletter (/newsletter) ───────────────────────────── */
 .nlDate {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #8a7565;
+  color: var(--muted);
 }
 .nlLightbox {
   width: min(100%, 960px);
@@ -3554,7 +3465,7 @@
 .vagasHead span {
   margin-left: auto;
   font-size: 12px;
-  color: #8a7565;
+  color: var(--muted);
 }
 .vagasBox ul {
   list-style: none;
@@ -3579,7 +3490,7 @@
   gap: 4px;
   margin-top: 2px;
   font-size: 12px;
-  color: #8a7565;
+  color: var(--muted);
 }
 .vagasQtd {
   margin-left: auto;
@@ -3588,11 +3499,19 @@
   border-radius: 999px;
   background: #7a152014;
   color: var(--wine);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .vagasBox .button {
   width: 100%;
+  /* Contorno: o aviso em destaque ao lado já é vinho, os dois não disputam atenção */
+  background: transparent;
+  color: var(--wine);
+  border-color: var(--wine);
+}
+.vagasBox .button:hover {
+  background: var(--wine);
+  color: #fff;
 }
 @media (max-width: 900px) {
   .noticiasGrid {
@@ -3706,4 +3625,74 @@
 .newsTabsRow .newsPause:hover {
   border-color: var(--wine);
   color: var(--wine);
+}
+
+/* ── Crítica de design (out/2026) ───────────────────────────────────── */
+
+/* Faixa de marcas do hero no celular/tablet: grade 4×2, tudo visível e sem rolagem lateral */
+@media (max-width: 800px) {
+  .heroBottom nav .brandStripStacked {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px 6px;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+    width: 100%;
+  }
+  .heroBottom nav .brandStripStacked a {
+    width: auto;
+    min-width: 0;
+    padding: 4px 0;
+  }
+  .heroBottom nav .brandStripStacked .plate_mini {
+    width: 100%;
+    max-width: 84px;
+    height: 48px;
+  }
+}
+
+/* Empresas no celular: card horizontal compacto (logo à esquerda), ~1/3 da altura */
+@media (max-width: 600px) {
+  .companyCard,
+  .companyFeatured .companyCard {
+    flex-direction: row;
+  }
+  .plate_card,
+  .companyFeatured .plate_card {
+    width: 34%;
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+  .plate_card .plateLogo,
+  .plate_card[data-shape='wide'] .plateLogo,
+  .companyFeatured .plate_card .plateLogo {
+    padding: 14% 10%;
+  }
+  .companyFeatured .companyBody,
+  .companyBody {
+    padding: 14px 14px 12px;
+  }
+  .companyCard h3,
+  .companyFeatured .companyCard h3 {
+    font-size: 17px;
+    margin-top: 8px;
+  }
+  .companyCard .companyBody > p,
+  .companyFeatured .companyCard .companyBody > p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 6px 0 12px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .companyMore {
+    padding-top: 10px;
+  }
+  .companyArrow {
+    width: 30px;
+    height: 30px;
+  }
 }

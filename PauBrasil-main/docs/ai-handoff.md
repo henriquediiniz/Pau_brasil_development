@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Hub: critica de design (contraste, mobile, cabecalho) | Claude | concluido | 2026-10-23: contraste, fonte minima 12px, cabecalho areia + newsletter branca, logos 4x2, cards compactos, pausa/play da newsletter corrigido; deploy | Parecer do Codex |
 | Hub: linha do tempo e feedbacks | Claude | concluido | 2026-10-21: linha do tempo 1994-2026 em eras; YSO e Hora 10 corrigidos; rolagem suave; color-scheme claro; filtros e selos mais fortes | Confirmar assinatura no Samsung Internet e cidades-sede adicionadas |
 | Hub: logos do Drive do grupo | Claude | concluido | 2026-10-20: logos Original Start e Locadora, assinatura Zenildo Oliveira, programas Capacitar e T&D Lideres, faixa de parceiros; Original Start corrigida para Moto Pecas | Confirmar descricao da Original Start e uso das marcas Ambev/Honda |
 | Limpeza de codigo morto | Claude | concluido | 2026-10-20: 21 arquivos, ~20 funcoes e 20 dependencias sem uso removidos; `jose` declarado | Revisar o que foi mantido de proposito (ver registro) |
@@ -253,6 +254,9 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
+- Claude — ajustes da critica de design + separacao do cabecalho (2026-10-23)
+  - objetivo concluido e publicado; arquivos em posse: nenhum
+
 - Claude — newsletter (autoplay e botoes em linha) + Universidade (retomar video) (2026-10-22)
   - objetivo concluido; arquivos em posse: nenhum (producao migrada com ok do usuario; curso de teste criado)
 
@@ -413,6 +417,25 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-23 - Claude - Ajustes da critica de design e separacao do cabecalho
+
+- Decisao do usuario: o hero continua ABAIXO da newsletter (pedido da diretoria). O resto da critica foi aprovado.
+- Cabecalho (`HubShell.tsx`): fundo areia claro (`#f4efe8`), linha areia e sombra curta; sombra mais forte depois de rolar (`data-scrolled`). Newsletter com fundo branco (opcao B escolhida pelo usuario apos comparacao A/B).
+- Contraste: novo token `--muted: #6f5c4e` substitui 15 cinzas-marrons que ficavam entre 3.2 e 4.4:1; auditoria local deu 0 textos abaixo de 4.5:1. Fonte minima de 12px (29 regras de 10/11px).
+- Celular: faixa de logos do hero em grade 4x2 (ate 800px), sem rolagem lateral; cards das empresas horizontais e compactos ate 600px (secao de ~4.070px para ~2.260px em 390px).
+- Barrinhas de foto da newsletter com area de toque de 24px (traco segue com 3px). Programas da Universidade em placas areia. Botao "Cadastrar meu curriculo" das vagas em contorno. Eyebrows sem icone (home e /nossa-gente). "Explore nossas empresas" com seta para baixo (ancora na pagina).
+- Removidos: faixa de acessos rapidos (01/02/03), frase "Origem, crescimento e pertencimento." e nota interna do catalogo de cargos, com o CSS morto correspondente.
+- `tests/e2e/hub.spec.ts`: o teste de transbordo ignora elementos dentro de faixa com rolagem lateral (abas da newsletter). O E2E do hub passou 3/3, incluindo o teste de celular que falhava desde antes.
+- Validacao: tsc 0; `npm test` 511/0; auditoria Playwright em 320/390/700/1440 sem transbordo.
+- **Newsletter (pedido principal da diretoria): pausa/play nao voltava a passar.** Causa: o carrossel pausava no hover e o botao de play fica dentro da area, entao com o mouse ali o play nao retomava; no celular o toque gera "mouse entrou" sem "mouse saiu" e travava de vez; no teclado o foco no proprio botao segurava a pausa. Correcao: sem pausa no hover; o botao (`data-news-toggle`) nao conta como foco que pausa; o play limpa as pausas temporarias (clique e foco). Testado com mouse, toque e teclado: pausado fica parado e o play volta a passar; retoma do ponto (1,46 s restantes de 4 s) e troca de campanha normalmente.
+- Parecer do outro agente: pendente.
+
+### 2026-10-23 - Claude - Critica de design da home em producao (somente analise)
+
+- `/design-critique` em https://pau-brasil-development.vercel.app/ com capturas desktop (1440) e celular (390) e auditoria automatica (contraste, alvos de toque, alt, escala de fontes). Nenhum arquivo de codigo alterado.
+- Principais achados: newsletter acima do hero rouba a primeira impressao; brand strip cortada no celular (pendencia antiga do E2E); 46 textos abaixo de 4.5:1 (a maioria 4.0-4.4, piores 3.24 nos numeros 01/02/03 e 3.61 nas eras inativas); barrinhas de foto da newsletter com 15 px de altura; 19 tamanhos de fonte (10 px nas datas das abas); pagina com 12.900 px no celular, sendo 4.000 px so na secao Empresas.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-22 - Claude - Newsletter mais estavel, botoes em uma linha e "voltar de onde parou" na Universidade
 

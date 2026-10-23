@@ -14,15 +14,16 @@ const CLICK_HOLD_MS = 6000
 /**
  * Newsletter no topo da home: campanhas internas com fotos que passam sozinhas.
  * Cada foto fica PHOTO_MS na tela; ao fim das fotos de uma campanha, entra a próxima.
- * O tempo é contado como "decorrido": pausar (hover, foco de teclado, aba escondida, botão)
+ * O tempo é contado como "decorrido": pausar (botão, foco de teclado, aba escondida)
  * congela a foto e a barrinha, e retomar continua de onde parou em vez de recomeçar.
+ * Não pausa no hover: o botão de play fica dentro da área, então o mouse parado ali
+ * (ou o toque no celular, que não gera "mouse saiu") travava a passagem depois do play.
  * Desligada com movimento reduzido (WCAG 2.2.2).
  */
 export function HubNewsletter({ items }: { items: HubNews[] }) {
   const [news, setNews] = useState(0)
   const [photo, setPhoto] = useState(0)
   const [paused, setPaused] = useState(false)
-  const [hovered, setHovered] = useState(false)
   const [keyboardFocus, setKeyboardFocus] = useState(false)
   const [clickHold, setClickHold] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -36,7 +37,7 @@ export function HubNewsletter({ items }: { items: HubNews[] }) {
   const item = items[news] ?? { photos: [] as HubNews['photos'], company: '', slug: '' }
   const company = HUB_COMPANIES.find((c) => c.slug === item.company)
   const running =
-    items.length > 0 && !paused && !hovered && !keyboardFocus && !clickHold && !hidden && !reduced
+    items.length > 0 && !paused && !keyboardFocus && !clickHold && !hidden && !reduced
   // Próxima foto quando ela é de outra campanha: carregada escondida para a troca não piscar.
   const upcoming =
     items.length > 1 && photo === item.photos.length - 1
@@ -124,11 +125,11 @@ export function HubNewsletter({ items }: { items: HubNews[] }) {
       id="newsletter"
       className={styles.newsletter}
       aria-labelledby="newsletter-title"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onFocus={(event) => {
         // Só o foco de teclado pausa; o foco que sobra de um clique de mouse não.
-        if (event.target.matches(':focus-visible')) setKeyboardFocus(true)
+        // O botão de pausa tem estado próprio: focar nele não pode segurar o play.
+        if (event.target.matches(':focus-visible') && !event.target.matches('[data-news-toggle]'))
+          setKeyboardFocus(true)
       }}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setKeyboardFocus(false)
@@ -193,7 +194,16 @@ export function HubNewsletter({ items }: { items: HubNews[] }) {
               <button
                 type="button"
                 className={styles.newsPause}
-                onClick={() => setPaused((value) => !value)}
+                data-news-toggle
+                onClick={() => {
+                  // Play é uma ordem explícita: libera também as outras pausas temporárias.
+                  if (paused) {
+                    window.clearTimeout(clickTimer.current)
+                    setClickHold(false)
+                    setKeyboardFocus(false)
+                  }
+                  setPaused(!paused)
+                }}
                 aria-label={paused ? 'Retomar fotos da newsletter' : 'Pausar fotos da newsletter'}
               >
                 {paused ? <Play size={14} /> : <Pause size={14} />}

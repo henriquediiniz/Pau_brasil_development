@@ -6,8 +6,6 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
-  GraduationCap,
-  Sprout,
 } from 'lucide-react'
 import { HubFooter, HubNav } from './_components/HubShell'
 import {
@@ -89,15 +87,11 @@ export default async function HomePage() {
                 <div className={styles.heroActions}>
                   <a href="#empresas" className={styles.button}>
                     Explore nossas empresas{' '}
-                    <ArrowUpRight size={18} aria-hidden="true" />
+                    <ArrowDown size={18} aria-hidden="true" />
                   </a>
                   <a href="#historia" className={styles.heroSecondary}>
                     Conheça o grupo <ArrowDown size={17} aria-hidden="true" />
                   </a>
-                </div>
-                <div className={styles.heroSignature}>
-                  <Sprout size={20} strokeWidth={1.4} aria-hidden="true" />
-                  <span>Origem, crescimento e pertencimento.</span>
                 </div>
               </div>
               <figure className={styles.heroMark}>
@@ -130,35 +124,6 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
-
-        <nav className={styles.quickLinks} aria-label="Acessos rápidos">
-          <div className={styles.container}>
-            <a href="#empresas">
-              <span>01</span>
-              <div>
-                <strong>Conheça nossos negócios</strong>
-                <small>Empresas e unidades do grupo</small>
-              </div>
-              <ArrowUpRight size={20} />
-            </a>
-            <Link href="/universidade-pb">
-              <span>02</span>
-              <div>
-                <strong>Continue aprendendo</strong>
-                <small>Universidade Pau Brasil</small>
-              </div>
-              <ArrowUpRight size={20} />
-            </Link>
-            <Link href="/carreiras/candidatar">
-              <span>03</span>
-              <div>
-                <strong>Faça parte da nossa história</strong>
-                <small>Carreiras e banco de talentos</small>
-              </div>
-              <ArrowUpRight size={20} />
-            </Link>
-          </div>
-        </nav>
 
         <HubNoticias {...noticias} />
 
@@ -288,9 +253,7 @@ export default async function HomePage() {
         >
           <div className={`${styles.container} ${styles.universityGrid}`}>
             <div data-reveal>
-              <span className={styles.eyebrow}>
-                <GraduationCap size={19} /> Universidade Pau Brasil
-              </span>
+              <span className={styles.eyebrow}>Universidade Pau Brasil</span>
               <h2>
                 Conhecimento que
                 <br />
@@ -353,11 +316,6 @@ export default async function HomePage() {
                   Explorar carreiras <ArrowRight size={16} />
                 </Link>
               </div>
-              <p className={styles.contentNote}>
-                O catálogo atual de cargos contempla Pau Brasil Bebidas. A
-                ampliação para as outras empresas será feita junto às equipes
-                responsáveis.
-              </p>
             </div>
             <HubTalentGuide />
           </div>

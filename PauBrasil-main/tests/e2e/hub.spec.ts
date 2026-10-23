@@ -105,7 +105,12 @@ test('mobile: navegação, imagens e ausência de conteúdo cortado', async ({
       Array.from(document.querySelectorAll('main *'))
         .filter((element) => {
           const box = element.getBoundingClientRect()
-          return box.width > 0 && (box.right > innerWidth + 1 || box.left < -1)
+          if (!(box.width > 0 && (box.right > innerWidth + 1 || box.left < -1))) return false
+          // Dentro de faixa com rolagem lateral (ex.: abas da newsletter) não é conteúdo cortado.
+          for (let el = element.parentElement; el; el = el.parentElement) {
+            if (/auto|scroll/.test(getComputedStyle(el).overflowX)) return false
+          }
+          return true
         })
         .map((element) => element.tagName),
     )
