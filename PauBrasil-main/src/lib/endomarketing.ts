@@ -3,7 +3,7 @@
  * campanhas e números do mês. Cadastrado em /gente/endomarketing.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { prisma } from '@/lib/prisma'
 import { urlDeImagemSchema } from '@/lib/armazenamento'
 import { HUB_COMPANIES } from '@/lib/hub-content'

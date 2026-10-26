@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { urlDeImagemSchema } from '@/lib/armazenamento'
 
 export const dynamic = 'force-dynamic'
@@ -21,7 +21,7 @@ export async function PATCH(req: NextRequest) {
 
   const body = await req.json()
   const parsed = schema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   await prisma.user.update({
     where: { id: userId },

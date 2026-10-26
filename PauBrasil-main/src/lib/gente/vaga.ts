@@ -6,7 +6,7 @@
  * entre a listagem, o detalhe e a importação.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { calcularSlaVaga, type RecVagaStatusValue } from './vaga-sla'
 
 export const STATUS_VAGA = ['ABERTA', 'FECHADA', 'CANCELADA'] as const

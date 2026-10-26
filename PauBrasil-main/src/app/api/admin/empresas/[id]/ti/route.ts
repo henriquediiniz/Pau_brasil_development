@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { isSysAdmin } from '@/lib/auth-helpers'
 import bcrypt from 'bcryptjs'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { withHandler } from '@/lib/api-handler'
 
 const ALLOWED_DOMAIN = 'grupopaubrasil.com.br'
@@ -31,7 +31,7 @@ export const POST = withHandler(async (req: NextRequest, { params }: { params: {
 
   const parsed = createTiSchema.safeParse(raw)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
   }
 
   const { name, email, password } = parsed.data

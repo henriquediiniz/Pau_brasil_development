@@ -257,7 +257,7 @@ O sistema passou por uma grande modernização arquitetural:
 ### Em andamento
 
 - Claude — execucao da varredura geral, em fases (2026-10-26; usuario deu autorizacao total)
-  - fases 1-3 publicadas; migrations `20261026120000_limite_tentativa` e `20261026150000_drop_legado_pontos_visitas` PENDENTES em producao (o usuario aplica; codigo funciona antes e depois); proximas: 4 (deps), 5 (estrutura), 6 (Next 16)
+  - fases 1-3 publicadas; migrations `20261026120000_limite_tentativa` e `20261026150000_drop_legado_pontos_visitas` PENDENTES em producao (o usuario aplica; codigo funciona antes e depois); fase 4 publicada; proximas: 5 (estrutura), 6 (Next 16 + troca do next-pwa)
 
 - Claude — linha do tempo: ano em destaque avancando ano a ano (2026-10-26)
   - objetivo concluido e publicado (ano a ano + caminhaozinho); arquivos em posse: nenhum
@@ -425,6 +425,16 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-26 - Claude - Varredura: fase 4 (dependencias e validacao)
+
+- `npm audit fix` sem major: `next-auth` 4.24.15, `@sentry/nextjs` 10.76.2 e transitivas.
+- `xlsx` 0.18.5 (prototype pollution e ReDoS, sem correcao no npm) -> 0.20.3 pelo tarball oficial `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` (a SheetJS saiu do npm). Modelo de planilha do Gente testado ao vivo.
+- `zod` 3.25 -> 4.6.7 (vulnerabilidade de memoria). Ajustes: `.errors` -> `.issues` (2), `errorMap` -> `error` no `z.literal` da LGPD. Novo `src/lib/zod.ts` com `z.config(z.locales.pt())` (mensagens padrao em portugues) — **importar `z` de `@/lib/zod`, nao de `zod`**; os 54 imports foram trocados.
+- Bug: 28 rotas devolviam `{ error: parsed.error.flatten() }` (objeto); telas que exibem `error` como texto quebravam (ex.: contato com mensagem curta derrubava a pagina). Agora `{ error: mensagemDeValidacao(...), detalhes: flatten() }`, mesmo formato do modulo Gente. Contato com `minLength` na tela.
+- Restante do audit: `next` (critico; so o 16 corrige) e a cadeia do `next-pwa` (build) ficam para a fase 6.
+- Validacao: tsc, lint, `npm test` 529/0, build; ao vivo: modelo xlsx, candidatura sem LGPD (mensagem certa), contato e setup-password com mensagens em portugues.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-26 - Claude - Varredura: fase 3 (banco legado e backup completo)
 

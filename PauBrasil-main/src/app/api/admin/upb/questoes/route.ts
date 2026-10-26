@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { canAccessCompanyScope, isSysAdmin, isUpbAdmin } from '@/lib/auth-helpers'
 import { prisma } from '@/lib/prisma'
 import { getEffectiveSessionUser } from '@/lib/session-user'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { withHandler } from '@/lib/api-handler'
 
 const createSchema = z.object({
@@ -56,7 +56,7 @@ export const POST = withHandler(async (req: NextRequest) => {
 
   const body = await req.json()
   const parsed = createSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   const temporada = await prisma.uPBTemporada.findUnique({
     where: { id: parsed.data.temporadaId },

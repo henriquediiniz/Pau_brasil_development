@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { prisma } from '@/lib/prisma'
 import { chaveDeCvValida } from '@/lib/armazenamento'
 import { notify } from '@/lib/notify'
@@ -52,9 +52,7 @@ const CandidaturaSchema = z.object({
       `Idade deve estar entre ${IDADE_MINIMA} e ${IDADE_MAXIMA} anos`)
     .optional(),
   escolaridade:        z.enum(VALORES_ESCOLARIDADE).optional(),
-  consentimentoLgpd:   z.literal(true, {
-    errorMap: () => ({ message: 'É necessário aceitar os termos de privacidade.' }),
-  }),
+  consentimentoLgpd:   z.literal(true, { error: 'É necessário aceitar os termos de privacidade.' }),
 })
 
 export async function POST(req: NextRequest) {

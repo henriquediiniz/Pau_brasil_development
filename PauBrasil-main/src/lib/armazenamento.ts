@@ -12,7 +12,7 @@
 
 import { randomUUID } from 'crypto'
 import { del, get, put } from '@vercel/blob'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 
 export function armazenamentoConfigurado(): boolean {
   return !!process.env.BLOB_READ_WRITE_TOKEN

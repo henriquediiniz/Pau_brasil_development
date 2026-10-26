@@ -39,7 +39,7 @@ export default function ContatoPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setErro(data.error ?? 'Erro ao enviar mensagem.')
+        setErro(typeof data.error === 'string' ? data.error : 'Erro ao enviar mensagem.')
         setStatus('error')
         return
       }
@@ -132,7 +132,7 @@ export default function ContatoPage() {
 
               <div className="space-y-1.5">
                 <label htmlFor="contato-mensagem" className={rotulo}>Mensagem *</label>
-                <textarea id="contato-mensagem" value={mensagem} onChange={e => setMensagem(e.target.value)} required rows={5}
+                <textarea id="contato-mensagem" value={mensagem} onChange={e => setMensagem(e.target.value)} required minLength={10} maxLength={2000} rows={5}
                   placeholder="Descreva como podemos ajudar..." className={campo + ' resize-none'} />
               </div>
 

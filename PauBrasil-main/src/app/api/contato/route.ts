@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { sendEmail, emailContatoRecebido } from '@/lib/email'
@@ -23,7 +23,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    // Texto, não objeto: a tela exibe `error` direto
+    const campo = parsed.error.issues[0]
+    const nomes: Record<string, string> = { nome: 'Nome', email: 'E-mail', assunto: 'Assunto', mensagem: 'Mensagem' }
+    return NextResponse.json(
+      { error: `${nomes[String(campo?.path[0])] ?? 'Dados'}: ${campo?.message ?? 'inválido'}` },
+      { status: 400 },
+    )
   }
 
   const ip = getIp(req)

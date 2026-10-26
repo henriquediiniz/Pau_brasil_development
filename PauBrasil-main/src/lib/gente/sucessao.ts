@@ -6,7 +6,7 @@
  * está pronto para crescer, e quem cobre cada cargo crítico se a pessoa sair.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import {
   normalizar,
   resolverOperacao,

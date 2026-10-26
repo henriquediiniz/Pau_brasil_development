@@ -11,7 +11,7 @@
  * ninguém declarou na API quebra o teste, e não o uso.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { listaDeTexto } from './lista-campo'
 
 /** Os campos que o formulário de descritivo envia. */

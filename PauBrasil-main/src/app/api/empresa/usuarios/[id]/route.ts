@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { getEffectiveSessionUser } from '@/lib/session-user'
 import { updateProvisionedUser } from '@/lib/user-provisioning'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 
 const updateSchema = z.object({
   name: z.string().min(2).optional(),
@@ -32,7 +32,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (rawBody === null) return NextResponse.json({ error: 'Body invalido' }, { status: 400 })
 
   const parsed = updateSchema.safeParse(rawBody)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   if (!actorIsSysAdmin && parsed.data.isEmpresaAdmin !== undefined) {
     return NextResponse.json(

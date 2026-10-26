@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import bcrypt from 'bcryptjs'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { ALLOWED_EMAIL_DOMAIN, JWT_REFRESH_INTERVAL_MS } from '@/lib/config'
 import { consumirTentativa, liberarTentativas, mensagemLimite } from '@/lib/limite-tentativas'
 
@@ -98,7 +98,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials)
         if (!parsed.success) {
-          throw new Error(parsed.error.errors[0].message)
+          throw new Error(parsed.error.issues[0].message)
         }
 
         const { email, password, totpToken } = parsed.data

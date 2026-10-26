@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { isSysAdmin } from '@/lib/auth-helpers'
 import { prisma } from '@/lib/prisma'
 import { getEffectiveSessionUser } from '@/lib/session-user'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json()
   const parsed = createSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   const { nome } = parsed.data
   const slugVal = parsed.data.slug || toSlug(nome)

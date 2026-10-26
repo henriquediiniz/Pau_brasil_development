@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { withHandler } from '@/lib/api-handler'

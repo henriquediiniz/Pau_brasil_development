@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { notify } from '@/lib/notify'
 import { audit } from '@/lib/audit'
 import { getEffectiveSessionUser } from '@/lib/session-user'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { withHandler } from '@/lib/api-handler'
 
 const schema = z.object({
@@ -23,7 +23,7 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
 
   const body = await req.json()
   const parsed = schema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   if (!isSysAdmin(actor)) {
     const mat = await prisma.uPBMatricula.findUnique({

@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { canAccessCompanyScope, isUpbAdmin, type SessionUser } from '@/lib/auth-helpers'
 import { audit } from '@/lib/audit'
 import { getEffectiveSessionUser } from '@/lib/session-user'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { urlDeImagemSchema } from '@/lib/armazenamento'
 import { withHandler } from '@/lib/api-handler'
 
@@ -43,7 +43,7 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
 
   const body = await req.json()
   const parsed = updateSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   const temporada = await prisma.uPBTemporada.update({
     where: { id: params.id },

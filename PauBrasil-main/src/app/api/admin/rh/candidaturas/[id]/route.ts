@@ -7,7 +7,7 @@ import { audit } from '@/lib/audit'
 import { notify } from '@/lib/notify'
 import { TRANSICOES_VALIDAS } from '@/lib/carreiras-areas'
 import { EtapaCandidatura, TipoNotaCandidatura } from '@prisma/client'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 
 /*
   Mover para Rejeitado ou Arquivado NAO apaga mais o curriculo.

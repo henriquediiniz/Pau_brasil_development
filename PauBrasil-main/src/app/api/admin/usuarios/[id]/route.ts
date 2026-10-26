@@ -6,7 +6,7 @@ import { audit } from '@/lib/audit'
 import { isRhAdmin, isSysAdmin } from '@/lib/auth-helpers'
 import { getEffectiveSessionUser } from '@/lib/session-user'
 import { updateProvisionedUser } from '@/lib/user-provisioning'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { withHandler } from '@/lib/api-handler'
 
 const updateSchema = z.object({
@@ -38,7 +38,7 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
   const body = await req.json()
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
   }
 
   const actorIsSysAdmin = isSysAdmin(actor)

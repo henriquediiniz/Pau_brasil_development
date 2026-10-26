@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { isSysAdmin } from '@/lib/auth-helpers'
 import { prisma } from '@/lib/prisma'
 import { getEffectiveSessionUser } from '@/lib/session-user'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { withHandler } from '@/lib/api-handler'
 
 const updateSchema = z.object({
@@ -45,7 +45,7 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
 
   const body = await req.json()
   const parsed = updateSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   const empresa = await prisma.empresa.update({
     where: { id: params.id },

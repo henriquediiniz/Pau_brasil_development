@@ -4,7 +4,7 @@
  * importação e a promoção vinda do Banco de Talentos.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { resumirEtapas, type EtapaRegistrada } from './etapas'
 
 export const SITUACOES = [

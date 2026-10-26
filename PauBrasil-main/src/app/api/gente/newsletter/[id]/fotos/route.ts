@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { autenticarGente, autor } from '@/lib/gente/api'

@@ -7,7 +7,7 @@
  * `canViewDadoSensivel` e com auditoria gravada antes de servir.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { calcularVigencia } from './cotas'
 
 export const pcdSchema = z.object({

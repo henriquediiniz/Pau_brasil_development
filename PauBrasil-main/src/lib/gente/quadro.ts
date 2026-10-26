@@ -6,7 +6,7 @@
  * da lotação, numa transação.
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 
 import { cpfValido, normalizarCpf } from './cpf'
 

@@ -3,7 +3,7 @@
  * As fotos ficam no banco (bytea) e são servidas por /api/public/newsletter/foto/[id].
  */
 
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { prisma } from '@/lib/prisma'
 import { HUB_COMPANIES, type HubNews } from '@/lib/hub-content'
 

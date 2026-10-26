@@ -9,7 +9,7 @@ import {
   createProvisionedUser,
   normalizeEmail,
 } from '@/lib/user-provisioning'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 import { withHandler } from '@/lib/api-handler'
 
 export const dynamic = 'force-dynamic'
@@ -97,7 +97,7 @@ export const POST = withHandler(async (req: NextRequest) => {
 
   const body = await req.json()
   const parsed = createSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   if (!isSysAdmin(actor)) {
     const requestedElevatedAccess =

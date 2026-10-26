@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { validatePasswordPolicy } from '@/lib/user-provisioning'
 import bcrypt from 'bcryptjs'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 
 const schema = z.object({
   password: z.string().min(10),
@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest) {
   if (!body) return NextResponse.json({ error: 'Body inválido' }, { status: 400 })
 
   const parsed = schema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
 
   const user = await prisma.user.findUnique({
     where: { id: userId },

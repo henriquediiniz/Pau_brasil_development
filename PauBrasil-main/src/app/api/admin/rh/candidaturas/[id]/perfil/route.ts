@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { authOptions } from '@/lib/auth'
 import { isRhAdmin } from '@/lib/auth-helpers'
 import { prisma } from '@/lib/prisma'

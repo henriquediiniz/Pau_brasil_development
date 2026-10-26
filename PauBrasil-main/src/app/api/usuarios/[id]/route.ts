@@ -6,7 +6,7 @@ import { audit } from '@/lib/audit'
 import { isSysAdmin } from '@/lib/auth-helpers'
 import { getEffectiveSessionUser } from '@/lib/session-user'
 import bcrypt from 'bcryptjs'
-import { z } from 'zod'
+import { z, mensagemDeValidacao } from '@/lib/zod'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,7 +37,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const body = await req.json()
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: mensagemDeValidacao(parsed.error), detalhes: parsed.error.flatten() }, { status: 400 })
   }
 
   // Only SYS_ADMIN can change role or nivel
