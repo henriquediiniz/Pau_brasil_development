@@ -419,7 +419,7 @@ Outros pontos importantes do sistema:
 - `public/manifest.json`
   - configura atalhos do PWA para Hoje, OBZ, Universidade e Ranking
 - `next.config.js`
-  - habilita PWA, cache offline e imagens remotas do Cloudinary
+  - imagens remotas do Cloudinary (o PWA agora é o `public/sw.js`, escrito à mão)
 - `docker-compose.yml`
   - sobe PostgreSQL local para desenvolvimento
 - `src/components`
