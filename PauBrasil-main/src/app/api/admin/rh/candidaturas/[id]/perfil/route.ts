@@ -33,7 +33,8 @@ const PerfilSchema = z.object({
   escolaridade:   z.enum(VALORES_ESCOLARIDADE).nullable().optional(),
 })
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   if (!isRhAdmin(session.user)) return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })

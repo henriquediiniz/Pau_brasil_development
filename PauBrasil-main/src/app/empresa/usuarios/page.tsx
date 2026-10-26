@@ -85,7 +85,7 @@ export default function EmpresaUsuariosPage() {
   useEffect(() => {
     fetchPendingCount()
     fetchAll()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [])
 
   function openCreate() {

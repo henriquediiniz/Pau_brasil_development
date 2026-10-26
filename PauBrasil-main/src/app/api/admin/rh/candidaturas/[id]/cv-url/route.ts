@@ -15,7 +15,8 @@ import {
 export const dynamic = 'force-dynamic'
 
 /** Entrega o currículo de uma candidatura do Banco de Talentos (arquivo privado no Vercel Blob). */
-export const GET = withHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const GET = withHandler(async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   if (!isRhAdmin(session.user)) return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })

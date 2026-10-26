@@ -20,11 +20,12 @@ const montserrat = Montserrat({
 export function generateStaticParams() {
   return HUB_COMPANIES.map(({ slug }) => ({ slug }))
 }
-export function generateMetadata({
-  params,
-}: {
-  params: { slug: string }
-}): Metadata {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ slug: string }>
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const company = HUB_COMPANIES.find((item) => item.slug === params.slug)
   return {
     title: company
@@ -36,7 +37,8 @@ export function generateMetadata({
 }
 export const viewport: Viewport = { colorScheme: 'only light' }
 
-export default function CompanyPage({ params }: { params: { slug: string } }) {
+export default async function CompanyPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const company = HUB_COMPANIES.find((item) => item.slug === params.slug)
   if (!company) notFound()
   if (company.externalUrl) redirect(company.externalUrl)

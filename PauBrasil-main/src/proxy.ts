@@ -4,7 +4,7 @@ import type { SessionUser } from '@/lib/auth-helpers'
 import { resolveMiddlewareRedirect } from '@/lib/middleware-access'
 
 export default withAuth(
-  function middleware(req) {
+  function proxy(req) {
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
     const user = token as SessionUser | null

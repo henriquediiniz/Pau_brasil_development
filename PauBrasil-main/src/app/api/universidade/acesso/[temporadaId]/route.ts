@@ -7,7 +7,8 @@ import { notify } from '@/lib/notify'
 import { getEffectiveSessionUser } from '@/lib/session-user'
 import { canAccessUpbAudience, hasUpbFunctionAccess } from '@/lib/upb-access'
 
-export async function GET(_req: NextRequest, { params }: { params: { temporadaId: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ temporadaId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -29,7 +30,8 @@ export async function GET(_req: NextRequest, { params }: { params: { temporadaId
   return NextResponse.json({ matricula: matricula ?? null })
 }
 
-export async function POST(_req: NextRequest, { params }: { params: { temporadaId: string } }) {
+export async function POST(_req: NextRequest, props: { params: Promise<{ temporadaId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

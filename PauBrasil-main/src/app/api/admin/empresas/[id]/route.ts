@@ -13,7 +13,8 @@ const updateSchema = z.object({
   ativo: z.boolean().optional(),
 })
 
-export const GET = withHandler(async (_: NextRequest, { params }: { params: { id: string } }) => {
+export const GET = withHandler(async (_: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -34,7 +35,8 @@ export const GET = withHandler(async (_: NextRequest, { params }: { params: { id
   return NextResponse.json(empresa)
 })
 
-export const PATCH = withHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const PATCH = withHandler(async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -56,7 +58,8 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
   return NextResponse.json(empresa)
 })
 
-export const DELETE = withHandler(async (_: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = withHandler(async (_: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

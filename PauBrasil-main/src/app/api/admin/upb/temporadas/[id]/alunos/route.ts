@@ -7,10 +7,8 @@ import { getEffectiveSessionUser } from '@/lib/session-user'
 
 // GET /api/admin/upb/temporadas/[id]/alunos
 // Retorna todos os usuários com qualquer registro na temporada (certificado, progresso ou matrícula)
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

@@ -34,7 +34,7 @@ export function CommandMenu({
   sections: CommandSection[]
   open: boolean
   onOpenChange: Dispatch<SetStateAction<boolean>>
-  triggerRef: RefObject<HTMLButtonElement>
+  triggerRef: RefObject<HTMLButtonElement | null>
 }) {
   const router = useRouter()
 

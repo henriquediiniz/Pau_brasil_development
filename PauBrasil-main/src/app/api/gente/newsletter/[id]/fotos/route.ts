@@ -22,7 +22,8 @@ const metaSchema = z.object({
 })
 
 /** Recebe uma foto já reduzida no navegador (JPEG ou WebP) e a guarda no banco. */
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
 

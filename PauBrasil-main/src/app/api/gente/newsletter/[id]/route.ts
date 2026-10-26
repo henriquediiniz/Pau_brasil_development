@@ -7,9 +7,10 @@ import { newsletterPatchSchema } from '@/lib/newsletter'
 
 export const dynamic = 'force-dynamic'
 
-type Params = { params: { id: string } }
+type Params = { params: Promise<{ id: string }> }
 
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(_req: NextRequest, props: Params) {
+  const params = await props.params;
   const auth = await autenticarGente()
   if (!auth.ok) return auth.resposta
   const post = await prisma.newsletterPost.findUnique({
@@ -25,7 +26,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
   return NextResponse.json(post)
 }
 
-export async function PATCH(req: NextRequest, { params }: Params) {
+export async function PATCH(req: NextRequest, props: Params) {
+  const params = await props.params;
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
 
@@ -66,7 +68,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   return NextResponse.json({ ok: true })
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(_req: NextRequest, props: Params) {
+  const params = await props.params;
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
 

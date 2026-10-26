@@ -3,7 +3,8 @@ import { prisma } from '@/lib/prisma'
 
 export const revalidate = 3600
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const funcoes = await prisma.function.findMany({
     where: { empresaId: params.id },
     select: { id: true, name: true },

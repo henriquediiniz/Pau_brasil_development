@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, use } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap, CheckCircle2, PlayCircle, Clock, Loader2,
@@ -51,7 +51,8 @@ function extractYouTubeId(url: string): string | null {
   } catch { return null }
 }
 
-export default function TemporadaPage({ params }: { params: { temporadaId: string } }) {
+export default function TemporadaPage(props: { params: Promise<{ temporadaId: string }> }) {
+  const params = use(props.params);
   const router = useRouter()
   const searchParams = useSearchParams()
   const episodioPedido = searchParams.get('ep')

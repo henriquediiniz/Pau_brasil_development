@@ -14,7 +14,7 @@ import { definicaoEtapa } from '@/lib/gente/etapas'
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
 const corpoSchema = z.object({
   etapas: z.array(etapaSchema).min(1).max(30),
@@ -27,7 +27,8 @@ const corpoSchema = z.object({
  * longo do processo e o que vale é o último resultado. O autor e a data de
  * avaliação são gravados pelo servidor, nunca vêm do cliente.
  */
-export const PATCH = withHandler<Ctx>(async (req, { params }) => {
+export const PATCH = withHandler<Ctx>(async (req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx

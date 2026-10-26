@@ -1,9 +1,11 @@
-'use client'
+'use client';
+import { use } from "react";
 
 import { PaginaCadastro } from '../../../_components/PaginaCadastro'
 import { SECOES_APRENDIZ, VALORES_APRENDIZ, validarAprendiz } from '../../../pcd/_campos'
 
-export default function EditarAprendizPage({ params }: { params: { id: string } }) {
+export default function EditarAprendizPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   return (
     <PaginaCadastro
       modo="editar"

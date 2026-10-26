@@ -34,7 +34,7 @@ export function useTotalPendentes(api: ApiCadastros) {
       .then((data) => setTotal(data.total ?? 0))
       .catch(() => {})
   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   useEffect(atualizar, [api])
   return [total, setTotal, atualizar] as const
 }

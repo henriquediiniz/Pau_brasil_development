@@ -11,8 +11,9 @@ import { getEffectiveSessionUser } from '@/lib/session-user'
 // A matrícula é regredida para PENDENTE (não deletada — mantém o registro de acesso).
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string; userId: string } },
+  props: { params: Promise<{ id: string; userId: string }> }
 ) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

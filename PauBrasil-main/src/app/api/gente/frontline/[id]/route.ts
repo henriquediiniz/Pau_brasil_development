@@ -8,7 +8,7 @@ import { podeEscreverNaOperacao, whereEscopoGente } from '@/lib/gente/scope'
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
 const patchSchema = z.object({
   cargo: z.string().min(1).optional(),
@@ -42,7 +42,8 @@ async function carregarParaEscrita(id: string, user: Parameters<typeof podeEscre
   return { item }
 }
 
-export const PATCH = withHandler<Ctx>(async (req, { params }) => {
+export const PATCH = withHandler<Ctx>(async (req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user } = auth.ctx
@@ -86,7 +87,8 @@ export const PATCH = withHandler<Ctx>(async (req, { params }) => {
   return NextResponse.json(item)
 })
 
-export const DELETE = withHandler<Ctx>(async (_req, { params }) => {
+export const DELETE = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user } = auth.ctx

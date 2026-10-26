@@ -17,7 +17,8 @@ const createTiSchema = z.object({
 })
 
 // POST — cria um novo usuário TI admin para a empresa
-export const POST = withHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const POST = withHandler(async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user || !isSysAdmin(session.user)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -58,7 +59,8 @@ export const POST = withHandler(async (req: NextRequest, { params }: { params: {
 })
 
 // PATCH — remove flag isEmpresaAdmin de um usuário existente
-export const PATCH = withHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const PATCH = withHandler(async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user || !isSysAdmin(session.user)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

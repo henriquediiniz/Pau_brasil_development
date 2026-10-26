@@ -9,7 +9,7 @@ import { LAUDO_MIME_ACEITOS, LAUDO_TAMANHO_MAXIMO } from '@/lib/gente/pcd'
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
 /**
  * Laudo de PCD — dado de saúde, art. 11 da LGPD.
@@ -37,7 +37,8 @@ async function carregar(id: string, escopo: Record<string, unknown>) {
 
 // ─── GET: entrega o laudo ─────────────────────────────────────────────────────
 
-export const GET = withHandler<Ctx>(async (_req, { params }) => {
+export const GET = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente()
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx
@@ -107,7 +108,8 @@ export const GET = withHandler<Ctx>(async (_req, { params }) => {
 
 // ─── POST: anexa o laudo ──────────────────────────────────────────────────────
 
-export const POST = withHandler<Ctx>(async (req: NextRequest, { params }) => {
+export const POST = withHandler<Ctx>(async (req: NextRequest, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx
@@ -182,7 +184,8 @@ export const POST = withHandler<Ctx>(async (req: NextRequest, { params }) => {
 
 // ─── DELETE: remove o laudo ───────────────────────────────────────────────────
 
-export const DELETE = withHandler<Ctx>(async (_req, { params }) => {
+export const DELETE = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx

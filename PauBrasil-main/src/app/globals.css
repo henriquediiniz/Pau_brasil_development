@@ -175,35 +175,35 @@
 /* Escopo .app-shell: público (landing, login, etc.) não é afetado */
 
 /* Backgrounds */
-:root:not(.dark) .app-shell .bg-\[#111118\]     { background-color: #ffffff; }
-:root:not(.dark) .app-shell .bg-\[#111118\]\/80 { background-color: rgba(255,255,255,.80); }
-:root:not(.dark) .app-shell .bg-\[#111118\]\/90 { background-color: rgba(255,255,255,.90); }
-:root:not(.dark) .app-shell .bg-\[#111118\]\/95 { background-color: rgba(255,255,255,.95); }
-:root:not(.dark) .app-shell .bg-\[#0d0d14\]     { background-color: #f1f5f9; }
-:root:not(.dark) .app-shell .bg-\[#0d0d14\]\/80 { background-color: rgba(241,245,249,.80); }
-:root:not(.dark) .app-shell .bg-\[#1a1a2e\]     { background-color: #f8fafc; }
-:root:not(.dark) .app-shell .bg-\[#1a1a24\]     { background-color: #f8fafc; }
-:root:not(.dark) .app-shell .bg-\[#1a1a28\]     { background-color: #f8fafc; }
-:root:not(.dark) .app-shell .bg-\[#1c1c24\]     { background-color: #f8fafc; }
-:root:not(.dark) .app-shell .bg-\[#1c1c24\]\/90 { background-color: rgba(248,250,252,.90); }
-:root:not(.dark) .app-shell .bg-\[#13131f\]     { background-color: #f8fafc; }
-:root:not(.dark) .app-shell .bg-\[#0f0f17\]     { background-color: #f1f5f9; }
-:root:not(.dark) .app-shell .bg-\[#0a0a0f\]     { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .bg-\[\#111118\]     { background-color: #ffffff; }
+:root:not(.dark) .app-shell .bg-\[\#111118\]\/80 { background-color: rgba(255,255,255,.80); }
+:root:not(.dark) .app-shell .bg-\[\#111118\]\/90 { background-color: rgba(255,255,255,.90); }
+:root:not(.dark) .app-shell .bg-\[\#111118\]\/95 { background-color: rgba(255,255,255,.95); }
+:root:not(.dark) .app-shell .bg-\[\#0d0d14\]     { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .bg-\[\#0d0d14\]\/80 { background-color: rgba(241,245,249,.80); }
+:root:not(.dark) .app-shell .bg-\[\#1a1a2e\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[\#1a1a24\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[\#1a1a28\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[\#1c1c24\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[\#1c1c24\]\/90 { background-color: rgba(248,250,252,.90); }
+:root:not(.dark) .app-shell .bg-\[\#13131f\]     { background-color: #f8fafc; }
+:root:not(.dark) .app-shell .bg-\[\#0f0f17\]     { background-color: #f1f5f9; }
+:root:not(.dark) .app-shell .bg-\[\#0a0a0f\]     { background-color: #f1f5f9; }
 
 /* Bordas */
 :root:not(.dark) .app-shell .border-white\/5  { border-color: #e2e8f0; }
 :root:not(.dark) .app-shell .border-white\/10 { border-color: #cbd5e1; }
 :root:not(.dark) .app-shell .border-white\/20 { border-color: #94a3b8; }
-:root:not(.dark) .app-shell .border-\[#111118\] { border-color: #e2e8f0; }
-:root:not(.dark) .app-shell .border-\[#09090b\] { border-color: #e2e8f0; }
+:root:not(.dark) .app-shell .border-\[\#111118\] { border-color: #e2e8f0; }
+:root:not(.dark) .app-shell .border-\[\#09090b\] { border-color: #e2e8f0; }
 
 /* Texto dentro de surfaces escuros (mesmo elemento ou descendente) */
-:root:not(.dark) .app-shell .bg-\[#111118\].text-white,
-:root:not(.dark) .app-shell .bg-\[#111118\] .text-white  { color: #1e293b; }
-:root:not(.dark) .app-shell .bg-\[#0d0d14\].text-white,
-:root:not(.dark) .app-shell .bg-\[#0d0d14\] .text-white  { color: #1e293b; }
-:root:not(.dark) .app-shell .bg-\[#1a1a2e\].text-white,
-:root:not(.dark) .app-shell .bg-\[#1a1a2e\] .text-white  { color: #1e293b; }
+:root:not(.dark) .app-shell .bg-\[\#111118\].text-white,
+:root:not(.dark) .app-shell .bg-\[\#111118\] .text-white  { color: #1e293b; }
+:root:not(.dark) .app-shell .bg-\[\#0d0d14\].text-white,
+:root:not(.dark) .app-shell .bg-\[\#0d0d14\] .text-white  { color: #1e293b; }
+:root:not(.dark) .app-shell .bg-\[\#1a1a2e\].text-white,
+:root:not(.dark) .app-shell .bg-\[\#1a1a2e\] .text-white  { color: #1e293b; }
 
 
 
@@ -270,7 +270,7 @@
 :root:not(.dark) .app-shell .bg-slate-800 { background-color: #e2e8f0; }
 
 /* Hex dentro do app que ainda não tinha par no light (tela de ajuda). */
-:root:not(.dark) .app-shell .bg-\[#0c0c12\]\/80 { background-color: rgba(248,250,252,.80); }
+:root:not(.dark) .app-shell .bg-\[\#0c0c12\]\/80 { background-color: rgba(248,250,252,.80); }
 
 /* ── bg-white/X — quase invisíveis em fundo branco ─────────────────────── */
 :root:not(.dark) .app-shell .bg-white\/2  { background-color: #f8fafc; }
@@ -656,12 +656,12 @@
 }
 
 /* Cards rounded-2xl: elevação base */
-:root:not(.dark) .app-shell .rounded-2xl.bg-\[#111118\] {
+:root:not(.dark) .app-shell .rounded-2xl.bg-\[\#111118\] {
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.05);
 }
 
 /* Cards rounded-xl: elevação menor (modais, dropdowns) */
-:root:not(.dark) .app-shell .rounded-xl.bg-\[#111118\] {
+:root:not(.dark) .app-shell .rounded-xl.bg-\[\#111118\] {
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.06);
 }
 

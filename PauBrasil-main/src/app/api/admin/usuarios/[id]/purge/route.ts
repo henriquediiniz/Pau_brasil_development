@@ -9,10 +9,8 @@ import { getEffectiveSessionUser } from '@/lib/session-user'
 // Somente SYS_ADMIN pode purgar contas.
 // A purga libera o e-mail para novo cadastro, preservando logs de auditoria
 // (que registram o nome da pessoa, não o userId).
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

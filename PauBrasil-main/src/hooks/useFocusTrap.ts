@@ -25,7 +25,7 @@ const FOCUSABLE_SELECTORS = [
  *   <div ref={containerRef} role="dialog" aria-modal="true">...</div>
  */
 export function useFocusTrap(
-  containerRef: React.RefObject<HTMLElement>,
+  containerRef: React.RefObject<HTMLElement | null>,
   isOpen: boolean,
   onClose: () => void,
 ) {

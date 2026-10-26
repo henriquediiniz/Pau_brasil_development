@@ -6,7 +6,8 @@ import { isSysAdmin } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: NextRequest, { params }: { params: { jobId: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ jobId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user || !isSysAdmin(session.user as any)) {
     return new NextResponse('Forbidden', { status: 403 })

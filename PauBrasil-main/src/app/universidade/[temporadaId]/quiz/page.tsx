@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, use } from 'react';
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { createQuizTracker } from '@/lib/quiz-tracker'
 import { useQuiz } from '@/hooks/universidade/useQuiz'
@@ -11,7 +11,8 @@ import { ChevronLeft, Loader2, AlertTriangle, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from '@/components/ui/toaster'
 
-export default function QuizPage({ params }: { params: { temporadaId: string } }) {
+export default function QuizPage(props: { params: Promise<{ temporadaId: string }> }) {
+  const params = use(props.params);
   const { track } = useAnalytics()
   const quizTracker = useMemo(() => createQuizTracker(track), [track])
   const [validationMessage, setValidationMessage] = useState<string | null>(null)

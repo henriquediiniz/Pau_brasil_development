@@ -40,13 +40,14 @@ async function checkEpisodioAccess(id: string, actor: SessionUser): Promise<bool
   return episodio != null && canAccessCompanyScope(actor, episodio.temporada.empresas)
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const actor = await getEffectiveSessionUser(session.user)
   if (!isUpbAdmin(actor)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  if (!await checkEpisodioAccess(params.id, actor)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  if (!(await checkEpisodioAccess(params.id, actor))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await req.json()
   const parsed = updateSchema.safeParse(body)

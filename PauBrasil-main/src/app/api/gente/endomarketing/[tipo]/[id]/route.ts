@@ -7,12 +7,13 @@ import { SCHEMAS, ehTipoEndo, tabelaEndo } from '@/lib/endomarketing'
 
 export const dynamic = 'force-dynamic'
 
-type Params = { params: { tipo: string; id: string } }
+type Params = { params: Promise<{ tipo: string; id: string }> }
 
 const naoEncontrado = (e: unknown) =>
   e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025'
 
-export async function PATCH(req: NextRequest, { params }: Params) {
+export async function PATCH(req: NextRequest, props: Params) {
+  const params = await props.params;
   if (!ehTipoEndo(params.tipo)) return NextResponse.json({ error: 'Tipo inválido' }, { status: 404 })
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
@@ -40,7 +41,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(_req: NextRequest, props: Params) {
+  const params = await props.params;
   if (!ehTipoEndo(params.tipo)) return NextResponse.json({ error: 'Tipo inválido' }, { status: 404 })
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta

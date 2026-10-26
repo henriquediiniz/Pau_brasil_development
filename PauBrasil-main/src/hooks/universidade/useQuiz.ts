@@ -126,7 +126,7 @@ export function useQuiz(temporadaId: string, tracker?: QuizTracker) {
       didCancel = true
       controller.abort()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [temporadaId, tracker, reloadToken])
 
   return {

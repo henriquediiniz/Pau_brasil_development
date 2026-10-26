@@ -26,7 +26,8 @@ async function canManageQuestao(id: string, actor: Awaited<ReturnType<typeof get
   return questao != null && canAccessCompanyScope(actor, questao.temporada.empresas)
 }
 
-export const PATCH = withHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const PATCH = withHandler(async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -63,7 +64,8 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
   return NextResponse.json(questao)
 })
 
-export const DELETE = withHandler(async (_req: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = withHandler(async (_req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

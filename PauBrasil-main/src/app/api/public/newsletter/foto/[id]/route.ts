@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic'
  * Campanha publicada: pública, com cache longo (uma foto nunca muda; editar = nova foto).
  * Campanha em rascunho: só para quem acessa o módulo Gente (pré-visualização).
  */
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const foto = await prisma.newsletterPhoto.findUnique({
     where: { id: params.id },
     select: { data: true, mimeType: true, post: { select: { published: true } } },

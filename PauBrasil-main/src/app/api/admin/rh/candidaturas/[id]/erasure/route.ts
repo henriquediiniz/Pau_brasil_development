@@ -18,7 +18,8 @@ export const dynamic = 'force-dynamic'
  * - CV armazenado no Vercel Blob
  * Gera audit log antes de deletar para rastreabilidade regulatória.
  */
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   if (!isRhAdmin(session.user)) return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })

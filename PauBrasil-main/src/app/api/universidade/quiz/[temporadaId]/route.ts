@@ -23,7 +23,8 @@ async function checkPreRequisitos(userId: string, preRequisitos: string[]): Prom
   return preRequisitos.filter(id => !concluidos.has(id))
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { temporadaId: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ temporadaId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -90,7 +91,8 @@ const submitSchema = z.object({
   respostas: z.record(z.string(), z.string()),
 })
 
-export async function POST(req: NextRequest, { params }: { params: { temporadaId: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ temporadaId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

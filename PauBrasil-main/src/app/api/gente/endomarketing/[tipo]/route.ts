@@ -6,16 +6,18 @@ import { ORDEM_GESTAO, SCHEMAS, ehTipoEndo, tabelaEndo } from '@/lib/endomarketi
 
 export const dynamic = 'force-dynamic'
 
-type Params = { params: { tipo: string } }
+type Params = { params: Promise<{ tipo: string }> }
 
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(_req: NextRequest, props: Params) {
+  const params = await props.params;
   if (!ehTipoEndo(params.tipo)) return NextResponse.json({ error: 'Tipo inválido' }, { status: 404 })
   const auth = await autenticarGente()
   if (!auth.ok) return auth.resposta
   return NextResponse.json(await tabelaEndo(params.tipo).findMany({ orderBy: ORDEM_GESTAO[params.tipo] }))
 }
 
-export async function POST(req: NextRequest, { params }: Params) {
+export async function POST(req: NextRequest, props: Params) {
+  const params = await props.params;
   if (!ehTipoEndo(params.tipo)) return NextResponse.json({ error: 'Tipo inválido' }, { status: 404 })
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta

@@ -47,3 +47,6 @@ Sentry.init({
     /^moz-extension:\/\//,
   ],
 })
+
+// Next 15.3+: o Sentry acompanha as navegações do App Router por aqui.
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

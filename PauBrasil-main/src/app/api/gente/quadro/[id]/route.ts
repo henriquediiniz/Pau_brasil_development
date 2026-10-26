@@ -8,9 +8,10 @@ import { SELECT_COLABORADOR, colaboradorPatchSchema } from '@/lib/gente/quadro'
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
-export const GET = withHandler<Ctx>(async (_req, { params }) => {
+export const GET = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente()
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx
@@ -45,7 +46,8 @@ export const GET = withHandler<Ctx>(async (_req, { params }) => {
   return NextResponse.json(item)
 })
 
-export const PATCH = withHandler<Ctx>(async (req, { params }) => {
+export const PATCH = withHandler<Ctx>(async (req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx
@@ -106,7 +108,8 @@ export const PATCH = withHandler<Ctx>(async (req, { params }) => {
   return NextResponse.json(item)
 })
 
-export const DELETE = withHandler<Ctx>(async (_req, { params }) => {
+export const DELETE = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx

@@ -257,7 +257,7 @@ O sistema passou por uma grande modernização arquitetural:
 ### Em andamento
 
 - Claude — execucao da varredura geral, em fases (2026-10-26; usuario deu autorizacao total)
-  - fases 1-3 publicadas; migrations `20261026120000_limite_tentativa` e `20261026150000_drop_legado_pontos_visitas` PENDENTES em producao (o usuario aplica; codigo funciona antes e depois); fase 5 publicada; proxima: 6 (Next 16 + troca do next-pwa)
+  - fases 1-3 publicadas; migrations `20261026120000_limite_tentativa` e `20261026150000_drop_legado_pontos_visitas` PENDENTES em producao (o usuario aplica; codigo funciona antes e depois); fase 6 (Next 16) na branch `chore/next-16`, validando na previa da Vercel antes do merge
 
 - Claude — linha do tempo: ano em destaque avancando ano a ano (2026-10-26)
   - objetivo concluido e publicado (ano a ano + caminhaozinho); arquivos em posse: nenhum
@@ -425,6 +425,18 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-26 - Claude - Varredura: fase 6 (Next 16, React 19, sem next-pwa)
+
+- Branch `chore/next-16`. `next` 14.2 -> 16.4.3, `react`/`react-dom` 19.3, `@types/react*` 19, `lucide-react` 1.61 (0.441 nao aceitava React 19), `eslint` 9 + `eslint-config-next` 16. `npm audit`: **0 vulnerabilidades**.
+- Params assincronos: codemod oficial (`next-async-request-api`, 41 arquivos) + script para o que ele nao pega: handlers dentro de `withHandler(async (req, { params }: {...}) =>` (21) e rotas do Gente com `type Ctx` + `withHandler<Ctx>(async (_req, { params }) =>` (35) -> `ctx` + `const params = await ctx.params`. Refs do React 19 (`RefObject<T | null>`).
+- `next-pwa` removido (cadeia vulneravel do workbox; cacheava APIs que nem existem mais). Novo `public/sw.js` escrito a mao: push + notificationclick (vindos de `worker/index.js`) e pagina offline embutida para navegacao sem rede; ao ativar apaga os caches antigos do next-pwa nos aparelhos. Registro em `providers.tsx` (so producao). Removidos `worker/`, `src/app/offline`.
+- `middleware.ts` -> `src/proxy.ts`. `next.config.js`: `serverExternalPackages`, sem `instrumentationHook`. Sentry: `sentry.client.config.ts` -> `instrumentation-client.ts` (+ `onRouterTransitionStart`); `onRequestError` no `instrumentation.ts`.
+- Turbopack (padrao no build) rejeitou seletores `.bg-\[#0a0a0f\]` do `globals.css`: `#` escapado (`\[\#...`), 25 ocorrencias.
+- ESLint 9 flat (`eslint.config.mjs`; `npm run lint` = `eslint .`). Regras novas do React Compiler como aviso (set-state-in-effect 35, purity, refs, static-components) — conversao e rodada propria; a barra lateral do portal recriada a cada render (static-components) e a primeira candidata.
+- `tests/e2e/portal-colaborador.spec.ts` estava obsoleto (loja, atividades, pontos, perfil so-Universidade) e falhava escondido (pulado por padrao): reescrito para o portal atual; passa com `PORTAL_E2E_DB=1` (2/2).
+- Validacao local: tsc, lint (0 erros), `npm test` 529/0, build; 25 paginas publicas/internas 200 sem erro de JS/API, rotas com [id] (universidade, newsletter, vagas, aderencia, PATCH usuario) ok, proxy redireciona sem login.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-26 - Claude - Varredura: fase 5 (estrutura)
 

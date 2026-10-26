@@ -12,7 +12,7 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
 /**
  * Entrega o currículo do candidato.
@@ -22,7 +22,8 @@ type Ctx = { params: { id: string } }
  * Currículo é dado pessoal: quem abriu e quando precisa ficar registrado
  * mesmo que o download falhe depois.
  */
-export const GET = withHandler<Ctx>(async (_req, { params }) => {
+export const GET = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente()
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx

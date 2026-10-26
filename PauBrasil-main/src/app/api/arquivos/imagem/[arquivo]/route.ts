@@ -8,7 +8,8 @@ export const dynamic = 'force-dynamic'
  * O nome é um UUID aleatório, então o endereço não é adivinhável; a imagem
  * nunca muda (trocar gera outro nome), o que permite cache longo.
  */
-export async function GET(_req: NextRequest, { params }: { params: { arquivo: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ arquivo: string }> }) {
+  const params = await props.params;
   if (!/^[A-Za-z0-9-]+\.(jpg|png|webp|gif)$/.test(params.arquivo)) {
     return NextResponse.json({ error: 'Imagem não encontrada' }, { status: 404 })
   }

@@ -1,4 +1,5 @@
-'use client'
+'use client';
+import { use } from "react";
 
 import Link from 'next/link'
 import useSWR from 'swr'
@@ -64,7 +65,8 @@ function paraFormulario(c: CandidatoApi): ValoresCandidato {
   }
 }
 
-export default function EditarCandidatoPage({ params }: { params: { id: string } }) {
+export default function EditarCandidatoPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { data, error, isLoading } = useSWR<CandidatoApi>(
     `/api/gente/candidatos/${params.id}`,
     fetcher,

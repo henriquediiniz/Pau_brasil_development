@@ -1,9 +1,11 @@
-'use client'
+'use client';
+import { use } from "react";
 
 import { PaginaCadastro } from '../../../_components/PaginaCadastro'
 import { SECOES_CARGO, VALORES_CARGO } from '../../_campos'
 
-export default function EditarCargoPage({ params }: { params: { id: string } }) {
+export default function EditarCargoPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   return (
     <PaginaCadastro
       modo="editar"

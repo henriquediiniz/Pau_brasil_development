@@ -164,7 +164,7 @@ function Calendario({
   aoAplicar: (de: string | null, ate: string | null) => void
   aoFechar: () => void
 }) {
-  const hoje = useMemo(hojeUtc, [])
+  const hoje = useMemo(() => hojeUtc(), [])
 
   const [inicio, setInicio] = useState<Date | null>(() => lerDataIso(de))
   const [fim, setFim] = useState<Date | null>(() => lerDataIso(ate))

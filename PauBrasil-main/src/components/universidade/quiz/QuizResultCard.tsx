@@ -13,7 +13,7 @@ export function QuizResultCard({
 }: {
   resultado: QuizResultado
   onRetry: () => void
-  resultHeadingRef: RefObject<HTMLHeadingElement>
+  resultHeadingRef: RefObject<HTMLHeadingElement | null>
 }) {
   return (
     <motion.div

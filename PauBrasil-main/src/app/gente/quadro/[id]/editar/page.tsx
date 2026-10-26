@@ -1,4 +1,5 @@
-'use client'
+'use client';
+import { use } from "react";
 
 import Link from 'next/link'
 import useSWR from 'swr'
@@ -27,7 +28,8 @@ interface ColaboradorApi {
   ativo: boolean
 }
 
-export default function EditarColaboradorPage({ params }: { params: { id: string } }) {
+export default function EditarColaboradorPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { data, error, isLoading } = useSWR<ColaboradorApi>(
     `/api/gente/quadro/${params.id}`,
     fetcher,

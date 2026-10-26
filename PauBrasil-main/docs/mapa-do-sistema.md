@@ -35,7 +35,7 @@ Os principais pontos de entrada e composição são:
   - tela de autenticação
 - `src/app/app/layout.tsx`
   - shell principal da aplicação autenticada, navegação, notificações e regras de exibição por perfil
-- `src/middleware.ts`
+- `src/proxy.ts` (era `middleware.ts` até o Next 16)
   - proteção de rotas e redirecionamentos por perfil, nível e empresa
 - `src/lib/auth.ts`
   - autenticação, sessão JWT e enriquecimento do usuário logado
@@ -409,7 +409,7 @@ Essa lógica aparece principalmente em:
 
 - `src/lib/auth.ts`
 - `src/lib/auth-helpers.ts`
-- `src/middleware.ts`
+- `src/proxy.ts` (era `middleware.ts` até o Next 16)
 - `src/app/app/layout.tsx`
 
 ## Componentes de Infraestrutura

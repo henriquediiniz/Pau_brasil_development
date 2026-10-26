@@ -7,7 +7,7 @@ import { SELECT_DESLIGAMENTO, registrarDesligamentoSchema } from '@/lib/gente/qu
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
 /**
  * Desliga alguém do quadro.
@@ -19,7 +19,8 @@ type Ctx = { params: { id: string } }
  * O registro do quadro não é apagado, só marcado como inativo: quem saiu ainda
  * precisa aparecer no histórico e no cálculo de turnover.
  */
-export const POST = withHandler<Ctx>(async (req, { params }) => {
+export const POST = withHandler<Ctx>(async (req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx

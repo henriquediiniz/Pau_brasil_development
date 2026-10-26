@@ -8,8 +8,9 @@ export const dynamic = 'force-dynamic'
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string; fotoId: string } },
+  props: { params: Promise<{ id: string; fotoId: string }> }
 ) {
+  const params = await props.params;
   const auth = await autenticarGente({ escrita: true })
   if (!auth.ok) return auth.resposta
 

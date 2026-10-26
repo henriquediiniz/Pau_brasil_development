@@ -1,4 +1,5 @@
-'use client'
+'use client';
+import { use } from "react";
 
 import Link from 'next/link'
 import useSWR from 'swr'
@@ -81,7 +82,8 @@ function paraFormulario(v: VagaApi): ValoresVaga {
   }
 }
 
-export default function EditarVagaPage({ params }: { params: { id: string } }) {
+export default function EditarVagaPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { data, error, isLoading } = useSWR<VagaApi>(
     `/api/gente/vagas/${params.id}`,
     fetcher,

@@ -214,7 +214,7 @@ function smoothPath(points: [number, number][]) {
  * Estrada sinuosa ao lado dos anos: mede a posição de cada ano e passa por todos, alternando os lados.
  * Fica numa faixa estreita à esquerda, então nunca corta a tela nem pede rolagem horizontal.
  */
-function EraRoad({ list, era, year }: { list: RefObject<HTMLOListElement>; era: number; year: number }) {
+function EraRoad({ list, era, year }: { list: RefObject<HTMLOListElement | null>; era: number; year: number }) {
   const [shape, setShape] = useState<RoadShape | null>(null)
   const road = useRef<SVGPathElement>(null)
   const truck = useRef<SVGGElement>(null)

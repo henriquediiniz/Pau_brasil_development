@@ -7,7 +7,7 @@ import { analisarAderencia, encontrarDescritivo } from '@/lib/gente/aderencia'
 
 export const dynamic = 'force-dynamic'
 
-type Ctx = { params: { id: string } }
+type Ctx = { params: Promise<{ id: string }> }
 
 /**
  * Confere uma vaga contra o descritivo de cargo padrão.
@@ -16,7 +16,8 @@ type Ctx = { params: { id: string } }
  * poder cobrar a correção mostrando exatamente qual campo divergiu, e uma
  * resposta que muda a cada execução não serve para isso.
  */
-export const GET = withHandler<Ctx>(async (_req, { params }) => {
+export const GET = withHandler<Ctx>(async (_req, ctx) => {
+  const params = await ctx.params
   const auth = await autenticarGente()
   if (!auth.ok) return auth.resposta
   const { user, where: escopo } = auth.ctx

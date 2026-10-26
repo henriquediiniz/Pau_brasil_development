@@ -8,7 +8,8 @@ import { audit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: NextRequest, { params }: { params: { jobId: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ jobId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user || !isSysAdmin(session.user as any)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -20,7 +21,8 @@ export async function GET(req: NextRequest, { params }: { params: { jobId: strin
   return NextResponse.json({ ...job, sizeBytes: job.sizeBytes?.toString() ?? null })
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { jobId: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ jobId: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions)
   if (!session?.user || !isSysAdmin(session.user as any)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

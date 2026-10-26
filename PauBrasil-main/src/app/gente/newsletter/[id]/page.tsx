@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -68,7 +68,8 @@ async function reduzirFoto(arquivo: File) {
   return { blob, width, height, blur }
 }
 
-export default function EditorNewsletterPage({ params }: { params: { id: string } }) {
+export default function EditorNewsletterPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const router = useRouter()
   const nova = params.id === 'nova'
   const [campos, setCampos] = useState<Campos>(VAZIO)

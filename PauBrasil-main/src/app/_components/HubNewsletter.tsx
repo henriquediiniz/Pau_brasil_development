@@ -31,7 +31,7 @@ export function HubNewsletter({ items }: { items: HubNews[] }) {
   // Tempo já decorrido da foto atual e início da contagem em andamento.
   const elapsed = useRef(0)
   const startedAt = useRef(0)
-  const clickTimer = useRef<number>()
+  const clickTimer = useRef<number | undefined>(undefined)
   const tabsRef = useRef<HTMLDivElement>(null)
   // Lista vazia vira um item vazio só para os hooks rodarem; o componente sai antes do JSX.
   const item = items[news] ?? { photos: [] as HubNews['photos'], company: '', slug: '' }
