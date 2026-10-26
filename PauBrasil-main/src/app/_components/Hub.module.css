@@ -139,14 +139,11 @@
   padding: 10px 12px;
 }
 .logo img {
-  width: 130px;
   height: auto;
   display: block;
 }
 .desktopNav {
   display: flex;
-  gap: 28px;
-  font-size: 13px;
   font-weight: 500;
 }
 .desktopNav a {
@@ -159,11 +156,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 12px;
   font-weight: 600;
   border: 1px solid #d9cec3;
   border-radius: 3px;
-  padding: 12px 15px;
   color: var(--ink);
 }
 .menuButton {
@@ -285,8 +280,6 @@
   border-radius: 3px;
   padding: 8px 14px;
   font-size: 12px;
-  color: #645b53;
-  background: transparent;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -294,9 +287,6 @@
   background: var(--ink);
   color: #fff;
   border-color: var(--ink);
-}
-.filters button:hover {
-  border-color: var(--wine);
 }
 
 /* ── Empresas: placas de marca e cards ─────────────────────────────── */
@@ -308,14 +298,7 @@
   margin-left: 8px;
   padding: 0 6px;
   border-radius: 10px;
-  background: #ece5dc;
-  color: #6d5f53;
   font-size: 12px;
-  font-weight: 600;
-}
-.filters button[aria-pressed="true"] .filterCount {
-  background: #ffffff26;
-  color: #fff;
 }
 .companyGrid {
   list-style: none;
@@ -376,15 +359,9 @@
   min-height: 250px;
 }
 .plate_mini {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
   box-shadow: 0 0 0 1px #00000014;
 }
 .plate_hero {
-  width: 112px;
-  height: 112px;
-  border-radius: 50%;
   margin-bottom: 30px;
   box-shadow:
     0 0 0 1px #ffffff1f,
@@ -460,14 +437,11 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 600;
-  color: var(--muted);
 }
 .partnerTag {
   text-transform: none;
   letter-spacing: 0;
   font-weight: 600;
-  color: var(--wine);
-  background: #7a15200f;
   border: 1px solid #7a152024;
   padding: 3px 8px;
   border-radius: 20px;
@@ -569,7 +543,6 @@
 .brandStripStacked a {
   flex-direction: column;
   gap: 9px;
-  width: 92px;
   padding: 6px 4px 8px;
   border: 0;
   border-radius: 8px;
@@ -580,8 +553,6 @@
   color: #a9a29a;
 }
 .brandStripStacked .plate_mini {
-  width: 52px;
-  height: 52px;
   box-shadow: 0 0 0 1px #ffffff1f;
   transition: transform 0.25s, box-shadow 0.25s;
 }
@@ -654,7 +625,6 @@
 }
 .historyIntro {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 70px;
   align-items: center;
 }
@@ -1152,13 +1122,7 @@
     width: calc(100% - 40px);
     gap: 20px;
   }
-  .desktopNav {
-    gap: 18px;
-  }
   .desktopNav a {
-    font-size: 12px;
-  }
-  .portalLink {
     font-size: 12px;
   }
   .heroGrid {
@@ -1551,10 +1515,6 @@
   .plate_card {
     aspect-ratio: 16 / 8;
   }
-  .companyFeatured .companyBody,
-  .companyBody {
-    padding: 20px;
-  }
   .companyFeatured .companyCard h3 {
     font-size: 20px;
   }
@@ -1574,8 +1534,6 @@
     width: 100%;
   }
   .plate_hero {
-    width: 88px;
-    height: 88px;
     margin-bottom: 24px;
   }
 }
@@ -2101,14 +2059,12 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  border-left: 1px solid #cbbdad;
 }
 .eraYears > li {
   position: relative;
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr);
   gap: 24px;
-  padding: 0 0 34px 34px;
   animation: eraIn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: calc(var(--i, 0) * 70ms);
 }
@@ -2182,7 +2138,6 @@
   .eraYears > li {
     grid-template-columns: 1fr;
     gap: 8px;
-    padding-left: 24px;
   }
   .eraYear {
     font-size: 28px;
@@ -2445,11 +2400,9 @@
 .newsBars {
   position: absolute;
   z-index: 3;
-  top: 14px;
   left: 16px;
   right: 16px;
   display: flex;
-  gap: 5px;
 }
 .newsBars span {
   position: relative;
@@ -2502,7 +2455,6 @@
   filter: blur(22px) brightness(0.75);
 }
 .newsSlide img {
-  position: relative;
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -2539,14 +2491,6 @@
 }
 
 @media (max-width: 1100px) {
-  .desktopNav {
-    gap: 18px;
-    font-size: 13px;
-  }
-  .portalLink {
-    font-size: 12px;
-    padding: 11px 13px;
-  }
   .newsGrid {
     gap: 36px;
   }

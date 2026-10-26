@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Users, Plus, Search, Loader2, Pencil, X, Eye, EyeOff, Check, Trash2, AlertTriangle, UserCheck, CheckSquare, Send, ClipboardList } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { toast } from '@/components/ui/toaster'
+import { CadastrosPendentes } from '@/components/usuarios/CadastrosPendentes'
 import { canManageTeamByNivel, isSysAdmin } from '@/lib/auth-helpers'
 import { getInviteStatus } from '@/lib/user-status'
 import { EMPRESA_NIVEL_OPTIONS, getNivelLabel } from '@/lib/user-display'
@@ -51,15 +52,7 @@ export default function EmpresaUsuariosPage() {
   const [reativando, setReativando] = useState<string | null>(null)
   const [reenviando, setReenviando] = useState<string | null>(null)
 
-  const [pendingList, setPendingList] = useState<PendingItem[]>([])
   const [pendingCount, setPendingCount] = useState(0)
-  const [pendingLoading, setPendingLoading] = useState(false)
-  const [approveModal, setApproveModal] = useState<PendingItem | null>(null)
-  const [approveForm, setApproveForm] = useState({ nivel: 'COLABORADOR', operationIds: [] as string[], managerId: '' })
-  const [approving, setApproving] = useState(false)
-  const [rejectModal, setRejectModal] = useState<PendingItem | null>(null)
-  const [rejectReason, setRejectReason] = useState('')
-  const [rejecting, setRejecting] = useState(false)
 
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [confirmBulk, setConfirmBulk] = useState(false)
@@ -82,15 +75,6 @@ export default function EmpresaUsuariosPage() {
     })
   }
 
-  const fetchPending = () => {
-    setPendingLoading(true)
-    fetch('/api/empresa/registros-pendentes?status=PENDING')
-      .then(r => r.json())
-      .then(data => { setPendingList(data.registros ?? []); setPendingCount(data.total ?? 0) })
-      .catch(() => {})
-      .finally(() => setPendingLoading(false))
-  }
-
   const fetchPendingCount = () => {
     fetch('/api/empresa/registros-pendentes?status=PENDING')
       .then(r => r.json())
@@ -103,11 +87,6 @@ export default function EmpresaUsuariosPage() {
     fetchAll()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    if (statusFilter === 'pendentes') fetchPending()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter])
 
   function openCreate() {
     setEditingUser(null); setForm(EMPTY_FORM); setShowPwd(false); setShowForm(true)
@@ -232,49 +211,6 @@ export default function EmpresaUsuariosPage() {
       toast({ title: (e as Error).message || 'Erro ao desativar', variant: 'destructive' })
     } finally {
       setBulkDeleting(false)
-    }
-  }
-
-  async function handleApprove() {
-    if (!approveModal) return
-    setApproving(true)
-    try {
-      const res = await fetch(`/api/empresa/registros-pendentes/${approveModal.id}/aprovar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nivel: approveForm.nivel, operationIds: approveForm.operationIds, managerId: approveForm.managerId || undefined }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Erro ao aprovar')
-      toast({ title: `✅ ${approveModal.name} aprovado!` })
-      setApproveModal(null)
-      fetchPending()
-    } catch (e: any) {
-      toast({ title: e.message || 'Erro ao aprovar', variant: 'destructive' })
-    } finally {
-      setApproving(false)
-    }
-  }
-
-  async function handleReject() {
-    if (!rejectModal) return
-    setRejecting(true)
-    try {
-      const res = await fetch(`/api/empresa/registros-pendentes/${rejectModal.id}/rejeitar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: rejectReason || undefined }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Erro ao rejeitar')
-      toast({ title: `Cadastro de ${rejectModal.name} rejeitado.` })
-      setRejectModal(null)
-      setRejectReason('')
-      fetchPending()
-    } catch (e: any) {
-      toast({ title: e.message || 'Erro ao rejeitar', variant: 'destructive' })
-    } finally {
-      setRejecting(false)
     }
   }
 
@@ -515,58 +451,7 @@ export default function EmpresaUsuariosPage() {
 
       {/* Tabela pendentes */}
       {statusFilter === 'pendentes' && (
-        <div className="rounded-2xl bg-white/3 border border-white/8 overflow-hidden">
-          {pendingLoading ? (
-            <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 text-brand-400 animate-spin" /></div>
-          ) : pendingList.length === 0 ? (
-            <div className="text-center py-8 text-slate-500 text-sm">Nenhuma solicitação pendente.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/5">
-                    {['Nome', 'E-mail', 'Função', 'Mensagem', 'Data', ''].map(h => (
-                      <th key={h} className="text-left text-xs text-slate-500 font-medium px-4 py-3 last:pr-5">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {pendingList.map((reg, i) => (
-                    <motion.tr key={reg.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
-                      className="hover:bg-white/2 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center shrink-0">
-                            <span className="text-white font-bold text-xs">{reg.name[0]}</span>
-                          </div>
-                          <div>
-                            <div className="text-sm text-white font-medium">{reg.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-slate-400">{reg.email}</td>
-                      <td className="px-4 py-3 text-xs text-slate-400">{reg.function?.name ?? '—'}</td>
-                      <td className="px-4 py-3 text-xs text-slate-500 max-w-[160px] truncate" title={reg.note ?? ''}>{reg.note || '—'}</td>
-                      <td className="px-4 py-3 text-xs text-slate-500">{new Date(reg.createdAt).toLocaleDateString('pt-BR')}</td>
-                      <td className="px-4 py-3 pr-5">
-                        <div className="flex items-center gap-1.5">
-                          <button onClick={() => { setApproveModal(reg); setApproveForm({ nivel: 'COLABORADOR', operationIds: [], managerId: '' }) }}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
-                            <UserCheck className="w-3 h-3" /> Aprovar
-                          </button>
-                          <button onClick={() => { setRejectModal(reg); setRejectReason('') }}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors">
-                            <X className="w-3 h-3" /> Rejeitar
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <CadastrosPendentes api="/api/empresa" managers={managers} onTotal={setPendingCount} />
       )}
 
       {/* Tabela */}
@@ -687,84 +572,6 @@ export default function EmpresaUsuariosPage() {
         )}
       </AnimatePresence>
 
-      {/* Modal aprovar cadastro */}
-      <AnimatePresence>
-        {approveModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#111118] rounded-2xl border border-white/10 p-6 max-w-sm w-full shadow-2xl space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-white font-display font-bold">Aprovar cadastro</h3>
-                <button onClick={() => setApproveModal(null)} className="text-slate-500 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
-              </div>
-              <p className="text-sm text-slate-400">{approveModal.name}</p>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1.5">Nível hierárquico</label>
-                  <select value={approveForm.nivel} onChange={e => setApproveForm(p => ({ ...p, nivel: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500">
-                    {['COLABORADOR','SUPERVISOR','COORDENADOR','GERENTE','DIRETOR','PRESIDENTE'].map(v => (
-                      <option key={v} value={v} className="bg-[#111118]">{v.charAt(0) + v.slice(1).toLowerCase()}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1.5">Gestor responsável <span className="text-slate-600">(opcional)</span></label>
-                  <select value={approveForm.managerId} onChange={e => setApproveForm(p => ({ ...p, managerId: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500">
-                    <option value="" className="bg-[#111118]">Sem gestor</option>
-                    {managers.map(m => <option key={m.id} value={m.id} className="bg-[#111118]">{m.name}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setApproveModal(null)} disabled={approving}
-                  className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-400 hover:text-white text-sm font-medium transition-colors disabled:opacity-50">
-                  Cancelar
-                </button>
-                <button onClick={handleApprove} disabled={approving}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 text-sm font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50">
-                  {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><UserCheck className="w-4 h-4" /> Confirmar</>}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Modal rejeitar cadastro */}
-      <AnimatePresence>
-        {rejectModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#111118] rounded-2xl border border-red-500/20 p-6 max-w-sm w-full shadow-2xl space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-white font-display font-bold">Rejeitar cadastro</h3>
-                <button onClick={() => setRejectModal(null)} className="text-slate-500 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
-              </div>
-              <p className="text-sm text-slate-400">Rejeitar solicitação de <strong className="text-white">{rejectModal.name}</strong>?</p>
-              <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1.5">Motivo <span className="text-slate-600">(opcional)</span></label>
-                <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} maxLength={500}
-                  placeholder="Explique o motivo da rejeição..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 resize-none" />
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => setRejectModal(null)} disabled={rejecting}
-                  className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-400 hover:text-white text-sm font-medium transition-colors disabled:opacity-50">
-                  Cancelar
-                </button>
-                <button onClick={handleReject} disabled={rejecting}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-sm font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50">
-                  {rejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Trash2 className="w-4 h-4" /> Rejeitar</>}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
