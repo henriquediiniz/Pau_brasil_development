@@ -3,27 +3,11 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
-import { ALLOWED_EMAIL_DOMAIN, LOGIN_RATE_LIMIT } from '@/lib/config'
+import { ALLOWED_EMAIL_DOMAIN } from '@/lib/config'
+import { consumirTentativa, ipDe, mensagemLimite } from '@/lib/limite-tentativas'
 import { normalizeEmail, validatePasswordPolicy } from '@/lib/user-provisioning'
 
 export const dynamic = 'force-dynamic'
-
-// Rate limiting by IP (same in-memory pattern as auth.ts)
-const registroAttempts = new Map<string, { count: number; resetAt: number }>()
-
-function checkRateLimit(ip: string): void {
-  const now = Date.now()
-  const record = registroAttempts.get(ip)
-  if (record && now < record.resetAt) {
-    if (record.count >= LOGIN_RATE_LIMIT.maxAttempts) {
-      const remaining = Math.ceil((record.resetAt - now) / 60_000)
-      throw new Error(`Muitas tentativas. Tente novamente em ${remaining} minuto${remaining !== 1 ? 's' : ''}.`)
-    }
-    registroAttempts.set(ip, { ...record, count: record.count + 1 })
-  } else {
-    registroAttempts.set(ip, { count: 1, resetAt: now + LOGIN_RATE_LIMIT.windowMs })
-  }
-}
 
 const registroSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -43,13 +27,9 @@ const registroSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-
-  try {
-    checkRateLimit(ip)
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 429 })
-  }
+  const ip = ipDe(req)
+  const limite = await consumirTentativa('registro', ip)
+  if (!limite.ok) return NextResponse.json({ error: mensagemLimite(limite) }, { status: 429 })
 
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Corpo inválido' }, { status: 400 })

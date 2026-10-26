@@ -252,6 +252,11 @@ function LoginContent() {
                   {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {setupToken && (
+                <p className={styles.hint}>
+                  Pelo menos 10 caracteres, com letra maiúscula, minúscula, número e caractere especial.
+                </p>
+              )}
             </div>
             {totpRequired && (
               <div className={styles.field}>

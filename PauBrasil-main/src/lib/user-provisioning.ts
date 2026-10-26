@@ -9,16 +9,12 @@ import { Prisma } from '@prisma/client'
 
 export const INVITE_TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 7
 
-const WEAK_PASSWORDS = new Set([
-  '12345678',
-  '123456789',
-  'password',
-  'senha123',
-  'admin123',
-  'admin@2026',
-  'paubrasil',
-  'grupopaubrasil',
-])
+// Raízes de senha óbvias. A checagem é por "contém": a política já exige 10 caracteres,
+// maiúscula, número e símbolo, então a comparação exata nunca pegava nada ("Senha123!a" passava).
+const WEAK_PASSWORD_ROOTS = [
+  'senha', 'password', 'admin', 'qwerty', '123456', 'abc123', 'mudar',
+  'paubrasil', 'grupopaubrasil',
+]
 
 const AUDIT_FIELDS = [
   'name', 'email', 'role', 'nivel', 'isUPBAdmin',
@@ -63,7 +59,7 @@ export function validatePasswordPolicy(password: string, userHint?: { name?: str
   if (!/[A-Z]/.test(password)) throw new Error('Senha deve conter letra maiúscula')
   if (!/[0-9]/.test(password)) throw new Error('Senha deve conter número')
   if (!/[^A-Za-z0-9]/.test(password)) throw new Error('Senha deve conter caractere especial')
-  if (WEAK_PASSWORDS.has(normalized)) throw new Error('Senha muito comum')
+  if (WEAK_PASSWORD_ROOTS.some(root => normalized.includes(root))) throw new Error('Senha muito comum')
 
   const emailUser = userHint?.email?.split('@')[0]?.toLowerCase()
   const nameParts = userHint?.name?.toLowerCase().split(/\s+/).filter(part => part.length >= 3) ?? []

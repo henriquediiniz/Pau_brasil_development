@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import { apagarPrivado } from '@/lib/armazenamento'
+import { limparTentativasVencidas } from '@/lib/limite-tentativas'
 import {
   DIAS_RETENCAO_CV, ETAPAS_DE_SAIDA, cvVencido, saidaDoFunil,
 } from '@/lib/carreiras-retencao'
@@ -30,6 +31,9 @@ export async function GET(req: NextRequest) {
   if (req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // Aproveita a passada diária para apagar os contadores de tentativa vencidos
+  await limparTentativasVencidas().catch((error) => console.error('[cron/limpar-cvs] tentativas', error))
 
   const hoje = new Date()
 

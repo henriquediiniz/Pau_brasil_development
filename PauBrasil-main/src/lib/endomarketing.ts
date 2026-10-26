@@ -113,7 +113,6 @@ export const ORDEM_GESTAO: Record<TipoEndo, object> = {
   avisos: [{ ordem: 'asc' }, { createdAt: 'desc' }],
 }
 
-export type ConteudoNossaGente = Awaited<ReturnType<typeof carregarNossaGente>>
 
 /** Tudo que a página pública precisa. Sem banco, devolve listas vazias e a página continua no ar. */
 export async function carregarNossaGente() {

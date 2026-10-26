@@ -256,6 +256,9 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
+- Claude — execucao da varredura geral, em fases (2026-10-26; usuario deu autorizacao total)
+  - fases 1-2 publicadas (migration `20261026120000_limite_tentativa` pendente em producao: aplicar com o comando do usuario); proximas: 3 (banco legado), 4 (deps), 5 (estrutura), 6 (Next 16)
+
 - Claude — linha do tempo: ano em destaque avancando ano a ano (2026-10-26)
   - objetivo concluido e publicado (ano a ano + caminhaozinho); arquivos em posse: nenhum
 
@@ -422,6 +425,29 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-26 - Claude - Varredura: fases 1 e 2 (seguranca, bugs e limpeza)
+
+- `prisma/auxiliar` (URL do Neon com senha, repo publico) removido e ignorado no `.gitignore`. **Senha do Neon precisa ser trocada pelo usuario** (integracao Vercel `neon-rose-compass`; sem acesso de login aqui). O arquivo segue no historico do git.
+- Limites de tentativa: novo `src/lib/limite-tentativas.ts` + model `LimiteTentativa` (migration aditiva `20261026120000_limite_tentativa`), janela fixa com `INSERT ... ON CONFLICT` no Postgres; falha do banco libera a tentativa. Substitui os `Map` em memoria e o Upstash (nunca configurado em producao: nao ha env UPSTASH): login (por e-mail; zera no sucesso), registro, upload-cv, parse-cv, candidatura (IP e e-mail). Cron `limpar-cvs` apaga contadores vencidos. Contato ja limitava pelo AuditLog (mantido).
+- 2FA: removida a rota morta `api/auth/totp/verify` (sem uso e sem limite) e o token temporario assinado com `NEXTAUTH_SECRET ?? 'fallback-temp-secret'`; o login so devolve `TOTP_REQUIRED:` e o cliente reenvia com o codigo (contado no limite de login).
+- `setup-password` agora aplica `validatePasswordPolicy` (aceitava 8 caracteres sem regra); dica da regra na tela. Senhas fracas: checagem por raiz contida (`WEAK_PASSWORD_ROOTS`), antes era igualdade e nunca pegava nada. `tests/provisioning-api.test.ts` entrou no `npm test` (526/0).
+- Curriculo: limite unico de 4 MB (`CV_MAX_BYTES` em `carreiras-perfil.ts`; a Vercel corta acima de 4,5 MB) na tela e nas rotas; a tela recusa na hora o arquivo grande ou que nao e PDF. `upload-cv` nao revela mais o nome de quem ja enviou o mesmo PDF.
+- Limpeza: removidos `nodemailer`, `@types/nodemailer`, `jose`, `@upstash/ratelimit`, `@upstash/redis`, `src/lib/rate-limit.ts`, `public/brand/logo-principal.png`, tipos `FaixaEtaria`/`ConteudoNossaGente`; `next.config.js` sem nodemailer/date-fns e com `webpack.treeshake.removeDebugLogging` no lugar de `disableLogger`. Pasta local `postman/` (fora do git) apagada — continha 1 arquivo que nao foi inspecionado antes (erro meu, avisado ao usuario).
+- Validacao: tsc, lint, `npm test` 526/0, E2E hub 3/3, build; testes locais: 6a tentativa de login bloqueada ("Tente novamente em 9 minutos"), login real ok, registro 429 na 6a, upload 4,2 MB recusado, tela recusa 4,3 MB sem chamar o servidor.
+- Parecer do outro agente: pendente.
+
+### 2026-10-26 - Claude - Varredura geral do codigo (somente analise)
+
+- Ferramentas: grafo de imports proprio (knip nao roda com TS 5.9), exports sem uso, deps sem uso, `npm audit --omit=dev`, `next lint`, varredura de segredos no historico do git (mascarada), auditoria de rotas de API, models do Prisma sem uso, links internos quebrados, CSS duplicado.
+- **URGENTE (seguranca):** `prisma/auxiliar` versionado desde o 1o commit com URL completa (com senha) de um banco Neon (`ep-long-sea-...`); o repositorio GitHub e PUBLICO. Nao foi possivel confirmar se e o banco de producao atual (o classificador negou puxar o env de producao para comparar). Acao recomendada: trocar a senha no Neon e atualizar as envs na Vercel, apagar o arquivo, avaliar deixar o repo privado.
+- Bugs: tela de curriculo diz "max. 5 MB" e `upload-cv` recusa > 2 MB (erro so no ultimo passo); `NEXTAUTH_SECRET ?? 'fallback-temp-secret'` em `auth.ts` e `totp/verify`; limites de tentativa em `Map` em memoria (login, registro, upload-cv, candidaturas) nao funcionam em serverless; `upload-cv` revela o nome do candidato quando o PDF e duplicado; `totp/verify` sem limite; `tests/provisioning-api.test.ts` fora dos scripts e com 1 falha (blocklist).
+- Limpeza: `nodemailer` + `@types/nodemailer` sem uso (so no next.config); `public/brand/logo-principal.png` (1,6 MB) sem uso; `postman/` com pastas vazias (fora do git); tipos mortos `FaixaEtaria` e `ConteudoNossaGente`; Universidade ainda credita `PointsLedger` (pontos retirados); Sentry `disableLogger` deprecado.
+- Banco legado (precisa migration + ok): `LeaderVisit`, `VisitaObrigatoria`, `Operation` (+ `/admin/operacoes`), `TaskDefinition`, `TaskInstance`, `PointsLedger`, `RewardProduct`, `RedemptionOrder`, `GlobalGoal`, `FeedEvent`, `MetaPontuacao`.
+- Dependencias: 3 criticas (`next` so corrige no 16, major; `next-auth` e `@sentry/nextjs` com fix sem major), `xlsx` sem fix no npm, `zod` 4 (major), `next-pwa` descontinuado.
+- Estrutura: `Hub.module.css` 3.8 mil linhas com 113 seletores redefinidos; 402 linhas de remapeamento `.app-shell` no `globals.css`; `admin/usuarios` e `empresa/usuarios` ~65% iguais; `/talentos` x `/gente/candidatos/do-banco-de-talentos` sobrepostos; este handoff com 3,1 mil linhas.
+- Saudavel: nenhum arquivo de `src` orfao, lint e tsc limpos, 511 testes, sem links internos quebrados (rotas antigas vao para a lista de redirecionamento de `portal-features.ts`).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-26 - Claude - Linha do tempo: um ano em destaque por vez
 

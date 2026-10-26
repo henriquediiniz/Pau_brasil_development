@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { parseCvRatelimit } from '@/lib/rate-limit'
+import { consumirTentativa, ipDe } from '@/lib/limite-tentativas'
+import { CV_MAX_BYTES } from '@/lib/carreiras-perfil'
 
 function extractData(text: string) {
   // Regex aprimorado que separa telefone colado do email, e captura possível Cidade no final
@@ -110,17 +111,14 @@ function extractData(text: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (parseCvRatelimit) {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous'
-      const { success } = await parseCvRatelimit.limit(ip)
-      if (!success) {
-        return NextResponse.json({ error: "Muitas tentativas. Tente novamente em 10 minutos." }, { status: 429 })
-      }
+    if (!(await consumirTentativa('lerCv', ipDe(req))).ok) {
+      return NextResponse.json({ error: "Muitas tentativas. Tente novamente em 10 minutos." }, { status: 429 })
     }
 
     const formData = await req.formData()
     const file = formData.get("file") as File
     if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 })
+    if (file.size > CV_MAX_BYTES) return NextResponse.json({ error: "Arquivo muito grande" }, { status: 400 })
 
     // Converter file para Buffer
     const buffer = Buffer.from(await file.arrayBuffer())

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { chaveDeCvValida } from '@/lib/armazenamento'
 import { notify } from '@/lib/notify'
 import { montarCatalogo, gruposDosCargos, nomesDoCatalogo } from '@/lib/gente/cargo-publico'
-import { candidatarRatelimit } from '@/lib/rate-limit'
+import { consumirTentativa, ipDe } from '@/lib/limite-tentativas'
 import { waitUntil } from '@vercel/functions'
 import {
   VALORES_ESCOLARIDADE, VALORES_GENERO, IDADE_MAXIMA, IDADE_MINIMA,
@@ -18,21 +18,6 @@ const ESTADOS_BR = [
   'MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN',
   'RS','RO','RR','SC','SP','SE','TO',
 ] as const
-
-// Rate limit: 3 candidaturas por e-mail por 24h
-const emailRateMap = new Map<string, { count: number; resetAt: number }>()
-
-function checkEmailRateLimit(email: string): boolean {
-  const now = Date.now()
-  const entry = emailRateMap.get(email)
-  if (!entry || now > entry.resetAt) {
-    emailRateMap.set(email, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 })
-    return true
-  }
-  if (entry.count >= 3) return false
-  entry.count++
-  return true
-}
 
 const CandidaturaSchema = z.object({
   nome:                z.string().min(2).max(120).trim(),
@@ -80,13 +65,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Requisição inválida' }, { status: 400 })
   }
 
-  // Rate Limiter Estrito Anti-Spam (Upstash Redis)
-  if (candidatarRatelimit) {
-    const ip = req.headers.get('x-forwarded-for') ?? 'anonymous'
-    const { success } = await candidatarRatelimit.limit(ip)
-    if (!success) {
-      return NextResponse.json({ error: 'Muitas candidaturas. Tente novamente mais tarde.' }, { status: 429 })
-    }
+  // Anti-spam por IP (contador no banco, vale entre instâncias)
+  if (!(await consumirTentativa('candidaturaIp', ipDe(req))).ok) {
+    return NextResponse.json({ error: 'Muitas candidaturas. Tente novamente mais tarde.' }, { status: 429 })
   }
 
   const parsed = CandidaturaSchema.safeParse(body)
@@ -134,8 +115,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Upload do currículo inválido. Envie o PDF novamente.' }, { status: 422 })
   }
 
-  // Rate limit por e-mail
-  if (!checkEmailRateLimit(data.email)) {
+  // Limite por e-mail
+  if (!(await consumirTentativa('candidaturaEmail', data.email)).ok) {
     return NextResponse.json(
       { error: 'Muitas candidaturas. Tente novamente em 24 horas.' },
       { status: 429 }

@@ -16,7 +16,7 @@ import hubStyles from '@/app/_components/Hub.module.css'
 import { EmailsCurriculo } from '@/app/_components/EmailsCurriculo'
 import { AvisoLgpd } from './_components/AvisoLgpd'
 import {
-  ESCOLARIDADES, GENEROS, IDADE_MAXIMA, IDADE_MINIMA, idadeAceita, lerDataNascimento,
+  CV_MAX_BYTES, CV_MAX_TEXTO, ESCOLARIDADES, GENEROS, IDADE_MAXIMA, IDADE_MINIMA, idadeAceita, lerDataNascimento,
 } from '@/lib/carreiras-perfil'
 
 const montserrat = Montserrat({ subsets: ['latin'], display: 'swap', variable: '--font-hub' })
@@ -387,7 +387,7 @@ function FileDropZone({ file, onFile }: {
     e.preventDefault()
     setDragging(false)
     const f = e.dataTransfer.files[0]
-    if (f?.type === 'application/pdf') onFile(f)
+    if (f) onFile(f)
   }, [onFile])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -432,7 +432,7 @@ function FileDropZone({ file, onFile }: {
             ${dragging ? 'border-[#7a1520] bg-[#f1ebe3] scale-[1.02]' : 'border-[#d9cdbf] hover:border-[#c9ab94] hover:bg-[#faf9f6]'}`}>
           <Upload className={`w-8 h-8 mx-auto mb-3 transition-colors ${dragging ? 'text-[#7a1520] animate-bounce' : 'text-[#6f5c4e]'}`} />
           <div className="text-sm font-medium text-[#1a1a1a] mb-1">Arraste o PDF do currículo aqui</div>
-          <div className="text-xs text-[#6f5c4e]">ou clique para selecionar · máx. 5 MB</div>
+          <div className="text-xs text-[#6f5c4e]">ou clique para selecionar · máx. {CV_MAX_TEXTO}</div>
         </button>
       )}
     </div>
@@ -533,6 +533,15 @@ export default function CandidatarPage() {
 
   // AI Parser Helper
   const handleFileUpload = async (f: File) => {
+    // Recusa na hora, e não só no envio final (antes o servidor barrava em 2 MB no último passo)
+    if (f.type !== 'application/pdf') {
+      setErrors(prev => ({ ...prev, cvFile: 'Envie o currículo em PDF.' }))
+      return
+    }
+    if (f.size > CV_MAX_BYTES) {
+      setErrors(prev => ({ ...prev, cvFile: `O arquivo tem ${(f.size / (1024 * 1024)).toFixed(1)} MB. O máximo é ${CV_MAX_TEXTO}.` }))
+      return
+    }
     set('cvFile', f)
     setParsing(true)
     try {
@@ -779,7 +788,7 @@ export default function CandidatarPage() {
                   {step === 3 && 'Onde quer atuar?'}
                 </h1>
                 <p className="text-[#6f5c4e] text-sm mt-1.5 flex items-center justify-center gap-1.5">
-                  {step === 1 && 'Vamos começar pelo seu CV em PDF (máx. 5 MB)'}
+                  {step === 1 && `Vamos começar pelo seu CV em PDF (máx. ${CV_MAX_TEXTO})`}
                   {step === 2 && <><Sparkles className="w-3.5 h-3.5 text-[#7a1520]" /> Auto-preenchidos pela IA. Revise os campos abaixo.</>}
                   {step === 3 && `Escolha até ${MAX_CARGOS} cargos de interesse`}
                 </p>

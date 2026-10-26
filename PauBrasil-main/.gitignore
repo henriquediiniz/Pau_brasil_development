@@ -44,3 +44,7 @@ scratch*.js
 
 # PWA worker gerado a cada build (nome muda sempre)
 public/worker-*.js
+
+# Anotacoes locais com credenciais (nunca versionar)
+prisma/auxiliar
+.env*

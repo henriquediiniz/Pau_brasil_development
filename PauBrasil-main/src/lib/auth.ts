@@ -5,9 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
-import { ALLOWED_EMAIL_DOMAIN, LOGIN_RATE_LIMIT, JWT_REFRESH_INTERVAL_MS } from '@/lib/config'
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+import { ALLOWED_EMAIL_DOMAIN, JWT_REFRESH_INTERVAL_MS } from '@/lib/config'
+import { consumirTentativa, liberarTentativas, mensagemLimite } from '@/lib/limite-tentativas'
 
 const loginSchema = z.object({
   email: z
@@ -20,55 +19,7 @@ const loginSchema = z.object({
   totpToken: z.string().optional(),
 })
 
-const TOTP_JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET ?? 'fallback-temp-secret'
-)
-
-// ── Rate limiting ────────────────────────────────────────────────────────────
-// Uses Upstash Redis (sliding window) when env vars are present — survives
-// Vercel instance rotation. Falls back to in-memory for local dev.
-const loginAttempts = new Map<string, { count: number; resetAt: number }>()
 const TOKEN_REFRESH_INTERVAL_MS = JWT_REFRESH_INTERVAL_MS
-
-const ratelimit =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Ratelimit({
-        redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(
-          LOGIN_RATE_LIMIT.maxAttempts,
-          `${LOGIN_RATE_LIMIT.windowMs / 60_000} m`,
-        ),
-        prefix: '@pb/login',
-      })
-    : null
-
-async function checkRateLimit(email: string): Promise<void> {
-  const key = email.toLowerCase()
-  if (ratelimit) {
-    const { success, reset } = await ratelimit.limit(key)
-    if (!success) {
-      const remaining = Math.ceil((reset - Date.now()) / 60_000)
-      throw new Error(`Muitas tentativas. Tente novamente em ${remaining} minuto${remaining !== 1 ? 's' : ''}.`)
-    }
-    return
-  }
-  const now = Date.now()
-  const record = loginAttempts.get(key)
-  if (record && now < record.resetAt) {
-    if (record.count >= LOGIN_RATE_LIMIT.maxAttempts) {
-      const remaining = Math.ceil((record.resetAt - now) / 60_000)
-      throw new Error(`Muitas tentativas. Tente novamente em ${remaining} minuto${remaining !== 1 ? 's' : ''}.`)
-    }
-    loginAttempts.set(key, { ...record, count: record.count + 1 })
-  } else {
-    loginAttempts.set(key, { count: 1, resetAt: now + LOGIN_RATE_LIMIT.windowMs })
-  }
-}
-
-function clearRateLimit(email: string): void {
-  // Redis sliding window expires naturally — only clear local fallback
-  loginAttempts.delete(email.toLowerCase())
-}
 
 async function refreshTokenState(token: JWT) {
   if (!token.id) return token
@@ -158,8 +109,9 @@ export const authOptions: NextAuthOptions = {
 
         const { email, password, totpToken } = parsed.data
 
-        // Verificar rate limit antes de qualquer consulta ao banco
-        await checkRateLimit(email)
+        // Limite de tentativas por e-mail antes de qualquer consulta ao usuário
+        const limite = await consumirTentativa('login', email)
+        if (!limite.ok) throw new Error(mensagemLimite(limite))
 
         const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
 
@@ -199,23 +151,17 @@ export const authOptions: NextAuthOptions = {
         const totpEnabled = (user as any).totpEnabled ?? false
         const totpSecret  = (user as any).totpSecret  ?? null
         if (totpEnabled && totpSecret) {
-          if (!totpToken) {
-            // Issue a 5-minute temp token so the client can complete the 2nd step
-            const { SignJWT } = await import('jose')
-            const tempToken = await new SignJWT({ sub: user.id })
-              .setProtectedHeader({ alg: 'HS256' })
-              .setExpirationTime('5m')
-              .sign(TOTP_JWT_SECRET)
-            throw new Error(`TOTP_REQUIRED:${tempToken}`)
-          }
+          // Só avisa que falta o código; o cliente reenvia o login com ele.
+          // (Havia um token temporário assinado aqui, mas nenhuma tela o usava.)
+          if (!totpToken) throw new Error('TOTP_REQUIRED:')
           const OTPAuth = await import('otpauth')
           const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(totpSecret) })
           const delta = totp.validate({ token: totpToken, window: 1 })
           if (delta === null) throw new Error('Código 2FA inválido')
         }
 
-        // Login bem-sucedido — limpar contador de tentativas
-        clearRateLimit(email)
+        // Login bem-sucedido — zera o contador de tentativas
+        await liberarTentativas('login', email)
 
         return {
           id:              user.id,

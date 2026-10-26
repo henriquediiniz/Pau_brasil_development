@@ -50,14 +50,14 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    serverComponentsExternalPackages: ['pdf-parse', 'nodemailer'],
+    serverComponentsExternalPackages: ['pdf-parse'],
     /*
       Importar de um barrel (`import { motion } from 'framer-motion'`) arrasta
       o pacote inteiro para o bundle mesmo usando uma peca so. O Next 14.2 ja
       faz esse tratamento para lucide-react e recharts por padrao; framer-motion
       e xlsx ficam de fora da lista e precisam ser declarados.
     */
-    optimizePackageImports: ['framer-motion', 'lucide-react', 'date-fns'],
+    optimizePackageImports: ['framer-motion', 'lucide-react'],
     serverActions: { allowedOrigins: ['localhost:3000'] },
     instrumentationHook: true,
   },
@@ -65,12 +65,6 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
-  },
-  webpack(config, { isServer }) {
-    if (isServer) {
-      config.externals = [...(Array.isArray(config.externals) ? config.externals : []), 'nodemailer']
-    }
-    return config
   },
   async headers() {
     return [
@@ -100,7 +94,7 @@ module.exports = withSentryConfig(
     // Upload de source maps apenas na build de produção
     silent: true,
     hideSourceMaps: true,
-    disableLogger: true,
+    webpack: { treeshake: { removeDebugLogging: true } },
 
     // Não adiciona o Sentry no bundle do browser em dev
     widenClientFileUpload: true,

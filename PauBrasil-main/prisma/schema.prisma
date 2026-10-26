@@ -1523,3 +1523,15 @@ model EndoAviso {
 
   @@index([published, ordem])
 }
+
+/// Contador de tentativas por chave e janela fixa (ver src/lib/limite-tentativas.ts).
+/// Vale entre instâncias da Vercel, ao contrário de um Map em memória.
+model LimiteTentativa {
+  chave    String
+  janela   DateTime
+  contagem Int      @default(1)
+  expiraEm DateTime
+
+  @@id([chave, janela])
+  @@index([expiraEm])
+}

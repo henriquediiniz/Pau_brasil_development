@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import { validatePasswordPolicy } from '@/lib/user-provisioning'
 
 const setupSchema = z.object({
   token: z.string().min(20),
@@ -26,6 +27,13 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: 'Convite expirado ou inválido' }, { status: 400 })
+  }
+
+  // Mesma política do cadastro e da troca de senha (o convite aceitava 8 caracteres sem regra)
+  try {
+    validatePasswordPolicy(parsed.data.password, user)
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 400 })
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12)

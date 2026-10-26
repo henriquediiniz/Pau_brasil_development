@@ -113,7 +113,6 @@ export const FAIXAS_ETARIAS = [
   { valor: '45_MAIS', rotulo: '45 anos ou mais', de: 45, ate: IDADE_MAXIMA },
 ] as const
 
-export type FaixaEtaria = (typeof FAIXAS_ETARIAS)[number]['valor']
 
 /**
  * Faixa etária → intervalo de datas de nascimento, para filtrar no banco.
@@ -134,3 +133,10 @@ export function intervaloDeNascimento(
 
   return { gt: menosAnos(f.ate + 1), lte: menosAnos(f.de) }
 }
+
+/**
+ * Tamanho máximo do currículo em PDF. A Vercel corta requisições acima de 4,5 MB,
+ * então 4 MB é o teto real; a tela e as duas rotas (ler e enviar) usam este valor.
+ */
+export const CV_MAX_BYTES = 4 * 1024 * 1024
+export const CV_MAX_TEXTO = '4 MB'
