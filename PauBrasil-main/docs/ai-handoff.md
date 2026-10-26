@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Varredura geral (seguranca, legado, backup, deps, Next 16) | Claude | concluido | 2026-10-26: fases 1-6 publicadas | Usuario: senha Neon + migrations em producao; Codex: parecer |
 | Hub: linha do tempo ano a ano | Claude | concluido | 2026-10-26: um ano em destaque por vez + caminhaozinho na estrada; deploy | Parecer do Codex |
 | Paginas publicas no visual do hub (candidatar, carreiras, contato, registro, erro/offline) | Claude | concluido | 2026-10-23: tema verde antigo removido; deploy | Parecer do Codex |
 | Hub: critica de design (contraste, mobile, cabecalho) | Claude | concluido | 2026-10-23: contraste, fonte minima 12px, cabecalho areia + newsletter branca, logos 4x2, cards compactos, pausa/play da newsletter corrigido; deploy | Parecer do Codex |
@@ -436,6 +437,7 @@ Use este formato:
 - ESLint 9 flat (`eslint.config.mjs`; `npm run lint` = `eslint .`). Regras novas do React Compiler como aviso (set-state-in-effect 35, purity, refs, static-components) — conversao e rodada propria; a barra lateral do portal recriada a cada render (static-components) e a primeira candidata.
 - `tests/e2e/portal-colaborador.spec.ts` estava obsoleto (loja, atividades, pontos, perfil so-Universidade) e falhava escondido (pulado por padrao): reescrito para o portal atual; passa com `PORTAL_E2E_DB=1` (2/2).
 - Validacao local: tsc, lint (0 erros), `npm test` 529/0, build; 25 paginas publicas/internas 200 sem erro de JS/API, rotas com [id] (universidade, newsletter, vagas, aderencia, PATCH usuario) ok, proxy redireciona sem login.
+- Previa da Vercel (protegida; acessada com `vercel curl`): paginas e API 200, home com todas as secoes, sw novo servido. Merge fast-forward em `main` (`9467ea3`, `da4308f`). Producao: 10 paginas publicas 200 sem erro de JS, linha do tempo e newsletter avancando, sw registrado (`/sw.js`, escopo `/`), proxy redirecionando.
 - Parecer do outro agente: pendente.
 
 ### 2026-10-26 - Claude - Varredura: fase 5 (estrutura)
