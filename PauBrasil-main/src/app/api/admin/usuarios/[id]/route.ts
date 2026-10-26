@@ -15,10 +15,6 @@ const updateSchema = z.object({
   nivel: z.enum(['COLABORADOR', 'SUPERVISOR', 'COORDENADOR', 'GERENTE', 'DIRETOR', 'DIRETO', 'PRESIDENTE']).optional(),
   isUPBAdmin: z.boolean().optional(),
   isEmpresaAdmin: z.boolean().optional(),
-  isItinerantLeader: z.boolean().optional(),
-  isVisitasAdmin: z.boolean().optional(),
-  leaderTitle: z.string().nullable().optional(),
-  managedAreaIds: z.array(z.string()).optional(),
   functionId: z.string().nullable().optional(),
   company: z.string().nullable().optional(),
   empresaId: z.string().nullable().optional(),
@@ -51,9 +47,6 @@ export const PATCH = withHandler(async (req: NextRequest, { params }: { params: 
     parsed.data.nivel !== undefined ||
     parsed.data.isUPBAdmin !== undefined ||
     parsed.data.isEmpresaAdmin !== undefined ||
-    parsed.data.isItinerantLeader !== undefined ||
-    parsed.data.isVisitasAdmin !== undefined ||
-    parsed.data.managedAreaIds !== undefined ||
     parsed.data.company !== undefined ||
     parsed.data.empresaId !== undefined
 

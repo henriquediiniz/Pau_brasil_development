@@ -145,3 +145,40 @@ test('roundtrip: payload com dados reais serializa e deserializa corretamente', 
   assert.equal(result.tables.SystemConfig[0].key, 'backup_enabled')
   assert.equal(result.rowCounts.User, 1)
 })
+
+// ─── cobertura do backup (lista derivada do schema) ──────────────────────────
+
+test('backup cobre todos os models do schema, exceto os de FORA_DO_BACKUP', async () => {
+  const { Prisma } = await import('@prisma/client')
+  const { FORA_DO_BACKUP } = await import('../src/lib/backup-modelos')
+  const esperados = Prisma.dmmf.datamodel.models.map((m) => m.name).filter((n) => !(n in FORA_DO_BACKUP)).sort()
+  assert.deepEqual([...EXPORT_ORDER].sort(), esperados)
+  for (const tabela of ['RecCandidato', 'QuadroColaborador', 'NewsletterPhoto', 'EndoAviso']) {
+    assert.ok(EXPORT_ORDER.includes(tabela), `${tabela} precisa estar no backup`)
+  }
+})
+
+test('backup grava pais antes dos filhos (FK fora do 2º passo)', async () => {
+  const { Prisma } = await import('@prisma/client')
+  const { MODELOS_BACKUP } = await import('../src/lib/backup-modelos')
+  const posicao = new Map(MODELOS_BACKUP.map((m, i) => [m.nome, i]))
+  for (const m of Prisma.dmmf.datamodel.models) {
+    const meu = MODELOS_BACKUP.find((x) => x.nome === m.name)
+    if (!meu) continue
+    for (const f of m.fields) {
+      if (f.kind !== 'object' || !f.relationFromFields?.length || !posicao.has(f.type)) continue
+      if (f.relationFromFields.every((c) => meu.segundoPasso.includes(c))) continue
+      assert.ok(posicao.get(f.type)! < posicao.get(m.name)!, `${f.type} deve vir antes de ${m.name}`)
+    }
+  }
+})
+
+test('serializeRow e desserializarLinha preservam binário (fotos da newsletter)', async () => {
+  const { desserializarLinha } = await import('../src/lib/backup-import')
+  const bytes = Buffer.from([0xff, 0xd8, 0x00, 0x10, 0x7f])
+  const serializado = serializeRow({ id: 'x', data: bytes })
+  assert.deepEqual(serializado.data, { $bytes: bytes.toString('base64') })
+  const volta = desserializarLinha(JSON.parse(JSON.stringify(serializado)), ['data'])
+  assert.ok(Buffer.isBuffer(volta.data))
+  assert.deepEqual(volta.data, bytes)
+})

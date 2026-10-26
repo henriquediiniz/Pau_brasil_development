@@ -257,7 +257,7 @@ O sistema passou por uma grande modernização arquitetural:
 ### Em andamento
 
 - Claude — execucao da varredura geral, em fases (2026-10-26; usuario deu autorizacao total)
-  - fases 1-2 publicadas (migration `20261026120000_limite_tentativa` pendente em producao: aplicar com o comando do usuario); proximas: 3 (banco legado), 4 (deps), 5 (estrutura), 6 (Next 16)
+  - fases 1-3 publicadas; migrations `20261026120000_limite_tentativa` e `20261026150000_drop_legado_pontos_visitas` PENDENTES em producao (o usuario aplica; codigo funciona antes e depois); proximas: 4 (deps), 5 (estrutura), 6 (Next 16)
 
 - Claude — linha do tempo: ano em destaque avancando ano a ano (2026-10-26)
   - objetivo concluido e publicado (ano a ano + caminhaozinho); arquivos em posse: nenhum
@@ -425,6 +425,16 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-26 - Claude - Varredura: fase 3 (banco legado e backup completo)
+
+- **Backup diario estava incompleto:** a lista de tabelas era manual e nao tinha nada do modulo Gente (Rec*, Quadro*), newsletter nem endomarketing (20 tabelas). Novo `src/lib/backup-modelos.ts` deriva tudo do `Prisma.dmmf`: ordem topologica pelas FKs, segundo passo para auto-referencia/ciclo, chave primaria (`id` ou `key`), campos `Bytes` (fotos da newsletter vao como `{ $bytes: base64 }`). `FORA_DO_BACKUP` so tem `LimiteTentativa`. `backup-export.ts`/`backup-import.ts` usam essa lista; import avisa tabela que nao existe mais no schema (backups antigos). Testes novos garantem cobertura de todos os models e ordem das FKs. Teste local: 43 tabelas, ~20 MB com 121 fotos, reimportacao sem erro e foto identica.
+- **Restaurar pela tela nao funcionaria** (upload > 4,5 MB e cortado pela Vercel): `api/admin/backup/import` aceita JSON `{ jobId, dryRun }` e le o arquivo do Blob; botoes "Simular" e "Restaurar" em cada backup da lista.
+- Legado removido (codigo + migration `20261026150000_drop_legado_pontos_visitas`): tabelas `LeaderVisit`, `VisitaObrigatoria`, `Operation`, `TaskDefinition`, `TaskInstance`, `PointsLedger`, `RewardProduct`, `RedemptionOrder`, `GlobalGoal`, `FeedEvent`, `MetaPontuacao`; enums `Frequency`, `TaskStatus`, `LedgerKind`, `LedgerStatus`, `OrderStatus`, `LeaderVisitStatus`; colunas `User.isItinerantLeader/isVisitasAdmin/leaderTitle/managedAreaIds/targetRewardId` e `UPBTemporada.pontosNoCertificado`. Tela/API `/admin/operacoes` (sem link no menu), rota duplicada `src/app/admin/funcoes/[id]/route.ts`, `prisma/seed-operations.ts`, partes de tarefas/loja do `seed.ts`, credito de pontos na Universidade, filtro "Aprovadores" e campos de lider itinerante na tela de usuarios, flags na sessao.
+- Migration conferida: aplicada no banco local e `prisma migrate diff` so mostra o drift antigo de indices (AuditLog/Notification/RecCargo), que ficou de fora.
+- Validacao: tsc, lint, `npm test` 529/0, E2E 4 ok / 3 pulados / `login-flow` (conta gestor so existe no seed do CI); telas admin usuarios/upb/funcoes/backup e edicao de usuario (PATCH 200) sem erro.
+- Observacao: GitHub Actions do repo tem 0 execucoes (workflow `tests.yml` nunca rodou).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-26 - Claude - Varredura: fases 1 e 2 (seguranca, bugs e limpeza)
 

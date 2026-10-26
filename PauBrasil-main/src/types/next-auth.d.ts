@@ -15,9 +15,6 @@ declare module 'next-auth' {
       isActive: boolean
       isUPBAdmin: boolean
       isEmpresaAdmin: boolean
-      isItinerantLeader: boolean
-      isVisitasAdmin: boolean
-      leaderTitle: string | null
       faceReferenceUrl: string | null
       functionId: string | null
       company: string | null
@@ -36,9 +33,6 @@ declare module 'next-auth' {
     isActive: boolean
     isUPBAdmin: boolean
     isEmpresaAdmin: boolean
-    isItinerantLeader: boolean
-    isVisitasAdmin: boolean
-    leaderTitle: string | null
     faceReferenceUrl: string | null
     functionId: string | null
     company: string | null
@@ -58,9 +52,6 @@ declare module 'next-auth/jwt' {
     isActive: boolean
     isUPBAdmin: boolean
     isEmpresaAdmin: boolean
-    isItinerantLeader: boolean
-    isVisitasAdmin: boolean
-    leaderTitle: string | null
     faceReferenceUrl: string | null
     functionId: string | null
     company: string | null

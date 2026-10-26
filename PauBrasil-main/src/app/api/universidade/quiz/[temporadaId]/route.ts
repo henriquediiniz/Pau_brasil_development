@@ -184,25 +184,7 @@ export async function POST(req: NextRequest, { params }: { params: { temporadaId
 
     const isNovo = certificado.createdAt.getTime() === certificado.emitidoEm.getTime()
     if (isNovo) {
-      const pts = temporada.pontosNoCertificado ?? 0
-      const notasPartes = [`Voce foi aprovado na prova de "${temporada.titulo}" e ganhou seu certificado!`]
-      if (pts > 0) notasPartes.push(`+${pts} pontos creditados!`)
-
-      await notify(userId, 'Certificado emitido!', notasPartes.join(' '))
-
-      if (pts > 0) {
-        await prisma.pointsLedger.create({
-          data: {
-            userId,
-            kind: 'EARN',
-            status: 'CONFIRMED',
-            points: pts,
-            refType: 'UPBCertificado',
-            refId: certificado.id,
-            note: `Certificado UPB: ${temporada.titulo}`,
-          },
-        })
-      }
+      await notify(userId, 'Certificado emitido!', `Você foi aprovado na prova de "${temporada.titulo}" e ganhou seu certificado!`)
     }
   }
 
@@ -211,7 +193,6 @@ export async function POST(req: NextRequest, { params }: { params: { temporadaId
     total,
     aprovado,
     percentual: total > 0 ? Math.round((acertos / total) * 100) : 0,
-    pontosGanhos: aprovado ? (temporada.pontosNoCertificado ?? 0) : 0,
     tentativa,
     certificado,
   })

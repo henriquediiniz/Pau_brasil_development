@@ -17,7 +17,6 @@ const updateSchema = z.object({
   ordem: z.number().int().min(0).optional(),
   ativo: z.boolean().optional(),
   restricaoAcesso: z.boolean().optional(),
-  pontosNoCertificado: z.number().int().min(0).max(100000).optional(),
   empresas: z.array(z.string()).optional(),
   unidades: z.array(z.string()).optional(),
   funcoesComAcesso: z.array(z.string()).optional(),

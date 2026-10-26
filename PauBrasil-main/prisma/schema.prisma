@@ -25,45 +25,6 @@ enum Nivel {
   DIRETO
 }
 
-enum Frequency {
-  DAILY
-  WEEKLY
-  MONTHLY
-}
-
-enum TaskStatus {
-  PENDING
-  BLOCKED // aguardando conclusão de tarefa anterior (encadeamento)
-  DONE
-  APPROVED
-  REJECTED
-}
-
-enum LedgerKind {
-  EARN
-  REDEEM
-  ADJUST
-  REVERSAL
-}
-
-enum LedgerStatus {
-  CONFIRMED
-  PENDING
-}
-
-enum OrderStatus {
-  REQUESTED
-  APPROVED
-  DELIVERED
-  CANCELED
-}
-
-enum LeaderVisitStatus {
-  valid
-  blocked_gps
-  blocked_face
-}
-
 enum RegistrationStatus {
   PENDING
   APPROVED
@@ -159,11 +120,7 @@ model User {
   nivel                  Nivel     @default(COLABORADOR)
   isUPBAdmin             Boolean   @default(false)
   isEmpresaAdmin         Boolean   @default(false)
-  isItinerantLeader      Boolean   @default(false)
-  isVisitasAdmin         Boolean   @default(false)
-  leaderTitle            String?
   faceReferenceUrl       String?
-  managedAreaIds         String[]  @default([])
   functionId             String?
   units                  String[]  @default([])
   operationIds           String[]  @default([]) // fonte por ID; units fica como cache legado de nomes
@@ -171,7 +128,6 @@ model User {
   empresaId              String?
   managerId              String?
   photoUrl               String?
-  targetRewardId         String?
   isActive               Boolean   @default(true)
   mustChangePassword     Boolean   @default(false)
   passwordResetTokenHash String?
@@ -190,12 +146,6 @@ model User {
   filial                     Filial?             @relation(fields: [filialId], references: [id])
   manager                    User?               @relation("ManagerSubordinates", fields: [managerId], references: [id])
   subordinates               User[]              @relation("ManagerSubordinates")
-  taskInstances              TaskInstance[]
-  ledger                     PointsLedger[]
-  orders                     RedemptionOrder[]
-  targetReward               RewardProduct?      @relation("TargetReward", fields: [targetRewardId], references: [id])
-  feedEvents                 FeedEvent[]
-  approvals                  TaskInstance[]      @relation("Approver")
   notifications              Notification[]
   upbProgressos              UPBProgresso[]
   upbCertificados            UPBCertificado[]
@@ -203,9 +153,6 @@ model User {
   upbMatriculas              UPBMatricula[]
   upbMatriculasAprov         UPBMatricula[]      @relation("MatriculaAprovador")
   notasCandidatura           NotaCandidatura[]
-  leaderVisits               LeaderVisit[]
-  visitasObrigatorias        VisitaObrigatoria[] @relation("VisitasObrigatorias")
-  visitasObrigatoriasCreadas VisitaObrigatoria[] @relation("VisitasObrigatoriasCreadas")
   pushSubscriptions          PushSubscription[]
 
   // ── Gente: recrutamento e quadro ──
@@ -228,54 +175,6 @@ model User {
   @@index([isActive])
 }
 
-model LeaderVisit {
-  id            String            @id @default(cuid())
-  userId        String
-  operationSlug String
-  operationName String
-  checkedInAt   DateTime          @default(now())
-  photoUrl      String?
-  latitude      Float
-  longitude     Float
-  gpsValid      Boolean
-  faceValid     Boolean
-  status        LeaderVisitStatus
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([operationSlug])
-  @@index([checkedInAt])
-  @@index([userId, operationSlug, checkedInAt])
-}
-
-model Operation {
-  id           String @id @default(cuid())
-  slug         String @unique
-  name         String
-  latitude     Float
-  longitude    Float
-  radiusMeters Int    @default(200)
-}
-
-model VisitaObrigatoria {
-  id               String   @id @default(cuid())
-  userId           String
-  operationSlug    String
-  quantidadeMinima Int      @default(1)
-  ativo            Boolean  @default(true)
-  criadoPor        String
-  criadoEm         DateTime @default(now())
-  atualizadoEm     DateTime @updatedAt
-
-  user    User @relation("VisitasObrigatorias", fields: [userId], references: [id])
-  criador User @relation("VisitasObrigatoriasCreadas", fields: [criadoPor], references: [id])
-
-  @@unique([userId, operationSlug])
-  @@index([userId])
-  @@index([operationSlug])
-}
-
 model Function {
   id          String   @id @default(cuid())
   name        String
@@ -285,134 +184,10 @@ model Function {
 
   empresa            Empresa?              @relation(fields: [empresaId], references: [id])
   users              User[]
-  tasks              TaskDefinition[]
-  metas              MetaPontuacao[]
   registrosPendentes PendingRegistration[]
   recSucessoes       RecSucessao[]
 
   @@index([empresaId])
-}
-
-model TaskDefinition {
-  id              String    @id @default(cuid())
-  functionId      String
-  title           String
-  description     String?
-  frequency       Frequency @default(DAILY)
-  daysOfWeek      Int[]
-  points          Int       @default(10)
-  requireEvidence Boolean   @default(false)
-  requireApproval Boolean   @default(false)
-  dailyLimit      Int       @default(1)
-  active          Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-
-  // Encadeamento: quando esta tarefa é concluída, desbloqueia nextTask
-  nextTaskDefinitionId String?
-  nextTaskDefinition   TaskDefinition?  @relation("TaskChain", fields: [nextTaskDefinitionId], references: [id])
-  prevTasks            TaskDefinition[] @relation("TaskChain")
-
-  function  Function       @relation(fields: [functionId], references: [id])
-  instances TaskInstance[]
-
-  @@index([functionId])
-  @@index([nextTaskDefinitionId])
-}
-
-model TaskInstance {
-  id               String     @id @default(cuid())
-  userId           String
-  taskDefinitionId String? // null for ad-hoc tasks
-  date             DateTime
-  status           TaskStatus @default(PENDING)
-  evidenceUrl      String?
-  note             String?
-  approvedBy       String?
-  approvedAt       DateTime?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-
-  // Atividade avulsa — demanda verbal ou extra
-  isAdHoc         Boolean @default(false)
-  adHocTitle      String?
-  adHocDesc       String?
-  requestedPoints Int? // pontos sugeridos pelo colaborador
-  horario         String? // "HH:MM" — hora agendada (atividades agendadas)
-
-  // Encadeamento: qual instância desbloqueou esta (status BLOCKED → PENDING)
-  triggeredByInstanceId String?
-  triggeredByInstance   TaskInstance?  @relation("TaskTrigger", fields: [triggeredByInstanceId], references: [id])
-  triggeredInstances    TaskInstance[] @relation("TaskTrigger")
-
-  // Convites: se for cópia de convite de reunião
-  conviteDeId   String?
-  conviteDe     TaskInstance?  @relation("Convites", fields: [conviteDeId], references: [id])
-  convites      TaskInstance[] @relation("Convites")
-  conviteStatus String? // null | 'ACEITO' | 'RECUSADO'
-
-  user           User            @relation(fields: [userId], references: [id])
-  taskDefinition TaskDefinition? @relation(fields: [taskDefinitionId], references: [id])
-  approver       User?           @relation("Approver", fields: [approvedBy], references: [id])
-
-  @@unique([userId, taskDefinitionId, date])
-  @@index([userId, date])
-  @@index([userId, date, status])
-  @@index([userId, isAdHoc, date])
-  @@index([taskDefinitionId])
-  @@index([status])
-  @@index([isAdHoc])
-}
-
-model PointsLedger {
-  id        String       @id @default(cuid())
-  userId    String
-  kind      LedgerKind
-  status    LedgerStatus @default(CONFIRMED)
-  points    Int
-  refType   String?
-  refId     String?
-  note      String?
-  createdAt DateTime     @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@unique([refType, refId, kind])
-  @@index([userId])
-  @@index([userId, createdAt])
-  @@index([userId, status])
-  @@index([userId, kind])
-}
-
-model RewardProduct {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  pointsCost  Int
-  stock       Int?
-  emoji       String?  @default("🎁")
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  orders     RedemptionOrder[]
-  targetedBy User[]            @relation("TargetReward")
-}
-
-model RedemptionOrder {
-  id         String      @id @default(cuid())
-  userId     String
-  productId  String
-  pointsCost Int
-  status     OrderStatus @default(REQUESTED)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-
-  user    User          @relation(fields: [userId], references: [id])
-  product RewardProduct @relation(fields: [productId], references: [id])
-
-  @@index([userId])
-  @@index([userId, status])
-  @@index([status])
 }
 
 model AuditLog {
@@ -489,37 +264,6 @@ model Notification {
 
 // ─── Gamificação & ROI (Visão Executiva) ──────────────────────────────────────
 
-model GlobalGoal {
-  id           String    @id @default(cuid())
-  title        String
-  description  String?
-  targetValue  Decimal   @db.Decimal(15, 2)
-  currentValue Decimal   @default(0) @db.Decimal(15, 2)
-  deadline     DateTime?
-  rewardPoints Int
-  units        String[]  @default([]) // operações envolvidas (vazio = toda empresa)
-  active       Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  @@index([active])
-}
-
-model FeedEvent {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String // LEVEL_UP, NEW_TARGET, GOAL_REACHED, etc.
-  message   String
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId, createdAt])
-  @@index([createdAt])
-  @@index([type])
-  @@index([userId])
-}
-
 // ─── UPB — Universidade Pau Brasil ───────────────────────────────────────────
 
 enum UPBMatriculaStatus {
@@ -536,7 +280,6 @@ model UPBTemporada {
   ordem               Int      @default(0)
   ativo               Boolean  @default(true)
   restricaoAcesso     Boolean  @default(false) // exige matrícula aprovada
-  pontosNoCertificado Int      @default(0) // pontos creditados ao concluir/passar na prova
   empresas            String[] @default([]) // vazio = todas as empresas
   unidades            String[] @default([]) // vazio = todas as operações
   funcoesComAcesso    String[] @default([]) // IDs de funções com acesso automático (sem matrícula)
@@ -711,27 +454,6 @@ model UPBCertificado {
 }
 
 // ─── Metas de Pontuação ───────────────────────────────────────────────────────
-
-model MetaPontuacao {
-  id          String   @id @default(cuid())
-  titulo      String
-  meta        Int // pontos-alvo
-  periodo     String // 'mensal' | 'trimestral'
-  mes         Int? // 1-12 (quando mensal)
-  trimestre   Int? // 1-4 (quando trimestral)
-  ano         Int
-  funcaoId    String? // null = todas as funções (matching de usuário)
-  units       String[] @default([]) // operações (vazio = todas)
-  funcoesMeta String[] @default([]) // funções cujos pontos contam (vazio = todas)
-  ativo       Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  funcao Function? @relation(fields: [funcaoId], references: [id])
-
-  @@index([ano, periodo])
-  @@index([funcaoId])
-}
 
 // ─── Banco de Talentos ────────────────────────────────────────────────────────
 

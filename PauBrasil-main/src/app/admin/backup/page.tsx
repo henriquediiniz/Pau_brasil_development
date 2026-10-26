@@ -135,6 +135,29 @@ export default function BackupPage() {
     }
   }
 
+  /** Restaura um backup guardado (o servidor lê do Blob; o upload da tela não passa de 4,5 MB). */
+  async function restoreJob(jobId: string, simular: boolean) {
+    if (!simular && !window.confirm('Restaurar este backup sobre os dados atuais? Os registros do arquivo serão gravados por cima dos existentes.')) return
+    setImporting(true)
+    setImportResult(null)
+    try {
+      const res = await fetch('/api/admin/backup/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId, dryRun: simular }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Erro desconhecido')
+      setImportResult(data)
+      showToast(simular ? 'Simulação concluída: veja o resultado no card de importação.' : 'Backup restaurado com sucesso!')
+      if (!simular) await load()
+    } catch (e: any) {
+      showToast(e.message ?? 'Falha ao restaurar', false)
+    } finally {
+      setImporting(false)
+    }
+  }
+
   async function handleImport() {
     if (!importFile) return
     setImporting(true)
@@ -303,6 +326,26 @@ export default function BackupPage() {
                     >
                       <Download className="w-4 h-4" />
                     </a>
+                  )}
+                  {job.blobUrl && job.type !== 'IMPORT' && (
+                    <>
+                      <button
+                        onClick={() => restoreJob(job.id, true)}
+                        disabled={importing}
+                        className="px-2 py-1 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-white/8 transition-colors disabled:opacity-40"
+                        title="Simula a restauração sem gravar nada"
+                      >
+                        Simular
+                      </button>
+                      <button
+                        onClick={() => restoreJob(job.id, false)}
+                        disabled={importing}
+                        className="px-2 py-1 rounded-lg text-xs text-amber-400 hover:bg-amber-500/10 transition-colors disabled:opacity-40"
+                        title="Restaura este backup sobre os dados atuais"
+                      >
+                        Restaurar
+                      </button>
+                    </>
                   )}
                   <button
                     onClick={() => handleDelete(job.id)}

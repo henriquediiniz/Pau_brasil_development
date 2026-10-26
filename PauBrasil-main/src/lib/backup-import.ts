@@ -2,45 +2,22 @@ import { prisma } from './prisma'
 import { gunzipSync } from 'zlib'
 import { createHash } from 'crypto'
 
-export const IMPORT_ORDER = [
-  'Empresa', 'RewardProduct', 'GlobalGoal',
-  'Operation', 'Candidatura',
-  'Filial', 'Operacao', 'Function', 'UPBTemporada',
-  'UPBEpisodio', 'UPBQuestao', 'UPBObrigatorio',
-  'MetaPontuacao', 'TaskDefinition',
-  'User',
-  'PushSubscription', 'Notification', 'FeedEvent',
-  'UPBProgresso', 'UPBCertificado', 'UPBQuizTentativa', 'UPBMatricula',
-  'UPBQuestaoOpcao',
-  'LeaderVisit', 'VisitaObrigatoria', 'RedemptionOrder',
-  'TaskInstance', 'PointsLedger', 'PendingRegistration',
-  'AuditLog', 'NotaCandidatura', 'UPBRespostaUsuario',
-  'BackupJob', 'SystemConfig',
-]
+import { MODELOS_BACKUP, modeloBackup } from './backup-modelos'
 
-// Self-referential fields that require two-pass import
-const SELF_REF_FIELDS: Record<string, string[]> = {
-  User: ['managerId', 'targetRewardId'],
-  TaskDefinition: ['nextTaskDefinitionId'],
-  TaskInstance: ['triggeredByInstanceId', 'conviteDeId'],
-}
+/** Mesma ordem do export: pais antes dos filhos (derivada do schema). */
+export const IMPORT_ORDER = MODELOS_BACKUP.map((m) => m.nome)
 
-const MODEL_MAP: Record<string, string> = {
-  Empresa: 'empresa', RewardProduct: 'rewardProduct', GlobalGoal: 'globalGoal',
-  Operation: 'operation',
-  Candidatura: 'candidatura', Filial: 'filial', Operacao: 'operacao', Function: 'function',
-  UPBTemporada: 'uPBTemporada',
-  UPBEpisodio: 'uPBEpisodio', UPBQuestao: 'uPBQuestao',
-  UPBObrigatorio: 'uPBObrigatorio', MetaPontuacao: 'metaPontuacao', TaskDefinition: 'taskDefinition',
-  User: 'user', PushSubscription: 'pushSubscription', Notification: 'notification',
-  FeedEvent: 'feedEvent', UPBProgresso: 'uPBProgresso', UPBCertificado: 'uPBCertificado',
-  UPBQuizTentativa: 'uPBQuizTentativa', UPBMatricula: 'uPBMatricula',
-  UPBQuestaoOpcao: 'uPBQuestaoOpcao',
-  LeaderVisit: 'leaderVisit', VisitaObrigatoria: 'visitaObrigatoria',
-  RedemptionOrder: 'redemptionOrder', TaskInstance: 'taskInstance', PointsLedger: 'pointsLedger',
-  PendingRegistration: 'pendingRegistration',
-  AuditLog: 'auditLog', NotaCandidatura: 'notaCandidatura', UPBRespostaUsuario: 'uPBRespostaUsuario',
-  BackupJob: 'backupJob', SystemConfig: 'systemConfig',
+/** Reconstrói os campos binários que o export gravou como `{ $bytes: base64 }`. */
+export function desserializarLinha(row: Record<string, unknown>, binarios: string[]) {
+  if (!binarios.length) return row
+  const copia = { ...row }
+  for (const campo of binarios) {
+    const valor = copia[campo] as { $bytes?: string } | null | undefined
+    if (valor && typeof valor === 'object' && typeof valor.$bytes === 'string') {
+      copia[campo] = Buffer.from(valor.$bytes, 'base64')
+    }
+  }
+  return copia
 }
 
 export interface BackupPayload {
@@ -83,6 +60,7 @@ export function decompressAndParse(compressed: Buffer): BackupPayload {
 async function upsertBatch(
   modelKey: string,
   rows: Record<string, unknown>[],
+  chave: string,
   nullifyFields?: string[],
 ): Promise<number> {
   const delegate = (prisma as any)[modelKey]
@@ -90,13 +68,13 @@ async function upsertBatch(
 
   let count = 0
   for (const rawRow of rows) {
-    const row = nullifyFields
+    const row = nullifyFields?.length
       ? { ...rawRow, ...Object.fromEntries(nullifyFields.map(f => [f, null])) }
       : rawRow
 
     try {
       await delegate.upsert({
-        where: { id: row.id },
+        where: { [chave]: row[chave] },
         update: row,
         create: row,
       })
@@ -111,6 +89,7 @@ async function upsertBatch(
 async function applyTwoPassUpdates(
   modelKey: string,
   rows: Record<string, unknown>[],
+  chave: string,
   selfRefFields: string[],
 ): Promise<void> {
   const delegate = (prisma as any)[modelKey]
@@ -120,7 +99,7 @@ async function applyTwoPassUpdates(
   for (const row of rowsWithSelfRef) {
     const data = Object.fromEntries(selfRefFields.filter(f => row[f] != null).map(f => [f, row[f]]))
     try {
-      await delegate.update({ where: { id: row.id }, data })
+      await delegate.update({ where: { [chave]: row[chave] }, data })
     } catch {
       // Best-effort
     }
@@ -136,21 +115,25 @@ export async function runImport(
   const errors: string[] = []
 
   async function doImport() {
+    // Backup antigo pode trazer tabelas que já saíram do schema (ex.: as legadas removidas em out/2026)
+    for (const tableName of Object.keys(data.tables)) {
+      if (!modeloBackup(tableName) && (data.tables[tableName]?.length ?? 0) > 0) {
+        errors.push(`Tabela ignorada (não existe mais no schema): ${tableName}`)
+      }
+    }
     for (const tableName of IMPORT_ORDER) {
-      const rows = (data.tables[tableName] ?? []) as Record<string, unknown>[]
+      const modelo = modeloBackup(tableName)
+      if (!modelo) continue
+      const rows = ((data.tables[tableName] ?? []) as Record<string, unknown>[])
+        .map((row) => desserializarLinha(row, modelo.binarios))
       if (rows.length === 0) { rowCounts[tableName] = 0; continue }
 
-      const modelKey = MODEL_MAP[tableName]
-      if (!modelKey) { errors.push(`Tabela desconhecida: ${tableName}`); continue }
-
-      const selfRefFields = SELF_REF_FIELDS[tableName]
-
       try {
-        const count = await upsertBatch(modelKey, rows, selfRefFields)
+        const count = await upsertBatch(modelo.delegate, rows, modelo.chave, modelo.segundoPasso)
         rowCounts[tableName] = count
 
-        if (selfRefFields) {
-          await applyTwoPassUpdates(modelKey, rows, selfRefFields)
+        if (modelo.segundoPasso.length) {
+          await applyTwoPassUpdates(modelo.delegate, rows, modelo.chave, modelo.segundoPasso)
         }
       } catch (err: any) {
         errors.push(`${tableName}: ${err?.message ?? String(err)}`)

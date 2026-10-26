@@ -21,29 +21,6 @@ export const GET = withHandler(async () => {
 
   const functions = await prisma.function.findMany({
     where,
-    include: {
-      tasks: {
-        orderBy: { points: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          points: true,
-          frequency: true,
-          requireApproval: true,
-          requireEvidence: true,
-          active: true,
-          daysOfWeek: true,
-          nextTaskDefinitionId: true,
-          nextTaskDefinition: {
-            select: {
-              id: true,
-              title: true,
-              function: { select: { id: true, name: true } },
-            },
-          },
-        },
-      },
-    },
     orderBy: { name: 'asc' },
   })
 

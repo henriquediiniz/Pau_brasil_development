@@ -15,7 +15,6 @@ const createSchema = z.object({
   descricao: z.string().max(1000).optional(),
   capa: urlDeImagemSchema.optional().or(z.literal('')),
   restricaoAcesso: z.boolean().optional(),
-  pontosNoCertificado: z.number().int().min(0).max(100000).optional(),
   empresas: z.array(z.string()).default([]),
   unidades: z.array(z.string()).default([]),
   preRequisitos: z.array(z.string()).default([]),

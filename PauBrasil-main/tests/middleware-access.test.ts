@@ -148,10 +148,9 @@ test('troca obrigatoria de senha precede o destino por perfil sem criar loop', (
   }
 })
 
-test('links de visitas retiradas voltam ao inicio, inclusive para lider e admin', () => {
+test('links de visitas retiradas voltam ao inicio, inclusive para admin', () => {
   const users = [
-    buildSessionUser({ isItinerantLeader: true }),
-    buildSessionUser({ isVisitasAdmin: true }),
+    buildSessionUser(),
     buildSessionUser({ role: 'SYS_ADMIN' }),
   ]
   for (const user of users) {

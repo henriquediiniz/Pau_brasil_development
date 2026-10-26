@@ -16,8 +16,8 @@ export const dynamic = 'force-dynamic'
 
 const USER_SELECT = {
   id: true, name: true, email: true, role: true, nivel: true,
-  isUPBAdmin: true, isEmpresaAdmin: true, isItinerantLeader: true, isVisitasAdmin: true, leaderTitle: true,
-  managedAreaIds: true, functionId: true, units: true, operationIds: true, company: true, empresaId: true,
+  isUPBAdmin: true, isEmpresaAdmin: true,
+  functionId: true, units: true, operationIds: true, company: true, empresaId: true,
   managerId: true, photoUrl: true, isActive: true, createdAt: true, updatedAt: true,
   mustChangePassword: true, passwordResetExpiresAt: true,
   function: { select: { name: true } },
@@ -44,7 +44,6 @@ export const GET = withHandler(async (req: NextRequest) => {
     ...(access === 'admin' ? { role: { in: ['RH_ADMIN', 'SYS_ADMIN'] as ('RH_ADMIN' | 'SYS_ADMIN')[] } } : {}),
     ...(access === 'upb' ? { isUPBAdmin: true } : {}),
     ...(access === 'empresa' ? { isEmpresaAdmin: true } : {}),
-    ...(access === 'aprovador' ? { NOT: { managedAreaIds: { isEmpty: true } } } : {}),
     ...(search ? {
       OR: [
         { name: { contains: search, mode: 'insensitive' as const } },
@@ -81,7 +80,6 @@ const createSchema = z.object({
   nivel: z.enum(['COLABORADOR', 'SUPERVISOR', 'COORDENADOR', 'GERENTE', 'DIRETOR', 'DIRETO', 'PRESIDENTE']).default('COLABORADOR'),
   isUPBAdmin: z.boolean().default(false),
   isEmpresaAdmin: z.boolean().default(false),
-  managedAreaIds: z.array(z.string()).default([]),
   functionId: z.string().optional(),
   company: z.string().optional(),
   empresaId: z.string().optional(),
@@ -105,8 +103,7 @@ export const POST = withHandler(async (req: NextRequest) => {
     const requestedElevatedAccess =
       parsed.data.role !== 'USER' ||
       parsed.data.isUPBAdmin ||
-      parsed.data.isEmpresaAdmin ||
-      parsed.data.managedAreaIds.length > 0
+      parsed.data.isEmpresaAdmin
 
     if (requestedElevatedAccess) {
       return NextResponse.json(

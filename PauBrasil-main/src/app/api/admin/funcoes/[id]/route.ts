@@ -53,7 +53,6 @@ export const DELETE = withHandler(async (_req: NextRequest, { params }: { params
     )
   }
 
-  await prisma.taskDefinition.deleteMany({ where: { functionId: params.id } })
   await prisma.function.delete({ where: { id: params.id } })
   return NextResponse.json({ ok: true })
 })

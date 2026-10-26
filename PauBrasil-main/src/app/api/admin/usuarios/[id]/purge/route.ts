@@ -39,24 +39,14 @@ export async function DELETE(
     await tx.uPBMatricula.updateMany({ where: { aprovadoPor: id }, data: { aprovadoPor: null } })
     await tx.user.updateMany({ where: { managerId: id }, data: { managerId: null } })
 
-    // 2. Deletar visitas obrigatórias criadas por este usuário
-    //    (criadoPor é required — não pode ser nullificado sem migração)
-    await tx.visitaObrigatoria.deleteMany({ where: { criadoPor: id } })
-
-    // 3. Deletar registros de participação próprios
-    await tx.visitaObrigatoria.deleteMany({ where: { userId: id } })
-    await tx.leaderVisit.deleteMany({ where: { userId: id } })
+    // 2. Deletar registros de participação próprios
     await tx.pushSubscription.deleteMany({ where: { userId: id } })
     await tx.notification.deleteMany({ where: { userId: id } })
-    await tx.feedEvent.deleteMany({ where: { userId: id } })
     await tx.uPBCertificado.deleteMany({ where: { userId: id } })
     await tx.uPBProgresso.deleteMany({ where: { userId: id } })
     await tx.uPBQuizTentativa.deleteMany({ where: { userId: id } })
     await tx.uPBMatricula.deleteMany({ where: { userId: id } })
     await tx.notaCandidatura.deleteMany({ where: { autorId: id } })
-    await tx.redemptionOrder.deleteMany({ where: { userId: id } })
-    await tx.pointsLedger.deleteMany({ where: { userId: id } })
-    await tx.taskInstance.deleteMany({ where: { OR: [{ userId: id }, { approvedBy: id }] } })
 
     // 4. Deletar o usuário — e-mail agora fica livre
     await tx.user.delete({ where: { id } })

@@ -23,9 +23,6 @@ interface UserItem {
   isActive: boolean
   isUPBAdmin: boolean
   isEmpresaAdmin?: boolean
-  isItinerantLeader?: boolean
-  leaderTitle?: string | null
-  managedAreaIds?: string[]
   company?: string
   units?: string[]
   operationIds?: string[]
@@ -83,19 +80,15 @@ type RoleValue = 'USER' | 'RH_ADMIN' | 'SYS_ADMIN'
 const MODULE_DEFS = [
   { key: 'isUPBAdmin' as const, label: 'Admin UPB', desc: 'Gerencia cursos, episódios e certificados', icon: BookOpen, color: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/20', bgActive: 'bg-sky-500/20 border-sky-400/40' },
   { key: 'isEmpresaAdmin' as const, label: 'Admin de Empresa', desc: 'Configura dados e operações da empresa', icon: Building2, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', bgActive: 'bg-emerald-500/20 border-emerald-400/40' },
-  // Visitas foi retirado do portal: as flags de líder itinerante e admin de visitas
-  // continuam no banco e são preservadas ao salvar, mas não são mais oferecidas aqui.
 ]
 
-type AccessFilter = 'todos' | 'admin' | 'upb' | 'aprovador'
+type AccessFilter = 'todos' | 'admin' | 'upb'
 
 const EMPTY_FORM = {
   name: '', email: '', password: '',
   role: 'USER' as RoleValue,
   nivel: 'COLABORADOR',
-  isUPBAdmin: false, isEmpresaAdmin: false, isItinerantLeader: false, isVisitasAdmin: false,
-  leaderTitle: '',
-  managedAreaIds: [] as string[],
+  isUPBAdmin: false, isEmpresaAdmin: false,
   functionId: '', empresaId: '', units: [] as string[], operationIds: [] as string[], managerId: '',
 }
 
@@ -104,7 +97,6 @@ function AccessBadges({ user }: { user: UserItem }) {
   const badges: { label: string; cls: string }[] = []
   if (user.isUPBAdmin) badges.push({ label: 'UPB', cls: 'bg-sky-500/15 text-sky-400 border-sky-500/30' })
   if (user.isEmpresaAdmin) badges.push({ label: 'Empresa', cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' })
-  if ((user.managedAreaIds?.length ?? 0) > 0) badges.push({ label: 'Aprov.', cls: 'bg-teal-500/15 text-teal-400 border-teal-500/30' })
   if (badges.length === 0) return <span className="text-slate-600 text-xs">—</span>
   return (
     <div className="flex flex-wrap gap-1">
@@ -252,10 +244,6 @@ export default function AdminUsuariosPage() {
       nivel: user.nivel ?? 'COLABORADOR',
       isUPBAdmin: user.isUPBAdmin ?? false,
       isEmpresaAdmin: user.isEmpresaAdmin ?? false,
-      isItinerantLeader: user.isItinerantLeader ?? false,
-      isVisitasAdmin: (user as any).isVisitasAdmin ?? false,
-      leaderTitle: user.leaderTitle ?? '',
-      managedAreaIds: user.managedAreaIds ?? [],
       functionId: user.functionId ?? '',
       empresaId: user.empresaId ?? '',
       units: user.units ?? [],
@@ -296,10 +284,6 @@ export default function AdminUsuariosPage() {
           nivel: form.nivel,
           isUPBAdmin: form.isUPBAdmin,
           isEmpresaAdmin: form.isEmpresaAdmin,
-          isItinerantLeader: form.isItinerantLeader,
-          isVisitasAdmin: form.isVisitasAdmin,
-          leaderTitle: form.isItinerantLeader ? (form.leaderTitle || null) : null,
-          managedAreaIds: form.managedAreaIds,
         })
       }
 
@@ -512,7 +496,6 @@ export default function AdminUsuariosPage() {
     { key: 'todos', label: 'Todos' },
     { key: 'admin', label: 'Admin' },
     { key: 'upb', label: 'UPB' },
-    { key: 'aprovador', label: 'Aprovadores' },
   ]
 
   if (loading) return (
@@ -970,19 +953,6 @@ export default function AdminUsuariosPage() {
                       })}
                     </div>
                   </div>
-
-                  {/* Cargo do líder itinerante */}
-                  {form.isItinerantLeader && (
-                    <div>
-                      <label className="text-xs text-slate-400 font-medium block mb-1.5">Cargo / Título do líder</label>
-                      <input
-                        value={form.leaderTitle}
-                        onChange={e => setForm(p => ({ ...p, leaderTitle: e.target.value }))}
-                        placeholder="Ex: CFO, Diretora de Gente..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-slate-600 outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
-                      />
-                    </div>
-                  )}
 
                 </div>
               </form>

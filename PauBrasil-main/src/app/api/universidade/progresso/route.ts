@@ -28,7 +28,6 @@ export async function POST(req: NextRequest) {
       temporada: {
         select: {
           titulo: true,
-          pontosNoCertificado: true,
           restricaoAcesso: true,
           empresas: true,
           unidades: true,
@@ -85,35 +84,11 @@ export async function POST(req: NextRequest) {
       return { progresso, certificado, novoCertificado: false }
     }
 
-    const pts = episodio.temporada.pontosNoCertificado ?? 0
-    if (pts > 0) {
-      const jaCreditado = await tx.pointsLedger.findFirst({
-        where: { refType: 'UPBCertificado', refId: certificado.id },
-      })
-
-      if (!jaCreditado) {
-        await tx.pointsLedger.create({
-          data: {
-            userId,
-            kind: 'EARN',
-            status: 'CONFIRMED',
-            points: pts,
-            refType: 'UPBCertificado',
-            refId: certificado.id,
-            note: `Certificado UPB: ${episodio.temporada.titulo}`,
-          },
-        })
-      }
-    }
-
     return { progresso, certificado, novoCertificado: true }
   })
 
   if (certificado && novoCertificado) {
-    const pts = episodio.temporada.pontosNoCertificado ?? 0
-    const notasPartes = [`Voce concluiu a temporada "${episodio.temporada.titulo}" da Universidade Pau Brasil.`]
-    if (pts > 0) notasPartes.push(`+${pts} pontos creditados!`)
-    void notify(userId, 'Certificado emitido!', notasPartes.join(' '))
+    void notify(userId, 'Certificado emitido!', `Você concluiu a temporada "${episodio.temporada.titulo}" da Universidade Pau Brasil.`)
   }
 
   return NextResponse.json({ progresso, certificado })

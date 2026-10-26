@@ -17,7 +17,7 @@ interface Episodio {
 }
 interface Temporada {
   id: string; titulo: string; descricao: string | null; capa: string | null
-  ordem: number; ativo: boolean; restricaoAcesso: boolean; pontosNoCertificado: number
+  ordem: number; ativo: boolean; restricaoAcesso: boolean
   empresas: string[]; unidades: string[]; funcoesComAcesso: string[]
   preRequisitos: string[]; validadeDias: number | null
   episodios: Episodio[]
@@ -39,7 +39,7 @@ interface Matricula {
   temporada: { id: string; titulo: string }
 }
 
-const EMPTY_T = { titulo: '', descricao: '', capa: '', restricaoAcesso: false, pontosNoCertificado: 0, empresas: [] as string[], unidades: [] as string[], preRequisitos: [] as string[], validadeDias: null as number | null }
+const EMPTY_T = { titulo: '', descricao: '', capa: '', restricaoAcesso: false, empresas: [] as string[], unidades: [] as string[], preRequisitos: [] as string[], validadeDias: null as number | null }
 const EMPTY_E = { titulo: '', descricao: '', videoUrl: '', duracaoMin: 0, ordem: 0, temporadaId: '' }
 const EMPTY_OPCAO: Opcao = { texto: '', correta: false, ordem: 0 }
 
@@ -240,7 +240,7 @@ export default function AdminUPBPage() {
 
   function openCreateT() { setTForm(EMPTY_T); setTModal({ mode: 'create' }) }
   function openEditT(t: Temporada) {
-    setTForm({ titulo: t.titulo, descricao: t.descricao ?? '', capa: t.capa ?? '', restricaoAcesso: t.restricaoAcesso, pontosNoCertificado: t.pontosNoCertificado ?? 0, empresas: t.empresas ?? [], unidades: t.unidades ?? [], preRequisitos: t.preRequisitos ?? [], validadeDias: t.validadeDias ?? null })
+    setTForm({ titulo: t.titulo, descricao: t.descricao ?? '', capa: t.capa ?? '', restricaoAcesso: t.restricaoAcesso, empresas: t.empresas ?? [], unidades: t.unidades ?? [], preRequisitos: t.preRequisitos ?? [], validadeDias: t.validadeDias ?? null })
     setTModal({ mode: 'edit', id: t.id })
   }
   function openCreateE(temporadaId: string) {
@@ -446,11 +446,6 @@ export default function AdminUPBPage() {
                     {t.restricaoAcesso && (
                       <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                         <Lock className="w-3 h-3" /> Restrito
-                      </span>
-                    )}
-                    {(t.pontosNoCertificado ?? 0) > 0 && (
-                      <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">
-                        +{t.pontosNoCertificado} pts
                       </span>
                     )}
                     {t._count.questoes > 0 && (
@@ -885,18 +880,6 @@ export default function AdminUPBPage() {
                     <p className="text-xs text-slate-500">Colaboradores precisam solicitar matrícula</p>
                   </div>
                 </label>
-                <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1.5">
-                    Pontos ao concluir / passar na prova
-                    <span className="text-slate-600 ml-1">(0 = sem pontuação)</span>
-                  </label>
-                  <input
-                    type="number" min="0" max="100000"
-                    value={(tForm as any).pontosNoCertificado ?? 0}
-                    onChange={e => setTForm(p => ({ ...p, pontosNoCertificado: parseInt(e.target.value) || 0 }))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:ring-2 focus:ring-brand-500/50"
-                  />
-                </div>
                 {empresasList.length > 0 && (
                   <div>
                     <label className="text-xs text-slate-400 font-medium block mb-1.5 flex items-center gap-1.5">

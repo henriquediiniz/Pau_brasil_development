@@ -35,9 +35,6 @@ async function refreshTokenState(token: JWT) {
       isActive: true,
       isUPBAdmin: true,
       isEmpresaAdmin: true,
-      isItinerantLeader: true,
-      isVisitasAdmin: true,
-      leaderTitle: true,
       faceReferenceUrl: true,
       functionId: true,
       company: true,
@@ -74,9 +71,6 @@ async function refreshTokenState(token: JWT) {
     isActive: user.isActive,
     isUPBAdmin: user.isActive ? user.isUPBAdmin : false,
     isEmpresaAdmin:    user.isActive ? user.isEmpresaAdmin : false,
-    isItinerantLeader: user.isActive ? user.isItinerantLeader : false,
-    isVisitasAdmin:    user.isActive ? (user as any).isVisitasAdmin : false,
-    leaderTitle:       user.isActive ? (user.leaderTitle ?? null) : null,
     faceReferenceUrl:  user.isActive ? ((user as any).faceReferenceUrl ?? null) : null,
     functionId: user.isActive ? user.functionId : null,
     company: user.isActive ? user.company : null,
@@ -172,9 +166,6 @@ export const authOptions: NextAuthOptions = {
           isActive:        user.isActive,
           isUPBAdmin:      user.isUPBAdmin,
           isEmpresaAdmin:    user.isEmpresaAdmin,
-          isItinerantLeader: (user as any).isItinerantLeader ?? false,
-          isVisitasAdmin:    (user as any).isVisitasAdmin ?? false,
-          leaderTitle:       (user as any).leaderTitle ?? null,
           faceReferenceUrl:  (user as any).faceReferenceUrl ?? null,
           functionId:      user.functionId,
           company:         user.company,
@@ -196,9 +187,6 @@ export const authOptions: NextAuthOptions = {
         token.isActive        = user.isActive
         token.isUPBAdmin      = user.isUPBAdmin
         token.isEmpresaAdmin  = user.isEmpresaAdmin
-        token.isItinerantLeader = (user as any).isItinerantLeader ?? false
-        token.isVisitasAdmin    = (user as any).isVisitasAdmin ?? false
-        token.leaderTitle       = (user as any).leaderTitle ?? null
         token.faceReferenceUrl  = (user as any).faceReferenceUrl ?? null
         token.functionId      = user.functionId
         token.company         = user.company
@@ -239,9 +227,6 @@ export const authOptions: NextAuthOptions = {
       session.user.isActive        = token.isActive
       session.user.isUPBAdmin      = token.isUPBAdmin
       session.user.isEmpresaAdmin  = token.isEmpresaAdmin
-      session.user.isItinerantLeader = token.isItinerantLeader ?? false
-      session.user.isVisitasAdmin    = token.isVisitasAdmin ?? false
-      session.user.leaderTitle       = token.leaderTitle ?? null
       session.user.faceReferenceUrl  = token.faceReferenceUrl ?? null
       session.user.functionId      = token.functionId
       session.user.company         = token.company

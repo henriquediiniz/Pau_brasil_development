@@ -18,16 +18,14 @@ const WEAK_PASSWORD_ROOTS = [
 
 const AUDIT_FIELDS = [
   'name', 'email', 'role', 'nivel', 'isUPBAdmin',
-  'isEmpresaAdmin', 'isItinerantLeader', 'isVisitasAdmin', 'leaderTitle',
-  'managedAreaIds', 'functionId', 'company', 'empresaId', 'units', 'operationIds',
+  'isEmpresaAdmin', 'functionId', 'company', 'empresaId', 'units', 'operationIds',
   'managerId', 'isActive',
 ] as const
 
 const USER_SELECT = {
   id: true, name: true, email: true, role: true, nivel: true,
   isUPBAdmin: true, isEmpresaAdmin: true,
-  isItinerantLeader: true, isVisitasAdmin: true, leaderTitle: true,
-  managedAreaIds: true, functionId: true, units: true, operationIds: true,
+  functionId: true, units: true, operationIds: true,
   company: true, empresaId: true, managerId: true, photoUrl: true,
   isActive: true, createdAt: true, updatedAt: true,
   function: { select: { name: true } },
@@ -163,10 +161,6 @@ export async function createProvisionedUser(params: {
     nivel?: string
     isUPBAdmin?: boolean
     isEmpresaAdmin?: boolean
-    isItinerantLeader?: boolean
-    isVisitasAdmin?: boolean
-    leaderTitle?: string | null
-    managedAreaIds?: string[]
     functionId?: string | null
     company?: string | null
     empresaId?: string | null

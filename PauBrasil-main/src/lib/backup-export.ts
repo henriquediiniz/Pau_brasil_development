@@ -2,53 +2,19 @@ import { prisma } from './prisma'
 import { gzipSync } from 'zlib'
 import { createHash } from 'crypto'
 
-// Tables in FK dependency order (Tier 0 → Tier 6)
-export const EXPORT_ORDER = [
-  // Tier 0 — no outbound FKs
-  'Empresa', 'RewardProduct', 'GlobalGoal',
-  'Operation', 'Candidatura',
-  // Tier 1
-  'Filial', 'Operacao', 'Function', 'UPBTemporada',
-  // Tier 2
-  'UPBEpisodio', 'UPBQuestao', 'UPBObrigatorio',
-  'MetaPontuacao', 'TaskDefinition',
-  // Tier 3 — self-referential User (two-pass on import)
-  'User',
-  // Tier 4
-  'PushSubscription', 'Notification', 'FeedEvent',
-  'UPBProgresso', 'UPBCertificado', 'UPBQuizTentativa', 'UPBMatricula',
-  'UPBQuestaoOpcao',
-  'LeaderVisit', 'VisitaObrigatoria', 'RedemptionOrder',
-  'TaskInstance', 'PointsLedger', 'PendingRegistration',
-  // Tier 5
-  'AuditLog', 'NotaCandidatura', 'UPBRespostaUsuario',
-  'BackupJob', 'SystemConfig',
-]
+import { MODELOS_BACKUP } from './backup-modelos'
 
-// Prisma model accessor map (camelCase)
-const MODEL_MAP: Record<string, keyof typeof prisma> = {
-  Empresa: 'empresa', RewardProduct: 'rewardProduct', GlobalGoal: 'globalGoal',
-  Operation: 'operation',
-  Candidatura: 'candidatura', Filial: 'filial', Operacao: 'operacao', Function: 'function',
-  UPBTemporada: 'uPBTemporada',
-  UPBEpisodio: 'uPBEpisodio', UPBQuestao: 'uPBQuestao',
-  UPBObrigatorio: 'uPBObrigatorio', MetaPontuacao: 'metaPontuacao', TaskDefinition: 'taskDefinition',
-  User: 'user', PushSubscription: 'pushSubscription', Notification: 'notification',
-  FeedEvent: 'feedEvent', UPBProgresso: 'uPBProgresso', UPBCertificado: 'uPBCertificado',
-  UPBQuizTentativa: 'uPBQuizTentativa', UPBMatricula: 'uPBMatricula',
-  UPBQuestaoOpcao: 'uPBQuestaoOpcao',
-  LeaderVisit: 'leaderVisit', VisitaObrigatoria: 'visitaObrigatoria',
-  RedemptionOrder: 'redemptionOrder', TaskInstance: 'taskInstance', PointsLedger: 'pointsLedger',
-  PendingRegistration: 'pendingRegistration',
-  AuditLog: 'auditLog', NotaCandidatura: 'notaCandidatura', UPBRespostaUsuario: 'uPBRespostaUsuario',
-  BackupJob: 'backupJob', SystemConfig: 'systemConfig',
-}
+/** Tabelas na ordem das chaves estrangeiras, derivada do schema (ver backup-modelos.ts). */
+export const EXPORT_ORDER = MODELOS_BACKUP.map((m) => m.nome)
 
 export function serializeRow(row: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(row)) {
     if (v === null || v === undefined) {
       result[k] = v
+    } else if (v instanceof Uint8Array) {
+      // Bytes (ex.: fotos da newsletter): base64 marcado, para o import reconstruir o binário
+      result[k] = { $bytes: Buffer.from(v).toString('base64') }
     } else if (typeof v === 'bigint') {
       result[k] = v.toString()
     } else if (v instanceof Date) {
@@ -63,33 +29,27 @@ export function serializeRow(row: Record<string, unknown>): Record<string, unkno
   return result
 }
 
-// Tables whose PK is not 'id' — cursor pagination doesn't apply; they're small so a single findMany is fine
-const PLAIN_EXPORT_TABLES = new Set(['SystemConfig'])
-
 async function exportTable(tableName: string): Promise<unknown[]> {
-  const model = MODEL_MAP[tableName]
-  if (!model) return []
-  const delegate = (prisma as any)[model]
+  const modelo = MODELOS_BACKUP.find((m) => m.nome === tableName)
+  if (!modelo) return []
+  const delegate = (prisma as any)[modelo.delegate]
   if (!delegate?.findMany) return []
 
-  if (PLAIN_EXPORT_TABLES.has(tableName)) {
-    const rows: Record<string, unknown>[] = await delegate.findMany()
-    return rows.map(serializeRow)
-  }
-
+  // Lotes menores em tabelas com binário, para não segurar centenas de fotos na memória de uma vez
+  const lote = modelo.binarios.length ? 25 : 500
   const rows: unknown[] = []
-  let cursor: string | undefined
+  let cursor: unknown
 
   while (true) {
     const batch: Record<string, unknown>[] = await delegate.findMany({
-      take: 500,
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-      orderBy: { id: 'asc' },
+      take: lote,
+      ...(cursor !== undefined ? { skip: 1, cursor: { [modelo.chave]: cursor } } : {}),
+      orderBy: { [modelo.chave]: 'asc' },
     })
     if (batch.length === 0) break
     rows.push(...batch.map(serializeRow))
-    if (batch.length < 500) break
-    cursor = batch[batch.length - 1].id as string
+    if (batch.length < lote) break
+    cursor = batch[batch.length - 1][modelo.chave]
   }
 
   return rows
