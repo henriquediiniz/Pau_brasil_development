@@ -187,7 +187,9 @@ export function HubBrandStrip({
   )
 }
 
-const ERA_MS = 10000
+/** Tempo de cada ano em destaque: acompanha o tamanho do texto (um fato curto não espera tanto quanto três). */
+const yearMs = (events: string[]) =>
+  Math.min(8000, Math.max(4000, 2500 + events.join(' ').length * 30))
 
 // useLayoutEffect desenha a estrada antes da pintura; no servidor cai para useEffect, sem aviso.
 const useBeforePaint = typeof window === 'undefined' ? useEffect : useLayoutEffect
@@ -212,8 +214,12 @@ function smoothPath(points: [number, number][]) {
  * Estrada sinuosa ao lado dos anos: mede a posição de cada ano e passa por todos, alternando os lados.
  * Fica numa faixa estreita à esquerda, então nunca corta a tela nem pede rolagem horizontal.
  */
-function EraRoad({ list, era }: { list: RefObject<HTMLOListElement>; era: number }) {
+function EraRoad({ list, era, year }: { list: RefObject<HTMLOListElement>; era: number; year: number }) {
   const [shape, setShape] = useState<RoadShape | null>(null)
+  const road = useRef<SVGPathElement>(null)
+  const truck = useRef<SVGGElement>(null)
+  // Onde o caminhão está na estrada (comprimento percorrido); null até a primeira viagem.
+  const at = useRef<number | null>(null)
 
   useBeforePaint(() => {
     const element = list.current
@@ -247,6 +253,68 @@ function EraRoad({ list, era }: { list: RefObject<HTMLOListElement>; era: number
     return () => observer.disconnect()
   }, [list, era])
 
+  // Caminhãozinho: dirige pela estrada até logo depois do alfinete do ano em destaque.
+  // O painel remonta a cada era (key), então cada era começa com ele entrando pelo topo.
+  useEffect(() => {
+    const path = road.current
+    const body = truck.current
+    if (!shape || !path || !body) return
+    const total = path.getTotalLength()
+    // Comprimento da estrada em cada alfinete: o ponto amostrado mais próximo (a curva passa por eles).
+    const samples: [number, number, number][] = []
+    for (let length = 0; length <= total; length += 2) {
+      const point = path.getPointAtLength(length)
+      samples.push([length, point.x, point.y])
+    }
+    const lengthAt = ([x, y]: [number, number]) =>
+      samples.reduce(
+        (best, [length, px, py]) => {
+          const distance = (px - x) ** 2 + (py - y) ** 2
+          return distance < best.distance ? { distance, length } : best
+        },
+        { distance: Infinity, length: 0 },
+      ).length
+    const lane = shape.width >= 100 ? 24 : 18
+    // Para um pouco depois do alfinete: a cabeça do alfinete fica acima do ponto e não cobre o caminhão.
+    const target = Math.min(total - 1, lengthAt(shape.pins[year]) + lane + 6)
+    const from = at.current ?? 0
+    const place = (length: number, reverse: boolean) => {
+      const point = path.getPointAtLength(length)
+      const ahead = path.getPointAtLength(Math.min(total, length + 1))
+      const behind = path.getPointAtLength(Math.max(0, length - 1))
+      let angle = (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI
+      if (reverse) angle += 180
+      body.setAttribute('transform', `translate(${point.x.toFixed(1)},${point.y.toFixed(1)}) rotate(${angle.toFixed(1)})`)
+    }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced || Math.abs(target - from) < 1) {
+      at.current = target
+      return place(target, false)
+    }
+    const reverse = target < from
+    const duration = Math.min(1600, 500 + Math.abs(target - from) * 4)
+    // Na primeira viagem espera a estrada terminar de aparecer.
+    const delay = at.current === null ? 900 : 0
+    let frame = 0
+    let start: number | undefined
+    const tick = (now: number) => {
+      start ??= now
+      const t = Math.min(1, (now - start) / duration)
+      const eased = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2
+      at.current = from + (target - from) * eased
+      place(at.current, reverse)
+      if (t < 1) frame = requestAnimationFrame(tick)
+    }
+    place(from, reverse)
+    const timer = window.setTimeout(() => {
+      frame = requestAnimationFrame(tick)
+    }, delay)
+    return () => {
+      window.clearTimeout(timer)
+      cancelAnimationFrame(frame)
+    }
+  }, [shape, year])
+
   if (!shape) return null
   const lane = shape.width >= 100 ? 24 : 18
   return (
@@ -258,15 +326,34 @@ function EraRoad({ list, era }: { list: RefObject<HTMLOListElement>; era: number
       aria-hidden="true"
     >
       <path d={shape.d} fill="none" stroke="#e2d6c8" strokeWidth={lane + 10} strokeLinecap="round" />
-      <path d={shape.d} fill="none" stroke="#353130" strokeWidth={lane} strokeLinecap="round" />
+      <path ref={road} d={shape.d} fill="none" stroke="#353130" strokeWidth={lane} strokeLinecap="round" />
       <path d={shape.d} fill="none" stroke="#eadfcd" strokeWidth={2} strokeDasharray="9 8" />
+      {/* Caminhão visto de cima, apontando para +x; o transform do grupo externo vem do efeito acima.
+          Fica antes dos alfinetes, que passam por cima dele. */}
+      <g ref={truck} className={styles.eraTruck} transform="translate(-100,-100)">
+        <g transform={`scale(${lane / 24})`}>
+          <rect x={-14} y={-6} width={30} height={14} rx={3} fill="#000" opacity={0.22} />
+          <rect x={-16} y={-7} width={21} height={14} rx={2} fill="#faf9f6" stroke="#1a1a1a" strokeWidth={0.8} />
+          <rect x={-16} y={-1.3} width={21} height={2.6} fill="var(--wine)" />
+          <rect x={6} y={-6.2} width={9} height={12.4} rx={2.6} fill="var(--wine)" />
+          <rect x={11} y={-4.6} width={2.6} height={9.2} rx={1} fill="#dcc8b1" />
+        </g>
+      </g>
       {shape.pins.map(([x, y], index) => (
         <g key={index} className={styles.eraPin} style={{ '--i': index } as CSSProperties}>
-          <path
-            d={`M${x},${y + 2} L${x - 8.3},${y - 14} A11,11 0 1 1 ${x + 8.3},${y - 14} Z`}
-            fill="var(--wine)"
-          />
-          <circle cx={x} cy={y - 21} r={4.2} fill="#fff" />
+          {/* Grupo interno: a escala do alfinete ativo não briga com a animação de queda do externo */}
+          <g
+            className={styles.eraPinShape}
+            data-active={index === year}
+            style={{ transformOrigin: `${x}px ${y + 2}px` }}
+          >
+            {index === year && <circle className={styles.eraPinPulse} cx={x} cy={y - 21} r={11} />}
+            <path
+              d={`M${x},${y + 2} L${x - 8.3},${y - 14} A11,11 0 1 1 ${x + 8.3},${y - 14} Z`}
+              fill="var(--wine)"
+            />
+            <circle cx={x} cy={y - 21} r={4.2} fill="#fff" />
+          </g>
         </g>
       ))}
     </svg>
@@ -275,19 +362,41 @@ function EraRoad({ list, era }: { list: RefObject<HTMLOListElement>; era: number
 
 /**
  * Linha do tempo do grupo, dividida em eras; cada era lista os anos e as empresas citadas.
- * As eras avançam sozinhas enquanto a seção está na tela, com pausa no hover, no foco e no botão.
+ * Um ano fica em destaque por vez e a passagem avança ano a ano (e de era em era) enquanto
+ * a seção está na tela. Pausa no botão e no foco de teclado; não pausa no hover, que no
+ * celular travava a passagem (o toque não gera "mouse saiu"), como acontecia na newsletter.
  */
 export function HubTimeline() {
   const [active, setActive] = useState(0)
+  const [year, setYear] = useState(0)
   const [paused, setPaused] = useState(false)
-  const [held, setHeld] = useState(false)
+  const [keyboardFocus, setKeyboardFocus] = useState(false)
   const [visible, setVisible] = useState(false)
   const [reduced, setReduced] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLOListElement>(null)
+  // Tempo já decorrido do ano atual: pausar e retomar continua de onde parou, junto com a barrinha.
+  const elapsed = useRef(0)
+  const startedAt = useRef(0)
   const era = HUB_ERAS[active]
   const last = HUB_ERAS.length - 1
-  const running = visible && !paused && !held && !reduced
+  const lastYear = era.years.length - 1
+  const running = visible && !paused && !keyboardFocus && !reduced
+  const duration = yearMs(era.years[year].events)
+
+  const selectEra = (index: number) => {
+    setActive(index)
+    setYear(0)
+  }
+  // Setas andam ano a ano; nas pontas da era passam para a vizinha.
+  const step = (direction: 1 | -1) => {
+    const next = year + direction
+    if (next >= 0 && next <= lastYear) return setYear(next)
+    const other = active + direction
+    if (other < 0 || other > last) return
+    setActive(other)
+    setYear(direction === 1 ? 0 : HUB_ERAS[other].years.length - 1)
+  }
 
   useEffect(() => {
     setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -301,26 +410,40 @@ export function HubTimeline() {
     return () => observer.disconnect()
   }, [])
 
-  // `active` nas dependências reinicia a contagem quando a era muda, inclusive por clique.
+  // Ano novo (sozinho ou por clique) zera o decorrido; declarado antes do timer para rodar primeiro.
+  useEffect(() => {
+    elapsed.current = 0
+  }, [active, year])
+
+  // Agenda só o que falta do ano; ao pausar, guarda o que já passou.
   useEffect(() => {
     if (!running) return
-    const timer = window.setTimeout(
-      () => setActive((index) => (index === last ? 0 : index + 1)),
-      ERA_MS,
-    )
-    return () => window.clearTimeout(timer)
-  }, [running, active, last])
+    startedAt.current = Date.now()
+    const timer = window.setTimeout(() => {
+      elapsed.current = 0
+      if (year < lastYear) return setYear(year + 1)
+      setActive(active === last ? 0 : active + 1)
+      setYear(0)
+    }, Math.max(0, duration - elapsed.current))
+    return () => {
+      window.clearTimeout(timer)
+      elapsed.current = Math.min(duration, elapsed.current + Date.now() - startedAt.current)
+    }
+  }, [running, active, year, lastYear, last, duration])
 
   return (
     <div
       ref={root}
       className={styles.storyTimeline}
       data-running={running}
-      onMouseEnter={() => setHeld(true)}
-      onMouseLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
+      data-spotlight={!reduced}
+      onFocus={(event) => {
+        // Só o foco de teclado pausa; o botão de pausa tem estado próprio e não segura o play.
+        if (event.target.matches(':focus-visible') && !event.target.matches('[data-era-toggle]'))
+          setKeyboardFocus(true)
+      }}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setHeld(false)
+        if (!event.currentTarget.contains(event.relatedTarget)) setKeyboardFocus(false)
       }}
     >
       <div
@@ -334,16 +457,25 @@ export function HubTimeline() {
             type="button"
             aria-pressed={active === index}
             aria-controls="story-content"
-            onClick={() => setActive(index)}
+            onClick={() => selectEra(index)}
           >
             <span className={styles.timelineDot} />
             <small>{item.range}</small>
             {item.label}
-            {/* Só existe enquanto a contagem roda: remonta junto com o timer e os dois ficam em sincronia */}
-            {active === index && running && (
+            {/* Enche ano a ano: parte do trecho já percorrido e anima só o ano atual.
+                key remonta junto com o timer, então os dois ficam em sincronia. */}
+            {active === index && !reduced && (
               <span
+                key={`${active}-${year}`}
                 className={styles.eraProgress}
-                style={{ animationDuration: `${ERA_MS}ms` } as CSSProperties}
+                style={
+                  {
+                    '--from': year / era.years.length,
+                    '--to': (year + 1) / era.years.length,
+                    animationDuration: `${duration}ms`,
+                    animationPlayState: running ? 'running' : 'paused',
+                  } as CSSProperties
+                }
                 aria-hidden="true"
               />
             )}
@@ -359,20 +491,20 @@ export function HubTimeline() {
           <div className={styles.eraNav}>
             <button
               type="button"
-              onClick={() => setActive(active - 1)}
-              disabled={active === 0}
-              aria-label="Era anterior"
+              onClick={() => step(-1)}
+              disabled={active === 0 && year === 0}
+              aria-label="Ano anterior"
             >
               <ArrowLeft size={17} />
             </button>
-            <span>
-              {active + 1} / {HUB_ERAS.length}
+            <span aria-label={`Ano ${year + 1} de ${era.years.length} desta era`}>
+              {era.years[year].year}
             </span>
             <button
               type="button"
-              onClick={() => setActive(active + 1)}
-              disabled={active === last}
-              aria-label="Próxima era"
+              onClick={() => step(1)}
+              disabled={active === last && year === lastYear}
+              aria-label="Próximo ano"
             >
               <ArrowRight size={17} />
             </button>
@@ -380,7 +512,12 @@ export function HubTimeline() {
               <button
                 type="button"
                 className={styles.eraPause}
-                onClick={() => setPaused((value) => !value)}
+                data-era-toggle
+                onClick={() => {
+                  // Play é uma ordem explícita: libera também a pausa do foco de teclado.
+                  if (paused) setKeyboardFocus(false)
+                  setPaused(!paused)
+                }}
                 aria-label={paused ? 'Retomar passagem automática' : 'Pausar passagem automática'}
               >
                 {paused ? <Play size={15} /> : <Pause size={15} />}
@@ -394,10 +531,23 @@ export function HubTimeline() {
             <li
               key={item.year}
               style={{ '--i': index } as CSSProperties}
+              data-active={index === year}
+              // Clique em qualquer parte do ano também o destaca; o teclado usa o botão do número.
+              onClick={() => setYear(index)}
             >
-              <span className={styles.eraYear} data-year>
+              <button
+                type="button"
+                className={styles.eraYear}
+                data-year
+                aria-pressed={index === year}
+                aria-label={`Destacar ${item.year}`}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setYear(index)
+                }}
+              >
                 {item.year}
-              </span>
+              </button>
               <div>
                 <ul>
                   {item.events.map((event) => {
@@ -430,7 +580,7 @@ export function HubTimeline() {
         </ol>
         {/* Depois da lista de propósito: o ref da lista precisa estar ligado quando a estrada mede os anos.
             Em desenvolvimento o StrictMode remonta e mascarava isso; em produção a estrada não aparecia. */}
-        <EraRoad list={list} era={active} />
+        <EraRoad list={list} era={active} year={year} />
         </div>
       </div>
     </div>

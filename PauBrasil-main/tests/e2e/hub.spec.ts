@@ -20,7 +20,8 @@ test('hub: empresas, história e orientação de talentos', async ({ page }) => 
   await expect(
     page.getByRole('heading', { name: 'Além da Paraíba, sem perder a raiz.' }),
   ).toBeVisible()
-  await page.getByRole('button', { name: 'Era anterior' }).click()
+  await page.getByRole('button', { name: 'Ano anterior' }).click()
+  // No primeiro ano de uma era, "Ano anterior" volta para o último ano da era anterior.
   await expect(page.locator('#story-content')).toContainText('nasce a Pau Brasil Motos')
   await page.getByLabel('Sua área de interesse').selectOption('mecanica')
   await page.getByRole('button', { name: 'Explorar possibilidades' }).click()

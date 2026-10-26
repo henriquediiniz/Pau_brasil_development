@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Hub: linha do tempo ano a ano | Claude | concluido | 2026-10-26: um ano em destaque por vez + caminhaozinho na estrada; deploy | Parecer do Codex |
 | Paginas publicas no visual do hub (candidatar, carreiras, contato, registro, erro/offline) | Claude | concluido | 2026-10-23: tema verde antigo removido; deploy | Parecer do Codex |
 | Hub: critica de design (contraste, mobile, cabecalho) | Claude | concluido | 2026-10-23: contraste, fonte minima 12px, cabecalho areia + newsletter branca, logos 4x2, cards compactos, pausa/play da newsletter corrigido; deploy | Parecer do Codex |
 | Hub: linha do tempo e feedbacks | Claude | concluido | 2026-10-21: linha do tempo 1994-2026 em eras; YSO e Hora 10 corrigidos; rolagem suave; color-scheme claro; filtros e selos mais fortes | Confirmar assinatura no Samsung Internet e cidades-sede adicionadas |
@@ -255,6 +256,9 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
+- Claude — linha do tempo: ano em destaque avancando ano a ano (2026-10-26)
+  - objetivo concluido e publicado (ano a ano + caminhaozinho); arquivos em posse: nenhum
+
 - Claude — ajustes da critica de design + paginas publicas no visual do hub (2026-10-23)
   - objetivo concluido e publicado; arquivos em posse: nenhum
 
@@ -418,6 +422,18 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-26 - Claude - Linha do tempo: um ano em destaque por vez
+
+- Feedback (print do WhatsApp): "falta destaque", "comecar como se um ano estivesse selecionado e ir pulando ano a ano dando destaque a frase".
+- `HubTimeline` (`HubInteractive.tsx`): estado `year` alem da era. Passagem automatica ano a ano e, no ultimo ano, para a proxima era; tempo por ano proporcional ao texto (`yearMs`: 4-8 s). Tempo decorrido em ref (pausar/retomar continua de onde parou, igual a newsletter). Setas andam ano a ano (atravessam eras); clicar no numero do ano (botao, `aria-pressed`) ou em qualquer parte da linha destaca. Barra da aba da era enche ano a ano (`--from`/`--to` no keyframe `eraProgress`, `fill-mode: both`).
+- Mesmo bug da newsletter removido: nao pausa mais no hover/foco de mouse (no celular travava); so botao (`data-era-toggle`) e foco de teclado; play limpa a pausa do teclado.
+- Visual (`Hub.module.css`, bloco final): ano ativo com cartao branco atras (`li::after`), numero em vinho e texto em preto; os outros em `scale(.78)` / `#8a7565` / `--muted` (contraste mantido). Nada muda de altura, entao a estrada e os alfinetes nao se movem. Alfinete ativo `scale(1.25)` com pulso; os outros 0.45 de opacidade. Movimento reduzido: sem autoplay, sem esmaecer.
+- Gotchas: o numero do ano virou `<button>` e `.hub button { font: inherit }` zerava o tamanho; `font: 500 34px/1 inherit` e invalido (o navegador descarta) — usar propriedades separadas.
+- `tests/e2e/hub.spec.ts`: "Era anterior" -> "Ano anterior".
+- Validacao: Playwright em 1440 e 390 (troca de ano no tempo do texto, alfinetes alinhados, clique, seta, pausa parada por 9 s, play retoma do ponto: 3,3 s restantes de 5,4 s); tsc 0; `npm test` 511/0; E2E hub 3/3.
+- Caminhaozinho (pedido do usuario na sequencia): em `EraRoad`, um `<g>` com caminhao visto de cima (bau claro com faixa vinho, cabine vinho), desenhado antes dos alfinetes. Posicao e giro por JS com `getPointAtLength` no path da estrada: comprimento de cada alfinete = ponto amostrado mais proximo (a curva passa pelos pinos); para `lane + 6` depois do alfinete ativo (a cabeca do pino fica acima). Viagem com easing (500-1600 ms conforme a distancia), de re quando volta (gira 180), primeira viagem espera 900 ms a estrada aparecer; cada era entra pelo topo (o painel remonta por `key`). Movimento reduzido: posiciona sem animar. Testado em 1440 e 390: para ~22 px abaixo do pino, inverte na volta, entra pelo topo na troca de era, sem erros.
+- Parecer do outro agente: pendente.
 
 ### 2026-10-23 - Claude - Paginas publicas restantes na identidade do hub
 

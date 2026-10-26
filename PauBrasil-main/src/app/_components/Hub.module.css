@@ -2198,10 +2198,10 @@
 /* Passagem automática das eras: linha de progresso sob a aba ativa */
 @keyframes eraProgress {
   from {
-    transform: scaleX(0);
+    transform: scaleX(var(--from, 0));
   }
   to {
-    transform: scaleX(1);
+    transform: scaleX(var(--to, 1));
   }
 }
 .eraProgress {
@@ -2213,7 +2213,8 @@
   background: var(--wine);
   transform-origin: left;
   transform: scaleX(0);
-  animation: eraProgress linear forwards;
+  /* both: pausado, mostra o trecho já percorrido (--from) em vez de zerar */
+  animation: eraProgress linear both;
 }
 .eraNav .eraPause {
   margin-left: 6px;
@@ -3695,4 +3696,124 @@
     width: 30px;
     height: 30px;
   }
+}
+
+/* Linha do tempo ano a ano: um ano em destaque por vez (feedback "falta destaque", out/2026).
+   Só cor, escala e um cartão atrás: nada muda de altura, então a estrada e a página não pulam. */
+.eraYears > li {
+  isolation: isolate;
+  cursor: pointer;
+}
+.eraYears > li::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 2px -18px 2px calc(var(--road) - 18px);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 14px 34px -22px #4a1d1459;
+  opacity: 0;
+  transform: scale(0.98);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+.eraYears > li[data-active='true']::after {
+  opacity: 1;
+  transform: none;
+}
+.eraYears > li:first-child::after {
+  top: -8px;
+}
+.hub button.eraYear {
+  padding: 0;
+  border: 0;
+  background: none;
+  /* .hub button reseta a fonte; repete a do número do ano */
+  font-family: inherit;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-align: left;
+  cursor: pointer;
+  transform-origin: left top;
+  transition:
+    color 0.45s ease,
+    transform 0.45s ease;
+}
+.eraYears ul li {
+  transition: color 0.45s ease;
+}
+.eraYears .eraBrands {
+  transition: opacity 0.45s ease;
+}
+/* Anos fora de destaque: menores e mais claros, mas ainda legíveis (>= 3:1 no número, 4.5:1 no texto) */
+.storyTimeline[data-spotlight='true'] .eraYears > li:not([data-active='true']) .eraYear {
+  color: #8a7565;
+  transform: scale(0.78);
+}
+.storyTimeline[data-spotlight='true'] .eraYears > li:not([data-active='true']) ul li {
+  color: var(--muted);
+}
+.storyTimeline[data-spotlight='true'] .eraYears > li:not([data-active='true']) .eraBrands {
+  opacity: 0.55;
+}
+.storyTimeline[data-spotlight='true'] .eraYears > li:not([data-active='true']):hover .eraYear {
+  color: var(--wine);
+}
+.eraYears > li[data-active='true'] ul li {
+  color: var(--ink);
+}
+/* Alfinetes: o do ano ativo cresce e pulsa; os outros ficam menores e apagados */
+.eraPinShape {
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.45s ease;
+  transform-box: view-box;
+}
+.storyTimeline[data-spotlight='true'] .eraPinShape:not([data-active='true']) {
+  opacity: 0.45;
+  transform: scale(0.8);
+}
+.eraPinShape[data-active='true'] {
+  transform: scale(1.25);
+}
+@keyframes eraPinPulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+.eraPinPulse {
+  fill: var(--wine);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eraPinPulse 1.8s ease-out infinite;
+}
+@media (max-width: 800px) {
+  .hub button.eraYear {
+    font-size: 28px;
+  }
+  .eraYears > li::after {
+    inset: 2px -10px 2px calc(var(--road) - 10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eraYears > li::after,
+  .hub button.eraYear,
+  .eraPinShape {
+    transition: none;
+  }
+  .eraPinPulse {
+    display: none;
+  }
+}
+/* Caminhãozinho na estrada: posição e giro vêm do JS (segue a curva da estrada) */
+.eraTruck {
+  will-change: transform;
 }
