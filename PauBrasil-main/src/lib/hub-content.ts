@@ -71,6 +71,8 @@ export const HUB_COMPANIES: HubCompany[] = [
     plate: HUB_PLATE,
     monogram: 'UC',
     name: 'Unida Construtora',
+    // Trocar para https://unidaconstrutora.com.br quando o domínio apontar para o site novo
+    externalUrl: 'https://unida-construtora.vercel.app',
     segment: 'Construção',
     description:
       'Desenvolvimento de empreendimentos imobiliários e projetos de construção civil.',

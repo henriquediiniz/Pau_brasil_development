@@ -76,6 +76,7 @@ Status sugeridos:
 
 | Arquivo ou area | Agente | Status | Ultima acao | Proxima acao |
 | --- | --- | --- | --- | --- |
+| Hub: link da Unida para o site novo (`hub-content.ts`) | Claude | concluido | 2026-10-29: externalUrl da Unida | Trocar para o dominio real quando apontado |
 | Varredura geral (seguranca, legado, backup, deps, Next 16) | Claude | concluido | 2026-10-26: fases 1-6 publicadas | Usuario: senha Neon + migrations em producao; Codex: parecer |
 | Hub: linha do tempo ano a ano | Claude | concluido | 2026-10-26: um ano em destaque por vez + caminhaozinho na estrada; deploy | Parecer do Codex |
 | Paginas publicas no visual do hub (candidatar, carreiras, contato, registro, erro/offline) | Claude | concluido | 2026-10-23: tema verde antigo removido; deploy | Parecer do Codex |
@@ -257,6 +258,9 @@ O sistema passou por uma grande modernização arquitetural:
 
 ### Em andamento
 
+- Claude — pesquisa das empresas do grupo para os sites de cada uma (2026-10-28)
+  - concluido: 6 dossies em `docs/empresas/` + indice `docs/empresas/README.md`; arquivos em posse: nenhum (nao commitado: repo publico, aguardando ok do usuario)
+
 - Claude — execucao da varredura geral, em fases (2026-10-26; usuario deu autorizacao total)
   - fases 1-3 publicadas; migrations `20261026120000_limite_tentativa` e `20261026150000_drop_legado_pontos_visitas` PENDENTES em producao (o usuario aplica; codigo funciona antes e depois); fase 6 (Next 16) na branch `chore/next-16`, validando na previa da Vercel antes do merge
 
@@ -426,6 +430,27 @@ Use este formato:
 - Proximo passo sugerido:
 
 ## Registro de Rodadas
+
+### 2026-10-29 - Claude - Hub: Unida aponta para o site novo
+
+- `src/lib/hub-content.ts`: `externalUrl` da Unida = https://unida-construtora.vercel.app (mesmo mecanismo da Motos: logo e card abrem em nova aba; `/empresas/unida` redireciona). Trocar para o dominio quando unidaconstrutora.com.br apontar para o site novo.
+- Verificado no hub local; tsc ok. Parecer do outro agente: pendente.
+
+### 2026-10-28 - Claude - Site da Unida Construtora (repositorio separado)
+
+- Repositorio privado `henriquediiniz/UNIDA-CONSTRUTORA` (pasta irma `../UNIDA-CONSTRUTORA`), commit `619e05d`. Nao mexe neste repo; aqui so entrou a config `unida-dev` (porta 3001) no `.claude/launch.json` local.
+- Next.js 16 + React 19 + Tailwind 4 + Prisma 6 (Postgres local `unida_dev` no mesmo servidor de dev, porta 55432). Sessao propria com jose (padrao da doc do Next 16), proxy + `exigirUsuario()`.
+- Site publico (home, empreendimentos, pagina por empreendimento com obra, Linha DOMUS, A Unida, contato, trabalhe conosco, privacidade) e painel `/admin` (empreendimentos com abas Dados/Fotos/Obra, contatos com CSV, arquitetos, dados de contato, usuarios). Conteudo e 160 imagens baixados do site atual e do domusjardins.com.br (com ok do usuario).
+- Teste ponta a ponta do painel: 21/21 (login, salvar, foto, obra, etapas, lead, CSV, bloqueios sem login). Pendencias de conteudo em `docs/pendencias.md` do repo da Unida. Deploy ainda nao feito (falta projeto Vercel, banco, Blob e dominio).
+- Deploy feito no mesmo dia: projeto Vercel `unida-construtora` (time henrique-dev2, regiao gru1), banco Neon `unida-db` (gru1, plano free) e Blob `unida-fotos`. O build roda `prisma migrate deploy` + `scripts/preparar-producao.ts` (so carrega conteudo e cria o primeiro admin se o banco estiver vazio). No ar em https://unida-construtora.vercel.app. Primeiro admin: o e-mail da midia; senha em `.local-admin.txt` do repo da Unida.
+- Parecer do outro agente: pendente.
+
+### 2026-10-28 - Claude - Dossies das empresas do grupo (pesquisa publica)
+
+- Pedido: agente para levantar contexto das outras empresas do grupo e iniciar os sites de cada uma, uma por vez. Motos cancelada no meio (ja tem site).
+- Seis agentes de pesquisa em sequencia, so fontes publicas e sem dados pessoais de pessoas privadas: Unida, Instituto YSO, Original Start, Hora 10, Locadora, Fazenda Divina -> `docs/empresas/<slug>.md` (13-14 secoes, fonte e confianca por dado, lacunas para pedir a empresa). Indice com quadro comparativo, ordem sugerida e divergencias com o hub em `docs/empresas/README.md`.
+- Divergencias com `src/lib/hub-content.ts` (nao alteradas, aguardam confirmacao do grupo): datas da Hora 10 (Patos/Cajazeiras 2009 x 2011/2014), Locadora (2011 x 2024), Fazenda Divina (leite e fazenda-escola).
+- Parecer do outro agente: pendente.
 
 ### 2026-10-26 - Claude - Varredura: fase 6 (Next 16, React 19, sem next-pwa)
 
